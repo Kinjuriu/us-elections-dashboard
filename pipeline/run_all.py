@@ -15,6 +15,7 @@ STEPS = [
     ["build_midterm_swing.py"],
     ["build_senate_results.py"],
     ["build_house_delegations.py"],
+    ["build_members.py"],
     ["geo/build_geo.py"],  # map shapes; needs `npm install` for mapshaper
 ]
 

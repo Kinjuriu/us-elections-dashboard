@@ -92,6 +92,26 @@ Seats are counted by **caucus**: the president's party plus the independents who
   - NC-9 2018 is counted as vacant, because the election was never certified and was re-run in 2019. NY-22 2020 stays a Republican seat, because the count finished after the 117th Congress opened. Both rows carry a `note`.
   - With those rules, seat counts rebuilt from MEDSL match the House Historian's opening-day counts in every year from 2000 to 2024. The one difference is NY-22 2020, which the Historian lists as vacant at the opening.
 
+### `congress_legislators_current` and `congress_legislators_historical`
+- **Title:** unitedstates/congress-legislators, `legislators-current.yaml` and `legislators-historical.yaml`
+- **Publisher:** the unitedstates project, https://github.com/unitedstates/congress-legislators, pinned to commit `15530b7d` (24 October 2026)
+- **Licence:** CC0 1.0 (public domain)
+- **Accessed:** 4 November 2026
+- **Coverage used:** every voting term overlapping the 80th to 119th Congress. The 120th is not in the source until January 2027.
+- **Output:** `members_by_congress.csv`, `women_by_congress.csv`, `age_by_congress.csv`, built by `pipeline/build_members.py`.
+- **Caveats:**
+  - Counts are of members who served at any point in the Congress, so House totals exceed 435. Opening-day counts are not built: the source holds only a term start date, and gives some mid-Congress joiners the opening date (the 86th House has 447 terms starting on opening day).
+  - Delegates, resident commissioners and Alaska and Hawaii's pre-statehood delegates are excluded.
+  - Party is the party on a member's first day in that Congress. `IND` is Independent or Ind. Democrat; `OTHER` is any other label.
+  - `age_at_start` is whole years on 3 January of the Congress's first year. Three members have no birthday and their age is null (80th Rohrbough, 88th Burkhalter, 96th Hutchinson).
+
+### `medsl_county_president_meta` (metadata only)
+- **Title:** County Presidential Election Returns 2000-2024, MIT Election Data and Science Lab, doi:10.7910/DVN/VOQCHQ, version 20.0 (25 February 2026), CC0 1.0
+- **Status:** the data file `countypres_2000-2024.tab` sits behind a Dataverse guestbook and has not been downloaded. No output is built from it yet.
+
+### `manual` women cross-check
+- **File:** `data/manual/women_crosscheck.csv`: published totals of women by Congress, used only by a test and the step 07 report. 1991 to 2021 come from the Congressional Research Service report R43244 (CAWP's site blocks scripts); 2025 from CAWP's 2 January 2025 press release.
+
 ### `manual_2026_provisional`
 - **File:** `data/manual/2026_provisional.csv`
 - **Contents:**

@@ -30,6 +30,9 @@ USER_AGENT = "us-congress-dashboard-pipeline/0.1 (historical election data proje
 SENATE_SNAPSHOT = "20261102191213"
 SENATE_URL = "https://www.senate.gov/about/parties-leadership/party-division.htm"
 
+# unitedstates/congress-legislators, pinned to the commit of 24 October 2026.
+LEGISLATORS_COMMIT = "15530b7d621009eb5fc7eda67f75194d7d91f8c1"
+
 SOURCES = [
     {
         "source_id": "house_historian_party_divisions",
@@ -65,6 +68,21 @@ SOURCES = [
         "source_id": "medsl_house_meta",
         "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/IG0UN2",
         "path": "medsl/house_dataset_metadata.json",
+    },
+    {
+        "source_id": "medsl_county_president_meta",
+        "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/:latest-published?persistentId=doi:10.7910/DVN/VOQCHQ",
+        "path": "medsl/county_president_meta.json",
+    },
+    {
+        "source_id": "congress_legislators_current",
+        "url": f"https://raw.githubusercontent.com/unitedstates/congress-legislators/{LEGISLATORS_COMMIT}/legislators-current.yaml",
+        "path": "congress_legislators/legislators-current.yaml",
+    },
+    {
+        "source_id": "congress_legislators_historical",
+        "url": f"https://raw.githubusercontent.com/unitedstates/congress-legislators/{LEGISLATORS_COMMIT}/legislators-historical.yaml",
+        "path": "congress_legislators/legislators-historical.yaml",
     },
 ]
 

@@ -290,6 +290,7 @@ MANUAL_SOURCE_COLUMNS = {
     "senate_seat_changes.csv": ["source_url"],
     "senate_results_manual.csv": ["source_url"],
     "display_names.csv": ["source_url", "accessed_at"],
+    "women_crosscheck.csv": ["source_url", "accessed_at"],
 }
 # Templates whose rows are placeholders until filled; every row holding a value
 # must carry a source.
@@ -368,3 +369,52 @@ def test_called(senate, house):
     for df in (senate, house):
         assert df[~df.is_provisional].called.all()
         assert df.called.notna().all()
+
+
+# ---- members, women and age --------------------------------------------------
+
+@pytest.fixture(scope="module")
+def members():
+    return pd.read_csv(PROCESSED / "members_by_congress.csv")
+
+
+@pytest.fixture(scope="module")
+def women():
+    return pd.read_csv(PROCESSED / "women_by_congress.csv")
+
+
+def test_members_cover_80th_to_119th(members):
+    assert set(members.congress) == set(range(80, 120))
+    assert not members.duplicated(["congress", "chamber", "bioguide_id"]).any()
+
+
+def test_members_never_fewer_than_seats(members):
+    """Served-at-any-point counts are at least the seat count; Senate at least 96."""
+    n = members.groupby(["congress", "chamber"]).size().unstack()
+    assert (n["senate"] >= 96).all() and (n["senate"] <= 115).all()
+    assert (n["house"] >= 435).all() and (n["house"] <= 480).all()
+
+
+def test_women_counts_match_members(members, women):
+    w = members[members.gender == "F"].groupby(["congress", "chamber"]).size()
+    got = women.set_index(["congress", "chamber"]).women
+    assert (got.reindex(w.index).fillna(0) == w).all()
+    parts = women.women_dem + women.women_gop + women.women_other
+    assert (parts == women.women).all()
+    assert ((women.women / (women.women + women.men)).round(4) == women.share_women).all()
+
+
+def test_women_against_published_totals(women):
+    """data/manual/women_crosscheck.csv holds published totals; ours may differ by a few
+    (see review/07-report.md) but never by more than 5 and never in the wrong direction by much."""
+    x = pd.read_csv(MANUAL / "women_crosscheck.csv")
+    m = x.merge(women, on=["congress", "chamber"])
+    assert len(m) == len(x)
+    assert ((m.women - m.published_women).abs() <= 5).all()
+
+
+def test_age_bands_sum_to_one():
+    a = pd.read_csv(PROCESSED / "age_by_congress.csv")
+    assert len(a) == 80
+    assert ((a.share_under_45 + a.share_45_64 + a.share_65_plus - 1).abs() < 0.0006).all()
+    assert a.median_age.between(40, 70).all()

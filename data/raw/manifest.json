@@ -1,4 +1,18 @@
 {
+  "congress_legislators_current": {
+    "accessed_at": "2026-11-04T18:32:05+00:00",
+    "bytes": 1081187,
+    "path": "data/raw/congress_legislators/legislators-current.yaml",
+    "sha256": "fcd8e7f3b8b8286d99056a2be95907c7f6bce4d2dce069a074aa2f6970ecc717",
+    "url": "https://raw.githubusercontent.com/unitedstates/congress-legislators/15530b7d621009eb5fc7eda67f75194d7d91f8c1/legislators-current.yaml"
+  },
+  "congress_legislators_historical": {
+    "accessed_at": "2026-11-04T18:32:08+00:00",
+    "bytes": 8997407,
+    "path": "data/raw/congress_legislators/legislators-historical.yaml",
+    "sha256": "ea7a1e35e7854418033b155420b522d3cefffc9763b67d7044cde45b8e49a355",
+    "url": "https://raw.githubusercontent.com/unitedstates/congress-legislators/15530b7d621009eb5fc7eda67f75194d7d91f8c1/legislators-historical.yaml"
+  },
   "house_historian_party_divisions": {
     "accessed_at": "2026-11-04T12:42:16+00:00",
     "bytes": 95320,
@@ -19,6 +33,13 @@
     "path": "data/raw/house_historian/presidents_coinciding.html",
     "sha256": "94c40dbbbb308e67ebd7736a9bb47d85a9f45aa7b74c166d459c227687016272",
     "url": "https://history.house.gov/Institution/Presidents-Coinciding/Presidents-Coinciding/"
+  },
+  "medsl_county_president_meta": {
+    "accessed_at": "2026-11-04T18:32:46+00:00",
+    "bytes": 4883,
+    "path": "data/raw/medsl/county_president_meta.json",
+    "sha256": "3f0e1c4671246100196491427ac23ecff8e94846354c4d577142807aa91d1cf6",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/:latest-published?persistentId=doi:10.7910/DVN/VOQCHQ"
   },
   "medsl_house": {
     "accessed_at": "2026-11-04T04:42:20+00:00",
