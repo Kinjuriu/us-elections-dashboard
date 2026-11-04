@@ -14,6 +14,7 @@ import { join } from 'node:path';
 import { geoAlbers, geoConicEqualArea, geoPath, geoCentroid, geoContains, type GeoProjection } from 'd3-geo';
 import { feature } from 'topojson-client';
 import type { FeatureCollection, Feature, Geometry } from 'geojson';
+import { Mask, WATER, FOREIGN, FIRST_STATE } from './mask';
 
 const ROOT = process.cwd();
 const readJson = (rel: string) => JSON.parse(readFileSync(join(ROOT, rel), 'utf8'));
@@ -274,6 +275,40 @@ export function buildGeo(apportionments: Record<string, Record<string, number>>)
     }
     const unitsPerPx = 1 / spec.minScale;
     const labelH = spec.labelPx * unitsPerPx;
+
+    // Raster of this layout: water, neighbouring land, or which state.
+    const mask = new Mask(spec.width, spec.height, 2);
+    const stateCode: Record<string, number> = {};
+    states.forEach((f, i) => { stateCode[f.properties.st] = FIRST_STATE + i; });
+    const frameRect: [number, number, number, number] = [0, 0, spec.width, spec.height];
+    const insetBox = (b: Box): [number, number, number, number] => [b[0], b[1], b[0] + b[2], b[1] + b[3]];
+    for (const r of regions) {
+      const clipR = r === 'l48' ? frameRect : insetBox(spec[r]);
+      if (r !== 'l48') mask.fill(clipR, WATER);
+      mask.paint(proj[r], land, FOREIGN, clipR);
+      for (const f of states.filter((f) => regionOf(f.properties.st) === r)) {
+        mask.paint(proj[r], f, stateCode[f.properties.st], clipR);
+      }
+    }
+    const waterShare = (r: [number, number, number, number]) => mask.share(r, WATER);
+    const ownShare = (st: string, r: [number, number, number, number]) => mask.share(r, stateCode[st]);
+
+    /** Nearest spot to `at` where a w x h box is all water and inside `within`. */
+    const clearOfLand = (at: Pt, w: number, h: number, within: [number, number, number, number]): Pt => {
+      for (let ring = 0; ring < 200; ring++) {
+        const steps = ring === 0 ? 1 : 24;
+        for (let k = 0; k < steps; k++) {
+          const t = (k / steps) * Math.PI * 2;
+          const cx = at[0] + ring * Math.cos(t);
+          const cy = at[1] + ring * Math.sin(t);
+          const r: [number, number, number, number] = [cx - w / 2, cy - h / 2, cx + w / 2, cy + h / 2];
+          if (r[0] >= within[0] && r[1] >= within[1] && r[2] <= within[2] && r[3] <= within[3] && waterShare(r) === 1) {
+            return [cx, cy];
+          }
+        }
+      }
+      return at;
+    };
     // The column: each label at its state's height if it can be, pushed
     // down just far enough to clear the one above.
     const colX = (proj.l48(COLUMN_AT) as Pt)[0];
@@ -296,11 +331,21 @@ export function buildGeo(apportionments: Record<string, Record<string, number>>)
       const a = anchors[st];
       const badgeBelow = x1 - x0 < textW + (16 + 8) * unitsPerPx;
       // The eastern states always go in the column, so it reads as one list.
-      if (!CALLOUTS[st] || (fits && !COLUMN.includes(st))) {
+      // So do labels placed in clear water (Hawaii), at every size.
+      if (!CALLOUTS[st] || (fits && !COLUMN.includes(st) && CALLOUTS[st].leader !== false)) {
         return { state: st, x: pct(a[0], spec.width), y: pct(a[1], spec.height), align: 'middle', callout: false, onLand: false, leader: null, badgeBelow };
       }
-      const c = calloutAt(st);
       const co = CALLOUTS[st];
+      let c = calloutAt(st);
+      // A label with no leader line must sit wholly in the water (Hawaii).
+      if (co.leader === false) {
+        const region = regionOf(st);
+        const within = region === 'l48' ? frameRect : insetBox(spec[region]);
+        const h = labelH + 4 * unitsPerPx;
+        c = clearOfLand(c, textW + 4 * unitsPerPx, h, within);
+        // The label renders above its point (see .cmap__label--middle[data-callout]).
+        if (co.align === 'middle') c = [c[0], c[1] + h / 2];
+      }
       return {
         state: st, x: pct(c[0], spec.width), y: pct(c[1], spec.height), align: co.align, callout: true,
         onLand: calloutOnLand[st], badgeBelow: false,
@@ -341,11 +386,12 @@ export function buildGeo(apportionments: Record<string, Record<string, number>>)
       const placed: Rect[] = [];
       const out: HouseGrid[] = [];
 
-      const dims = (st: string) => {
+      /** Grid size for a state; `colsWanted` overrides the shape picked from its outline. */
+      const dims = (st: string, colsWanted?: number) => {
         const n = seats[st];
         const [[x0, y0], [x1, y1]] = bounds[st];
         const aspect = Math.min(1.8, Math.max(0.6, (y1 - y0) / (x1 - x0)));
-        const cols = Math.max(1, Math.round(Math.sqrt(n / aspect)));
+        const cols = colsWanted ?? Math.max(1, Math.round(Math.sqrt(n / aspect)));
         const gw = cols * pitch - spec.gap;
         const gh = Math.ceil(n / cols) * pitch - spec.gap;
         // With labels placed afterwards, only the Atlantic column and the
@@ -354,19 +400,15 @@ export function buildGeo(apportionments: Record<string, Record<string, number>>)
         return { n, cols, gw, gh, lw: labelled ? chipW(st) : 0, labelled };
       };
 
-      const finish = (st: string, gx: number, gy: number, side: LabelSide, offshore: boolean) => {
-        const d = dims(st);
+      const finish = (st: string, gx: number, gy: number, side: LabelSide, offshore: boolean, cols?: number) => {
+        const d = dims(st, cols);
         const { g, l } = shape(gx, gy, d.gw, d.gh, d.lw, side);
         placed.push(g);
         if (d.labelled) placed.push(l);
         const a = anchors[st];
-        const [[bx0, by0], [bx1, by1]] = bounds[st];
-        const cx = gx + d.gw / 2;
-        const cy = gy + d.gh / 2;
-        const overState = cx > bx0 && cx < bx1 && cy > by0 && cy < by1;
-        const nearAnchor = Math.hypot(cx - a[0], cy - a[1]) < Math.max(d.gw, d.gh) / 2 + pitch;
+        // A leader line whenever the grid does not sit mostly on its own state.
         let leader: [Pt, Pt] | null = null;
-        if (offshore || !(overState || nearAnchor)) {
+        if (offshore || ownShare(st, g) < 0.6) {
           leader = [[r1(a[0]), r1(a[1])], [r1(Math.min(Math.max(a[0], gx), gx + d.gw)), r1(Math.min(Math.max(a[1], gy), gy + d.gh))]];
         }
         const lx = side === 'right' ? l[0] : side === 'left' ? l[2] : (l[0] + l[2]) / 2;
@@ -401,7 +443,7 @@ export function buildGeo(apportionments: Record<string, Record<string, number>>)
       const rest = Object.keys(anchors).filter((st) => !offshore.includes(st))
         .sort((a, b) => seats[b] - seats[a] || a.localeCompare(b));
       for (const st of rest) {
-        const d = dims(st);
+        const base = dims(st);
         const region = regionOf(st);
         const frame: Rect = region === 'l48' ? [1, 1, spec.width - 1, spec.height - 1] : insetRect(spec[region]);
         const blockers: Rect[] = region === 'l48'
@@ -410,22 +452,54 @@ export function buildGeo(apportionments: Record<string, Record<string, number>>)
         const inFrame = (r: Rect) => r[0] >= frame[0] && r[1] >= frame[1] && r[2] <= frame[2] && r[3] <= frame[3];
         const free = (r: Rect) => inFrame(r) && !placed.some((p) => hits(r, p)) && !blockers.some((b) => hits(r, b));
         const [ax, ay] = anchors[st];
-        let found: { gx: number; gy: number; side: LabelSide } | null = null;
-        for (let ring = 0; ring < 400 && !found; ring++) {
-          const rad = ring * (pitch / 2);
-          const steps = ring === 0 ? 1 : 24;
-          for (let k = 0; k < steps && !found; k++) {
-            const t = (k / steps) * Math.PI * 2;
-            const gx = ax + rad * Math.cos(t) - d.gw / 2;
-            const gy = ay + rad * Math.sin(t) - d.gh / 2;
-            for (const side of SIDES) {
-              const { g, l } = shape(gx, gy, d.gw, d.gh, d.lw, side);
-              if (free(g) && (!d.labelled || free(l))) { found = { gx, gy, side }; break; }
+        const [[bx0, by0], [bx1, by1]] = bounds[st];
+        const stateSize = Math.hypot(bx1 - bx0, by1 - by0);
+        // Where the grid may go, in order of preference:
+        //   inside: on its own state (at most 3% of it outside the outline);
+        //   water:  wholly offshore, with a leader line (coastal states);
+        //   land:   on neighbouring land, never over water (inland states);
+        //   any:    anywhere free (last resort, never reached so far).
+        // "Inside" allows a sliver over a neighbour but not over water, and
+        // tries a few grid widths so long, thin states can keep theirs.
+        type Mode = 'inside' | 'water' | 'land' | 'any';
+        const fits: Record<Mode, (g: Rect) => boolean> = {
+          inside: (g) => ownShare(st, g) >= 0.92 && waterShare(g) <= 0.03,
+          // Offshore means just off its own coast: within three squares of the state.
+          water: (g) => waterShare(g) >= 0.97 &&
+            Math.max(bx0 - g[2], g[0] - bx1, 0) <= 3 * pitch && Math.max(by0 - g[3], g[1] - by1, 0) <= 3 * pitch,
+          land: (g) => waterShare(g) <= 0.03,
+          any: () => true,
+        };
+        const big = Math.max(base.gw, base.gh);
+        // Offshore only when the water is close; otherwise stay on land.
+        const reach: Record<Mode, number> = { inside: stateSize / 2, water: stateSize * 0.5 + big * 1.5, land: stateSize + 60, any: 400 };
+        const coastal = waterShare([bx0 - 6, by0 - 6, bx1 + 6, by1 + 6]) > 0;
+        const modes: Mode[] = coastal ? ['inside', 'water', 'land', 'any'] : ['inside', 'land', 'any'];
+        const colChoices = (mode: Mode) => mode !== 'inside' ? [base.cols]
+          : [...new Set([0, -1, 1, -2, 2, 3].map((k) => base.cols + k).filter((c) => c >= 1 && c <= base.n))];
+        let found: { gx: number; gy: number; side: LabelSide; mode: Mode; cols: number } | null = null;
+        for (const mode of modes) for (const cols of colChoices(mode)) {
+          if (found) break;
+          const d = dims(st, cols);
+          const rings = Math.ceil(reach[mode] / (pitch / 2));
+          for (let ring = 0; ring <= rings && !found; ring++) {
+            const rad = ring * (pitch / 2);
+            const steps = ring === 0 ? 1 : 24;
+            for (let k = 0; k < steps && !found; k++) {
+              const t = (k / steps) * Math.PI * 2;
+              const gx = ax + rad * Math.cos(t) - d.gw / 2;
+              const gy = ay + rad * Math.sin(t) - d.gh / 2;
+              const g: Rect = [gx, gy, gx + d.gw, gy + d.gh];
+              if (!free(g) || !fits[mode](g)) continue;
+              for (const side of SIDES) {
+                const { l } = shape(gx, gy, d.gw, d.gh, d.lw, side);
+                if (!d.labelled || free(l)) { found = { gx, gy, side, mode, cols }; break; }
+              }
             }
           }
         }
         if (!found) throw new Error(`No room for the ${st} House squares in the ${spec.id} layout (${key})`);
-        finish(st, found.gx, found.gy, found.side, false);
+        finish(st, found.gx, found.gy, found.side, found.mode === 'water', found.cols);
       }
 
       // 3. Phones: labels where there is room, biggest delegations first.
