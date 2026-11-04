@@ -49,6 +49,10 @@ def parse_house(first: int = FIRST_CONGRESS - 1) -> pd.DataFrame:
         rec["majority_party"] = "DEM" if rec["dem"] > rec["gop"] else "GOP"
         rows.append(rec)
     df = pd.DataFrame(rows).drop_duplicates("congress")
+    # The Historian gives one division per Congress and no House majority changed
+    # hands during a Congress in this period (checked against "Party Government").
+    df["majority_party_most_of_congress"] = df.majority_party
+    df["majority_note"] = ""
     df["chamber"] = "house"
     df["source_id"] = "house_historian_party_divisions"
     return df
@@ -65,38 +69,109 @@ def _tag(block: str, tag: str) -> str:
     return _text(m.group(1))
 
 
-def parse_senate(first: int = FIRST_CONGRESS - 1) -> pd.DataFrame:
+def _date(text: str) -> date | None:
+    m = re.search(r"(\d{1,2})/(\d{1,2})/(\d{4})", text or "")
+    return date(int(m.group(3)), int(m.group(1)), int(m.group(2))) if m else None
+
+
+def congress_span(n: int) -> tuple[date, date]:
+    start = election_year(n) + 1
+    return date(start, 1, 3), date(start + 2, 1, 3)
+
+
+def parse_senate_rows(first: int = FIRST_CONGRESS - 1) -> pd.DataFrame:
+    """Every dated row of every session table on the Senate's party division page.
+
+    Each session table lists the majority party first. A row with no date takes
+    the start of its session table; a date outside the Congress (e.g. "6/15/1959"
+    inside the 87th) is a typo in the source and takes the previous row's date.
+    """
     page = (RAW / "senate" / "party_division.html").read_text(encoding="utf-8", errors="replace")
     rows = []
     for block in page.split('<tr class="view"')[1:]:
         n = congress_number(_tag(block, "date"))
         if n is None or n < first:
             continue
-        first_table = block[block.index("<table>"): block.index("</table>")]
-        headers = [_text(h) for h in re.findall(r"<header>(.*?)</header>", first_table, re.S)]
-        body = first_table[first_table.index("<tbody>"):]
-        first_row = body[: body.index("</tr>")]
-        p1, p2 = (PARTY_WORDS[h.lower()] for h in headers[1:3])
-        rec = {"congress": n, "dem": 0, "gop": 0, "ind": 0, "other": 0}
-        rec[p1.lower()] = int(_tag(first_row, "party1"))
-        rec[p2.lower()] = int(_tag(first_row, "party2"))
-        other = _tag(first_row, "other_party")
-        details = []
-        for k, label in re.findall(r"(\d+)\s*([A-Za-z][A-Za-z ]*)?", other):
-            if int(k) == 0:
-                continue
-            if not label:
-                raise ValueError(f"unlabelled 'Other' count in Senate {n}: {other!r}")
-            rec[_ind_or_other(label)] += int(k)
-            details.append(f"{label.strip()} ({k})")
-        rec["other_detail"] = "; ".join(details)
-        rec["vacant"] = int(_tag(first_row, "vacancies"))
-        rec["total_seats"] = int(_tag(first_row, "total"))
-        # The Senate lists the majority party first in each session table.
-        rec["majority_party"] = p1
-        rec["opening_date"] = _text(re.search(r"<date>(.*?)</date>", first_row, re.S).group(1))
-        rows.append(rec)
-    df = pd.DataFrame(rows)
+        lo, hi = congress_span(n)
+        footnotes = _text(block[block.find("<footnote>"):]) if "<footnote>" in block else ""
+        prev = lo
+        for t, table in enumerate(re.findall(r"<table>(.*?)</table>", block, re.S)):
+            headers = [_text(h) for h in re.findall(r"<header>(.*?)</header>", table, re.S)]
+            p1, p2 = (PARTY_WORDS[h.lower()] for h in headers[1:3])
+            table_start = _date(headers[0]) or prev
+            body = table[table.index("<tbody>"):]
+            for r, row in enumerate(re.findall(r"<tr>(.*?)</tr>", body, re.S)):
+                d = _date(_tag(row, "date")) or table_start
+                if not lo <= d <= hi or d < prev:
+                    d = prev
+                prev = d
+                rec = {"congress": n, "table": t, "row": r, "table_start": table_start, "as_of": d,
+                       "majority_party": p1, "dem": 0, "gop": 0, "ind": 0, "other": 0}
+                rec[p1.lower()] = int(_tag(row, "party1"))
+                rec[p2.lower()] = int(_tag(row, "party2"))
+                other = _tag(row, "other_party")
+                details = []
+                for k, label in re.findall(r"(\d+)\s*([A-Za-z][A-Za-z ]*)?", other):
+                    if int(k) == 0:
+                        continue
+                    if not label:
+                        # Only the 107th leaves the label off (Jeffords, then Barkley);
+                        # its footnotes name both as independents.
+                        if "Independent" not in footnotes:
+                            raise ValueError(f"unlabelled 'Other' count in Senate {n}: {other!r}")
+                        label = "Independent"
+                    rec[_ind_or_other(label)] += int(k)
+                    details.append(f"{label.strip()} ({k})")
+                rec["other_detail"] = "; ".join(details)
+                rec["total_seats"] = int(_tag(row, "total"))
+                vac = _tag(row, "vacancies")
+                # One 97th Congress row leaves the vacancy cell empty; it is the remainder.
+                rec["vacant"] = int(vac) if vac else (
+                    rec["total_seats"] - rec["dem"] - rec["gop"] - rec["ind"] - rec["other"])
+                rows.append(rec)
+    return pd.DataFrame(rows)
+
+
+# Notes for Congresses where Senate control changed hands, from the footnotes of
+# the Senate's party division page. build() checks that these are exactly the
+# Congresses whose session tables change majority party.
+SENATE_MAJORITY_NOTES = {
+    107: ("Opening day 50 D, 50 R: Democratic from 3 to 20 January 2001 through outgoing "
+          "Vice President Gore's tie-breaking vote; Republican from 20 January 2001 through "
+          "Vice President Cheney's; Democratic from 6 June 2001, after Jim Jeffords left the "
+          "Republicans to sit as an independent caucusing with the Democrats."),
+    117: ("Opening day 51 R, 46 D, 2 independents, 1 vacant: Republican until the Georgia "
+          "runoff winners were seated. Democratic from 20 January 2021, with both independents "
+          "caucusing with the Democrats and Vice President Harris's tie-breaking vote."),
+}
+
+
+def senate_majority_most_of_congress(rows: pd.DataFrame) -> pd.DataFrame:
+    """The majority party that held the Senate for the most days of each Congress."""
+    out = []
+    for n, g in rows.groupby("congress"):
+        lo, hi = congress_span(n)
+        periods = g.groupby("table").agg(start=("table_start", "first"), party=("majority_party", "first"))
+        periods = periods.sort_values("start")
+        ends = list(periods.start.iloc[1:]) + [hi]
+        days = {}
+        for (start, party), end in zip(periods[["start", "party"]].itertuples(index=False), ends):
+            days[party] = days.get(party, 0) + (end - max(start, lo)).days
+        out.append({"congress": n, "majority_party_most_of_congress": max(days, key=days.get),
+                    "majority_changed": periods.party.nunique() > 1})
+    return pd.DataFrame(out)
+
+
+def parse_senate(first: int = FIRST_CONGRESS - 1) -> pd.DataFrame:
+    rows = parse_senate_rows(first)
+    # Opening day: the first row of the first session table.
+    df = rows[(rows.table == 0) & (rows.row == 0)].drop(columns=["table", "row", "table_start", "as_of"])
+    df = df.merge(senate_majority_most_of_congress(rows), on="congress")
+    changed = set(df[df.majority_changed].congress)
+    if changed != set(SENATE_MAJORITY_NOTES):
+        raise ValueError(f"Senate majority changed in {sorted(changed)}; notes exist for {sorted(SENATE_MAJORITY_NOTES)}")
+    df["majority_note"] = df.congress.map(SENATE_MAJORITY_NOTES).fillna("")
+    df = df.drop(columns="majority_changed").reset_index(drop=True)
     df["chamber"] = "senate"
     df["source_id"] = "senate_party_division"
     return df
@@ -112,7 +187,8 @@ def provisional_rows() -> pd.DataFrame:
             "total_seats": 435 if r.chamber == "house" else 100,
             **{k: (int(getattr(r, k)) if pd.notna(getattr(r, k)) else pd.NA)
                for k in ("dem", "gop", "ind", "other", "vacant")},
-            "majority_party": pd.NA, "other_detail": "",
+            "majority_party": pd.NA, "majority_party_most_of_congress": pd.NA,
+            "majority_note": "", "other_detail": "",
             "source_id": "manual_2026_provisional",
         })
     df = pd.DataFrame(rows)
@@ -120,6 +196,7 @@ def provisional_rows() -> pd.DataFrame:
         if pd.notna(r.dem) and pd.notna(r.gop):
             half = r.total_seats // 2
             df.loc[r.Index, "majority_party"] = "DEM" if r.dem > half else "GOP" if r.gop > half else pd.NA
+    df["majority_party_most_of_congress"] = df.majority_party
     return df
 
 
@@ -137,7 +214,8 @@ def build() -> pd.DataFrame:
     df["is_midterm"] = df.election_year.map(is_midterm)
     df["is_provisional"] = df.election_year >= PROVISIONAL_YEAR
     cols = ["congress", "election_year", "years_served", "chamber", "total_seats", "dem", "gop",
-            "ind", "other", "vacant", "majority_party", "majority_threshold", "president",
+            "ind", "other", "vacant", "majority_party", "majority_party_most_of_congress",
+            "majority_note", "majority_threshold", "president",
             "president_party", "is_midterm", "is_provisional", "source_id"]
     df = df.sort_values(["congress", "chamber"])
     for c in ("dem", "gop", "ind", "other", "vacant"):
