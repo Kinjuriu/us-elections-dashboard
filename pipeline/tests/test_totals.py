@@ -289,6 +289,7 @@ MANUAL_SOURCE_COLUMNS = {
     "senate_specials.csv": ["source_url"],
     "senate_seat_changes.csv": ["source_url"],
     "senate_results_manual.csv": ["source_url"],
+    "display_names.csv": ["source_url", "accessed_at"],
 }
 # Templates whose rows are placeholders until filled; every row holding a value
 # must carry a source.
@@ -339,3 +340,31 @@ def test_spot_checks(cc, senate, house):
     # 5. Maine House 2024 (MEDSL): both seats DEM; ME-2 final round Golden 197,151 v Theriault 194,445.
     r = house[(house.year == 2024) & (house.state_po == "ME")].iloc[0]
     assert (r.seats, r.dem, r.gop) == (2, 2, 0)
+
+
+# ---- display names and calls ----------------------------------------------------------
+
+def test_display_names(senate):
+    from common import NEEDS_DISPLAY_EXCEPTION, display_name, load_display_names
+    names = load_display_names()
+    # The rule on its own.
+    assert display_name("MURKOWSKI, LISA", {}) == "Lisa Murkowski"
+    assert display_name("ROBERT P. CASEY, JR.", {}) == "Robert P. Casey, Jr."
+    assert display_name("CINDY HYDE-SMITH", {}) == "Cindy Hyde-Smith"
+    assert display_name('JAMES H. "JIM" WEBB, JR.', {}) == 'James H. "Jim" Webb, Jr.'
+    assert display_name("JOHN D. ROCKEFELLER IV", {}) == "John D. Rockefeller IV"
+    assert display_name("Doug Jones", {}) == "Doug Jones"
+    # Every name the rule cannot handle has a hand-checked exception.
+    raw = senate.winner_name.dropna().map(lambda n: " ".join(n.split()))
+    unlisted = sorted({n for n in raw if NEEDS_DISPLAY_EXCEPTION.search(n) and n not in names})
+    assert not unlisted, f"add to data/manual/display_names.csv: {unlisted}"
+    # The source spelling stays in the data.
+    assert (senate.winner_name.isna() == senate.winner_display_name.isna()).all()
+    row = senate[(senate.year == 2014) & (senate.state_po == "KY")]
+    assert set(row.winner_display_name) == {"Mitch McConnell"}
+
+
+def test_called(senate, house):
+    for df in (senate, house):
+        assert df[~df.is_provisional].called.all()
+        assert df.called.notna().all()

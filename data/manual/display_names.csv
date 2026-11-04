@@ -1,0 +1,11 @@
+source_name,display_name,source_url,accessed_at,verified,note
+MITCH MCCONNELL,Mitch McConnell,https://en.wikipedia.org/wiki/Mitch_McConnell,2026-11-04T14:30:57Z,false,"Mc: the general rule would print Mcconnell. Spelling checked by Claude against the article title; to be hand-checked"
+MICH MCCONNELL,Mitch McConnell,https://en.wikipedia.org/wiki/Mitch_McConnell,2026-11-04T14:30:57Z,false,"MEDSL prints MICH for this row (Kentucky). Display corrects the first name; the data keeps the source spelling. To be hand-checked"
+JOHN MCCAIN,John McCain,https://en.wikipedia.org/wiki/John_McCain,2026-11-04T14:30:57Z,false,"Mc. Checked by Claude against the article title; to be hand-checked"
+CLAIRE MCCASKILL,Claire McCaskill,https://en.wikipedia.org/wiki/Claire_McCaskill,2026-11-04T14:30:57Z,false,"Mc. Checked by Claude against the article title; to be hand-checked"
+DAVE MCCORMICK,Dave McCormick,https://en.wikipedia.org/wiki/Dave_McCormick,2026-11-04T14:30:57Z,false,"Mc. Checked by Claude against the article title; to be hand-checked"
+JIM DEMINT,Jim DeMint,https://en.wikipedia.org/wiki/Jim_DeMint,2026-11-04T14:30:57Z,false,"De with a capital after it. Checked by Claude against the article title; to be hand-checked"
+MIKE DEWINE,Mike DeWine,https://en.wikipedia.org/wiki/Mike_DeWine,2026-11-04T14:30:57Z,false,"De with a capital after it. Checked by Claude against the article title; to be hand-checked"
+JD VANCE,JD Vance,https://en.wikipedia.org/wiki/JD_Vance,2026-11-04T14:30:57Z,false,"Initials without full stops. Checked by Claude against the article title; to be hand-checked"
+WYDEN RON,Ron Wyden,https://en.wikipedia.org/wiki/Ron_Wyden,2026-11-04T14:30:57Z,false,"MEDSL gives surname first without a comma for this row (Oregon). Checked by Claude against the article title; to be hand-checked"
+BEN R. LUJAN,Ben R. Luján,https://en.wikipedia.org/wiki/Ben_Ray_Luj%C3%A1n,2026-11-04T14:30:57Z,false,"Accent missing in MEDSL; middle initial kept as the source has it. Checked by Claude against the article title; to be hand-checked"

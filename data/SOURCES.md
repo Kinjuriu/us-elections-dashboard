@@ -98,7 +98,7 @@ Seats are counted by **caucus**: the president's party plus the independents who
   - The 2026 Senate race list: 33 Class 2 seats plus the Florida and Ohio Class 3 specials, from https://en.wikipedia.org/wiki/2026_United_States_Senate_elections (race list only). The tests check it against MEDSL's 2020 Class 2 races.
   - Empty slots for results.
 - **Status:** No 2026 results are entered yet. AP (apnews.com) blocks automated access, and on 4 November 2026 no certified results existed. Results must be entered by hand from AP or official state pages, with `result_source_url` and `result_accessed_at` on every row.
-- **Labelling:** every 2026 row is `is_provisional = true`. 2026 House seats per state reuse 2024 counts, since apportionment is unchanged from 2022 to 2030.
+- **Labelling:** every 2026 row is `is_provisional = true`. Its `called` value is passed through to the `called` column of `senate_results_by_state.csv` and `house_delegations_by_state.csv` (always true for certified years); the map shows a provisional result as a tint until it is called. 2026 House seats per state reuse 2024 counts, since apportionment is unchanged from 2022 to 2030.
 
 ### Manual reference files (`data/manual/`)
 - **`presidents.csv`:** see the House Historian presidents and party government entries above.
@@ -106,7 +106,19 @@ Seats are counted by **caucus**: the president's party plus the independents who
 - **`senate_specials.csv`:** the seat class for each special election from 1994 to 2026, used to link each race to the previous one for the same seat. Each row cites the Wikipedia article for that special. Every class is marked `verified = false`.
 - **`senate_results_manual.csv`:** races MEDSL lacks or gets wrong, to be filled from official state results.
 - **`candidate_party_overrides.csv`:** party labels MEDSL leaves blank.
+- **`display_names.csv`:** how a winner's name is shown when the title-case rule gets it wrong: Mc and De names, JD Vance, Luján's accent, and two MEDSL slips ("MICH MCCONNELL" in Kentucky 2014, "WYDEN RON" in Oregon). The pipeline writes `winner_display_name` next to `winner_name`, which keeps the source spelling. Each row cites the page the spelling was checked against and is marked `verified = false` until hand-checked. The tests fail if a winner's name starts a word with Mc, O' or JD and has no row here; De, La and Mac names cannot be told apart from ordinary ones (Dean, Lamar, Mack), so they must be added by hand.
 - **`senate_seat_changes.csv`:** party switches and appointments from 2000 to 2026 that changed a seat's party: Coverdell to Miller (GA 2000), Jeffords (VT 2001), Wellstone to Barkley (MN 2002), Specter (PA 2009), Lautenberg to Chiesa (NJ 2013), Sinema (AZ 2022) and Manchin (WV 2024). Each cites the archived Senate party division page and is marked `verified = false`. The page gives no date for Sinema's switch; that date comes from general knowledge.
+
+### Map geography (`pipeline/geo/build_geo.py`)
+
+The map's shapes, not its numbers. Every output is rebuilt by `python pipeline/geo/build_geo.py`, which downloads what it needs, checks each file against the SHA-256 in `data/raw/manifest.json`, and runs mapshaper (an npm dev dependency) on it.
+
+- **State outlines:** `us-atlas` npm package, version 3.0.1 (pinned in `package-lock.json`), file `states-10m.json`. It redistributes the US Census Bureau's cartographic boundary files, 2017 edition, as TopoJSON. Licence: ISC for the package; the Census data is public domain. Simplified with mapshaper (2.5km tolerance, shared borders kept) into `public/geo/states.topo.json`.
+- **Water depth (contour lines):** Natural Earth 10m physical, bathymetry layers at 200, 1,000, 2,000, 3,000, 4,000, 5,000 and 6,000 metres (`ne_10m_bathymetry_K_200` to `ne_10m_bathymetry_E_6000`), from https://naciscdn.org/naturalearth/10m/physical/. Each band is dissolved (Natural Earth splits them into tiles), turned into outlines, clipped to the area the map shows and simplified (6km tolerance; rings under 1,500 square km dropped). Output: object `bathymetry` in `public/geo/ocean.topo.json`.
+- **Lakes:** Natural Earth 10m `ne_10m_lakes`, scale rank 0 to 2 only (the Great Lakes and the largest others). Output: object `lakes` in `public/geo/ocean.topo.json`.
+- **Neighbouring land:** Natural Earth 10m `ne_10m_admin_0_countries`, every country except the US, clipped and simplified (3km tolerance). Output: `public/geo/land.topo.json`.
+- **Natural Earth licence:** public domain. Accessed 4 November 2026 (exact times in the manifest). The zips (about 20MB) are not committed; the script fetches them again on a fresh checkout and stops if one no longer matches its recorded hash.
+- **Projection:** the three parts of `d3.geoAlbersUsa` (Albers for the lower 48, conic equal-area for Alaska and Hawaii, with d3's parameters), each fitted to its own box so that Alaska and Hawaii sit in framed insets. Insets are not to the same scale as the lower 48.
 
 ## Flip definitions (Senate)
 

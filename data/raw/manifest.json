@@ -48,6 +48,69 @@
     "sha256": "33e42968de7a02488b4ac8eb975a152fe55d91fb8657b377e9a49aba5b16c0cd",
     "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/PEJ5QU"
   },
+  "ne_10m_admin_0_countries": {
+    "accessed_at": "2026-11-04T13:39:54+00:00",
+    "bytes": 4930492,
+    "path": "data/raw/naturalearth/ne_10m_admin_0_countries/ne_10m_admin_0_countries.zip",
+    "sha256": "ce1ac7036499a0edd641fbc093cd209a98f96a49d2eca8480aaacad35138a7f6",
+    "url": "https://naciscdn.org/naturalearth/10m/cultural/ne_10m_admin_0_countries.zip"
+  },
+  "ne_10m_bathymetry_E_6000": {
+    "accessed_at": "2026-11-04T13:39:50+00:00",
+    "bytes": 285758,
+    "path": "data/raw/naturalearth/ne_10m_bathymetry_E_6000/ne_10m_bathymetry_E_6000.zip",
+    "sha256": "6bdfb0255a3356b4261b9934125e35226a0487b0c11234c1563bb856cac95b88",
+    "url": "https://naciscdn.org/naturalearth/10m/physical/ne_10m_bathymetry_E_6000.zip"
+  },
+  "ne_10m_bathymetry_F_5000": {
+    "accessed_at": "2026-11-04T13:39:49+00:00",
+    "bytes": 2850744,
+    "path": "data/raw/naturalearth/ne_10m_bathymetry_F_5000/ne_10m_bathymetry_F_5000.zip",
+    "sha256": "d33247a325f31f5a7caeb7b9d963a8c1b6cb0576a8c26ebd7bd50f4dcc0ccaaf",
+    "url": "https://naciscdn.org/naturalearth/10m/physical/ne_10m_bathymetry_F_5000.zip"
+  },
+  "ne_10m_bathymetry_G_4000": {
+    "accessed_at": "2026-11-04T13:39:47+00:00",
+    "bytes": 3593230,
+    "path": "data/raw/naturalearth/ne_10m_bathymetry_G_4000/ne_10m_bathymetry_G_4000.zip",
+    "sha256": "466486cedef079608abe20fa832e542b6abc92bb5ca40c0f6e587ed7f7be95bd",
+    "url": "https://naciscdn.org/naturalearth/10m/physical/ne_10m_bathymetry_G_4000.zip"
+  },
+  "ne_10m_bathymetry_H_3000": {
+    "accessed_at": "2026-11-04T13:39:45+00:00",
+    "bytes": 2528623,
+    "path": "data/raw/naturalearth/ne_10m_bathymetry_H_3000/ne_10m_bathymetry_H_3000.zip",
+    "sha256": "5f0d480ffbd7a1dc39c48a9c29164b1a92094225d1d0399ab67ea61581add98a",
+    "url": "https://naciscdn.org/naturalearth/10m/physical/ne_10m_bathymetry_H_3000.zip"
+  },
+  "ne_10m_bathymetry_I_2000": {
+    "accessed_at": "2026-11-04T13:39:43+00:00",
+    "bytes": 1285685,
+    "path": "data/raw/naturalearth/ne_10m_bathymetry_I_2000/ne_10m_bathymetry_I_2000.zip",
+    "sha256": "e1e58ab0ae062e612835412f8e309bd46103b26196a0423514282a7e3e1f3265",
+    "url": "https://naciscdn.org/naturalearth/10m/physical/ne_10m_bathymetry_I_2000.zip"
+  },
+  "ne_10m_bathymetry_J_1000": {
+    "accessed_at": "2026-11-04T13:39:41+00:00",
+    "bytes": 758915,
+    "path": "data/raw/naturalearth/ne_10m_bathymetry_J_1000/ne_10m_bathymetry_J_1000.zip",
+    "sha256": "ff586fb1faf86c9917519577f1490a2106d7c45a456053374731f59aac0211e5",
+    "url": "https://naciscdn.org/naturalearth/10m/physical/ne_10m_bathymetry_J_1000.zip"
+  },
+  "ne_10m_bathymetry_K_200": {
+    "accessed_at": "2026-11-04T13:39:40+00:00",
+    "bytes": 1197185,
+    "path": "data/raw/naturalearth/ne_10m_bathymetry_K_200/ne_10m_bathymetry_K_200.zip",
+    "sha256": "68fe55b9ac57bd8255696d83259f5856594a60c582dd395de9c1772179337887",
+    "url": "https://naciscdn.org/naturalearth/10m/physical/ne_10m_bathymetry_K_200.zip"
+  },
+  "ne_10m_lakes": {
+    "accessed_at": "2026-11-04T13:39:52+00:00",
+    "bytes": 2349685,
+    "path": "data/raw/naturalearth/ne_10m_lakes/ne_10m_lakes.zip",
+    "sha256": "0803a06f9c3cb4671d89b68c48b142aad9366ba40f665245e12a913fbc61722a",
+    "url": "https://naciscdn.org/naturalearth/10m/physical/ne_10m_lakes.zip"
+  },
   "senate_party_division": {
     "accessed_at": "2026-11-04T12:42:18+00:00",
     "bytes": 701400,

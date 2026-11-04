@@ -1,6 +1,8 @@
 ---
-// Every chart and map sits in this frame: title, subtitle, optional legend,
-// the graphic, then source line and "Data as of" date (DESIGN_RULES.md 6).
+// Every chart sits in this frame: title, subtitle, optional legend, the
+// graphic, then source line and "Data as of" date (DESIGN_RULES.md 6).
+// Compact: the finding headlines live on the story page, and the notes in
+// the "Notes and sources" disclosure at the foot of the dashboard.
 // The build fails if any of the five parts is missing.
 import SourceLine from './SourceLine.astro';
 
@@ -9,15 +11,13 @@ interface Props {
   subtitle: string;
   source: string;
   dataAsOf: string;
-  /** Shows the provisional label. Set whenever 2026 data can appear. */
-  provisional?: boolean;
   /** For frames whose graphic is built in a later step: says what will go here. */
   pending?: string;
   /** Height reserved for a pending graphic, in px. */
   pendingHeight?: number;
 }
 
-const { title, subtitle, source, dataAsOf, provisional = false, pending, pendingHeight = 320 } = Astro.props;
+const { title, subtitle, source, dataAsOf, pending, pendingHeight = 320 } = Astro.props;
 
 const missing = Object.entries({ title, subtitle, source, dataAsOf })
   .filter(([, v]) => !v || !v.trim())
@@ -31,9 +31,6 @@ if (missing.length) {
   <figcaption class="chart-frame__head">
     <h3 class="chart-frame__title">{title}</h3>
     <p class="chart-frame__subtitle">{subtitle}</p>
-    {provisional && (
-      <p class="chart-frame__provisional label">2026 is provisional until results are certified</p>
-    )}
   </figcaption>
 
   {Astro.slots.has('legend') && (
@@ -51,7 +48,6 @@ if (missing.length) {
   </div>
 
   <div class="chart-frame__foot">
-    {Astro.slots.has('notes') && <div class="chart-frame__notes"><slot name="notes" /></div>}
     <SourceLine source={source} dataAsOf={dataAsOf} />
   </div>
 </figure>
@@ -67,18 +63,11 @@ if (missing.length) {
     font-size: var(--fs-4);
     max-width: var(--prose-max);
   }
-  @media (min-width: 768px) {
-    .chart-frame__title { font-size: var(--fs-5); }
-  }
   .chart-frame__subtitle {
-    margin-top: var(--sp-2);
+    margin-top: var(--sp-1);
     font-size: var(--fs-2);
     color: var(--ink-2);
-    line-height: 1.45;
-  }
-  .chart-frame__provisional {
-    margin-top: var(--sp-2);
-    color: var(--ink);
+    line-height: 1.4;
   }
   .chart-frame__legend {
     margin-bottom: var(--sp-4);

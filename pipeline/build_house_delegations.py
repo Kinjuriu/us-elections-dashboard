@@ -98,6 +98,7 @@ def build() -> pd.DataFrame:
     out["gop_vote_share"] = (100 * gop.reindex(idx).fillna(0).values / votes.reindex(idx).values).round(2)
     out["note"] = [notes.get((y, s), "") for y, s in zip(out.year, out.state_po)]
     out["is_provisional"] = False
+    out["called"] = True
     out["source_id"] = "medsl_house"
 
     # 2026: apportionment is unchanged since 2022, so seats per state come from 2024.
@@ -110,14 +111,15 @@ def build() -> pd.DataFrame:
         **{c: m[c].values for c in ("dem", "gop", "ind", "other", "vacant", "dem_vote_share",
                                     "gop_vote_share")},
         "note": "",
-        "is_provisional": True, "source_id": "manual_2026_provisional",
+        "is_provisional": True, "called": m.called.values, "source_id": "manual_2026_provisional",
     })
     out = pd.concat([out, prov], ignore_index=True)
     out["state"] = out.state_po.map(STATES)
+    out["called"] = out.called.astype("boolean")
     for c in ("dem", "gop", "ind", "other", "vacant", "seats"):
         out[c] = out[c].astype("Int64")
     cols = ["year", "state", "state_po", "seats", "dem", "gop", "ind", "other", "vacant",
-            "dem_vote_share", "gop_vote_share", "is_provisional", "note", "source_id"]
+            "dem_vote_share", "gop_vote_share", "is_provisional", "called", "note", "source_id"]
     out = out.sort_values(["year", "state_po"])
     write_csv(out[cols], "house_delegations_by_state.csv")
     write_csv(w.sort_values(["year", "state_po", "district"]), "house_district_winners.csv")
