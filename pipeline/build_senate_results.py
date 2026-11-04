@@ -7,16 +7,25 @@ one; the January 2021 Georgia runoffs are filed under the 2020 cycle).
 Vote shares use valid votes: candidate rows marked as over votes, under votes,
 blanks or exhausted ballots are dropped from the denominator.
 
-previous_party is the party that won the last election for the same seat
-(same state and Senate class), so "flipped" compares election with election.
-It ignores appointments and party switches between elections.
+Two flip definitions are kept:
+- flipped_vs_last_election: winner's party against previous_party, the party that
+  won the last election for the same seat (same state and Senate class).
+- flipped_vs_holder (AP's convention, used on the site): winner's party against
+  holder_party, the party holding the seat on election day. That is previous_party
+  updated by any appointment or party switch in data/manual/senate_seat_changes.csv
+  dated between 3 January after the last election and this election day.
+
+Election dates are the November general election day. Off-cycle specials missing
+from MEDSL (MA 2010 and 2013, NJ 2013, AL 2017) use their year's November date
+too; no listed seat change falls between their real date and that one.
 """
 from __future__ import annotations
 
 import pandas as pd
 
 from common import (
-    MANUAL, NON_VOTE_RE, PROVISIONAL_YEAR, RAW, STATES, load_2026, normalise_party, write_csv,
+    MANUAL, NON_VOTE_RE, PROVISIONAL_YEAR, RAW, STATES, election_day, load_2026, normalise_party,
+    write_csv,
 )
 
 FIRST_YEAR = 2000
@@ -132,10 +141,30 @@ def add_lineage(df: pd.DataFrame) -> pd.DataFrame:
         last = last.sort_values("special").iloc[0]
         prev.append(last.winner_party)
     df["previous_party"] = prev
-    df["flipped"] = [
-        (w != p) if pd.notna(w) and pd.notna(p) else pd.NA for w, p in zip(df.winner_party, df.previous_party)
-    ]
+    df["flipped_vs_last_election"] = _flip(df.winner_party, df.previous_party)
+    df["holder_party"] = holder_on_election_day(df)
+    df["flipped_vs_holder"] = _flip(df.winner_party, df.holder_party)
     return df
+
+
+def _flip(winner: pd.Series, before: pd.Series) -> list:
+    return [(w != p) if pd.notna(w) and pd.notna(p) else pd.NA for w, p in zip(winner, before)]
+
+
+def holder_on_election_day(df: pd.DataFrame) -> list:
+    changes = pd.read_csv(MANUAL / "senate_seat_changes.csv", parse_dates=["effective_date"])
+    holders = []
+    for r in df.itertuples():
+        earlier = df[(df.state_po == r.state_po) & (df.senate_class == r.senate_class) & (df.year < r.year)]
+        # Count changes from 3 January after the last election, when its winner took the
+        # seat: an interim appointment made between election day and then (Barkley,
+        # MN 2002) ends when the elected senator is sworn in.
+        since = pd.Timestamp(earlier.year.max() + 1, 1, 3) if len(earlier) else pd.Timestamp.min
+        seat = changes[(changes.state_po == r.state_po) & (changes.senate_class == r.senate_class)
+                       & (changes.effective_date > since)
+                       & (changes.effective_date < pd.Timestamp(election_day(r.year)))]
+        holders.append(seat.sort_values("effective_date").party_in.iloc[-1] if len(seat) else r.previous_party)
+    return holders
 
 
 def build() -> pd.DataFrame:
@@ -148,10 +177,11 @@ def build() -> pd.DataFrame:
     df["winner_pct"] = df.winner_pct.round(2)
     df["runner_up_pct"] = df.runner_up_pct.round(2)
     df["is_provisional"] = df.year >= PROVISIONAL_YEAR
-    df["flipped"] = df.flipped.astype("boolean")
+    for c in ("flipped_vs_last_election", "flipped_vs_holder"):
+        df[c] = df[c].astype("boolean")
     cols = ["year", "state", "state_po", "special", "winner_name", "winner_party", "runner_up_party",
-            "winner_pct", "runner_up_pct", "margin_pts", "flipped", "previous_party", "is_provisional",
-            "source_id"]
+            "winner_pct", "runner_up_pct", "margin_pts", "flipped_vs_last_election", "previous_party",
+            "flipped_vs_holder", "holder_party", "is_provisional", "source_id"]
     df = df.sort_values(["year", "state_po", "special"])
     write_csv(df[cols], "senate_results_by_state.csv")
     # Side detail kept out of the main file: seat class and MEDSL's own "unofficial" flag.
