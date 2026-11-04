@@ -108,6 +108,17 @@ Seats are counted by **caucus**: the president's party plus the independents who
 - **`candidate_party_overrides.csv`:** party labels MEDSL leaves blank.
 - **`senate_seat_changes.csv`:** party switches and appointments from 2000 to 2026 that changed a seat's party: Coverdell to Miller (GA 2000), Jeffords (VT 2001), Wellstone to Barkley (MN 2002), Specter (PA 2009), Lautenberg to Chiesa (NJ 2013), Sinema (AZ 2022) and Manchin (WV 2024). Each cites the archived Senate party division page and is marked `verified = false`. The page gives no date for Sinema's switch; that date comes from general knowledge.
 
+### Map geography (`pipeline/geo/build_geo.py`)
+
+The map's shapes, not its numbers. Every output is rebuilt by `python pipeline/geo/build_geo.py`, which downloads what it needs, checks each file against the SHA-256 in `data/raw/manifest.json`, and runs mapshaper (an npm dev dependency) on it.
+
+- **State outlines:** `us-atlas` npm package, version 3.0.1 (pinned in `package-lock.json`), file `states-10m.json`. It redistributes the US Census Bureau's cartographic boundary files, 2017 edition, as TopoJSON. Licence: ISC for the package; the Census data is public domain. Simplified with mapshaper (2.5km tolerance, shared borders kept) into `public/geo/states.topo.json`.
+- **Water depth (contour lines):** Natural Earth 10m physical, bathymetry layers at 200, 1,000, 2,000, 3,000, 4,000, 5,000 and 6,000 metres (`ne_10m_bathymetry_K_200` to `ne_10m_bathymetry_E_6000`), from https://naciscdn.org/naturalearth/10m/physical/. Each band is dissolved (Natural Earth splits them into tiles), turned into outlines, clipped to the area the map shows and simplified (6km tolerance; rings under 1,500 square km dropped). Output: object `bathymetry` in `public/geo/ocean.topo.json`.
+- **Lakes:** Natural Earth 10m `ne_10m_lakes`, scale rank 0 to 2 only (the Great Lakes and the largest others). Output: object `lakes` in `public/geo/ocean.topo.json`.
+- **Neighbouring land:** Natural Earth 10m `ne_10m_admin_0_countries`, every country except the US, clipped and simplified (3km tolerance). Output: `public/geo/land.topo.json`.
+- **Natural Earth licence:** public domain. Accessed 4 November 2026 (exact times in the manifest). The zips (about 20MB) are not committed; the script fetches them again on a fresh checkout and stops if one no longer matches its recorded hash.
+- **Projection:** the three parts of `d3.geoAlbersUsa` (Albers for the lower 48, conic equal-area for Alaska and Hawaii, with d3's parameters), each fitted to its own box so that Alaska and Hawaii sit in framed insets. Insets are not to the same scale as the lower 48.
+
 ## Flip definitions (Senate)
 
 The site displays `flipped_vs_holder`, with hatching, and uses `party_changed` for a note without hatching.
