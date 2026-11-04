@@ -2,8 +2,8 @@
 
 One row per state per general election, from MEDSL district returns: who won
 each district (most votes in the deciding round) and each party's share of all
-valid House votes cast in the state. Independents are counted in "other",
-since this file has no "ind" column.
+valid House votes cast in the state. Independents (e.g. Sanders, Goode) are in
+"ind"; any other party is in "other".
 
 Districts where the only race that year was flagged "special" (Texas 2006,
 after court-ordered redistricting) use that race. DC's non-voting delegate is
@@ -16,6 +16,17 @@ import pandas as pd
 from common import NON_VOTE_RE, PROVISIONAL_YEAR, RAW, STATES, load_2026, normalise_party, write_csv
 
 FIRST_YEAR = 2000
+
+# District results the House Historian does not count as seats at the opening of
+# the next Congress (its footnotes 5 and 6 on the Party Divisions page).
+#   "vacant": the seat is counted as vacant instead of for its vote leader.
+#   "note":   the seat keeps its vote leader and the state row carries a note.
+DISTRICT_ADJUSTMENTS = {
+    (2018, "NC", 9): ("vacant", "NC-9 counted as vacant: the 2018 election was never certified "
+                                "and was re-run in 2019."),
+    (2020, "NY", 22): ("note", "NY-22 counted for the Republican: the count finished after the "
+                               "117th Congress opened on 3 January 2021."),
+}
 
 
 def load_medsl() -> pd.DataFrame:
@@ -62,10 +73,20 @@ def build() -> pd.DataFrame:
     unknown = w[w.party.isna()]
     if len(unknown):
         raise ValueError(f"district winners with no party:\n{unknown}")
-    w["bucket"] = w.party.map({"DEM": "dem", "GOP": "gop", "IND": "other", "OTHER": "other"})
+    w["bucket"] = w.party.map({"DEM": "dem", "GOP": "gop", "IND": "ind", "OTHER": "other"})
+    w["note"] = ""
+    for (year, po, dist), (action, note) in DISTRICT_ADJUSTMENTS.items():
+        hit = (w.year == year) & (w.state_po == po) & (w.district == dist)
+        if hit.sum() != 1:
+            raise ValueError(f"adjustment target not found: {year} {po}-{dist}")
+        if action == "vacant":
+            w.loc[hit, "bucket"] = "vacant"
+        w.loc[hit, "note"] = note
     seats = w.pivot_table(index=["year", "state_po"], columns="bucket", values="district",
                           aggfunc="count", fill_value=0)
+    seats = seats.reindex(columns=["dem", "gop", "ind", "other", "vacant"], fill_value=0)
     seats["seats"] = seats.sum(axis=1)
+    notes = w[w.note != ""].groupby(["year", "state_po"]).note.agg(" ".join)
 
     d["p"] = d.party.map(normalise_party)
     votes = d.groupby(["year", "state_po"]).votes.sum()
@@ -75,7 +96,7 @@ def build() -> pd.DataFrame:
     idx = pd.MultiIndex.from_frame(out[["year", "state_po"]])
     out["dem_vote_share"] = (100 * dem.reindex(idx).fillna(0).values / votes.reindex(idx).values).round(2)
     out["gop_vote_share"] = (100 * gop.reindex(idx).fillna(0).values / votes.reindex(idx).values).round(2)
-    out["vacant"] = 0
+    out["note"] = [notes.get((y, s), "") for y, s in zip(out.year, out.state_po)]
     out["is_provisional"] = False
     out["source_id"] = "medsl_house"
 
@@ -86,15 +107,17 @@ def build() -> pd.DataFrame:
     prov = pd.DataFrame({
         "year": PROVISIONAL_YEAR, "state_po": m.state_po.values,
         "seats": m.state_po.map(seats_2024).values,
-        **{c: m[c].values for c in ("dem", "gop", "other", "vacant", "dem_vote_share", "gop_vote_share")},
+        **{c: m[c].values for c in ("dem", "gop", "ind", "other", "vacant", "dem_vote_share",
+                                    "gop_vote_share")},
+        "note": "",
         "is_provisional": True, "source_id": "manual_2026_provisional",
     })
     out = pd.concat([out, prov], ignore_index=True)
     out["state"] = out.state_po.map(STATES)
-    for c in ("dem", "gop", "other", "vacant", "seats"):
+    for c in ("dem", "gop", "ind", "other", "vacant", "seats"):
         out[c] = out[c].astype("Int64")
-    cols = ["year", "state", "state_po", "seats", "dem", "gop", "other", "vacant",
-            "dem_vote_share", "gop_vote_share", "is_provisional", "source_id"]
+    cols = ["year", "state", "state_po", "seats", "dem", "gop", "ind", "other", "vacant",
+            "dem_vote_share", "gop_vote_share", "is_provisional", "note", "source_id"]
     out = out.sort_values(["year", "state_po"])
     write_csv(out[cols], "house_delegations_by_state.csv")
     write_csv(w.sort_values(["year", "state_po", "district"]), "house_district_winners.csv")
