@@ -211,6 +211,15 @@ def test_flip_definitions(senate):
     assert (same.flipped_vs_last_election == same.flipped_vs_holder).all()
 
 
+def test_manual_results_resolve_knock_on_flips(senate):
+    """With the 8 manual races entered, every race before 2026 has both flip values."""
+    done = senate[senate.year < 2026]
+    assert done.flipped_vs_holder.notna().all() and done.flipped_vs_last_election.notna().all()
+    al = done[(done.year == 2020) & (done.state_po == "AL") & ~done.special].iloc[0]
+    assert (al.winner_party, al.holder_party, al.previous_party) == ("GOP", "DEM", "DEM")
+    assert al.flipped_vs_holder and al.flipped_vs_last_election
+
+
 # ---- house_delegations_by_state ----------------------------------------------------
 
 def test_house_delegations_sum_to_435(house):
@@ -261,6 +270,41 @@ def test_manual_rows_have_sources():
     has_result = p26[["winner_party", "dem", "gop"]].notna().any(axis=1)
     assert p26[has_result].result_source_url.notna().all()
     assert p26[has_result].result_accessed_at.notna().all()
+
+
+MANUAL_SOURCE_COLUMNS = {
+    "presidents.csv": ["dates_source_url", "party_source_url"],
+    "independents.csv": ["source_url"],
+    "senate_specials.csv": ["source_url"],
+    "senate_seat_changes.csv": ["source_url"],
+    "senate_results_manual.csv": ["source_url"],
+}
+# Templates whose rows are placeholders until filled; every row holding a value
+# must carry a source.
+MANUAL_TEMPLATES = {
+    "candidate_party_overrides.csv": (["party"], "source_url"),
+    "2026_provisional.csv": (["winner_name", "winner_party", "runner_up_party", "winner_pct",
+                              "runner_up_pct", "dem", "gop", "ind", "other", "vacant",
+                              "dem_vote_share", "gop_vote_share"], "result_source_url"),
+}
+
+
+def test_every_manual_row_has_source_url():
+    """Fails if any row in data/manual/ lacks a source_url (or, in the two template
+    files, if any row holding a value lacks one). New manual files must be registered."""
+    listed = set(MANUAL_SOURCE_COLUMNS) | set(MANUAL_TEMPLATES)
+    on_disk = {p.name for p in MANUAL.glob("*.csv")}
+    assert on_disk == listed, f"register new manual files in this test: {on_disk ^ listed}"
+    for name, cols in MANUAL_SOURCE_COLUMNS.items():
+        df = pd.read_csv(MANUAL / name)
+        for c in cols:
+            missing = df[df[c].isna() | (df[c].astype(str).str.strip() == "")]
+            assert missing.empty, f"{name}: rows without {c}: {missing.index.tolist()}"
+    for name, (value_cols, url_col) in MANUAL_TEMPLATES.items():
+        df = pd.read_csv(MANUAL / name)
+        has_value = df[value_cols].notna().any(axis=1)
+        missing = df[has_value & df[url_col].isna()]
+        assert missing.empty, f"{name}: rows with values but no {url_col}: {missing.index.tolist()}"
 
 
 # ---- spot checks, each verified by hand against the raw source ---------------------------
