@@ -1,0 +1,58 @@
+{
+  "house_historian_party_divisions": {
+    "accessed_at": "2026-11-04T12:42:16+00:00",
+    "bytes": 95320,
+    "path": "data/raw/house_historian/party_divisions.html",
+    "sha256": "55d4a4d8bd581896b0824ae1c364fc6ea60631bd2109be1ce76670b74a43560e",
+    "url": "https://history.house.gov/Institution/Party-Divisions/Party-Divisions/"
+  },
+  "house_historian_party_government": {
+    "accessed_at": "2026-11-04T12:51:35+00:00",
+    "bytes": 58765,
+    "path": "data/raw/house_historian/party_government.html",
+    "sha256": "6b1f3a6fac0e269448568caefc9587581ae9844a261b46be5dacee0962fdf515",
+    "url": "https://history.house.gov/Institution/Presidents-Coinciding/Party-Government/"
+  },
+  "house_historian_presidents": {
+    "accessed_at": "2026-11-04T12:42:17+00:00",
+    "bytes": 84233,
+    "path": "data/raw/house_historian/presidents_coinciding.html",
+    "sha256": "94c40dbbbb308e67ebd7736a9bb47d85a9f45aa7b74c166d459c227687016272",
+    "url": "https://history.house.gov/Institution/Presidents-Coinciding/Presidents-Coinciding/"
+  },
+  "medsl_house": {
+    "accessed_at": "2026-11-04T04:42:20+00:00",
+    "bytes": 4156562,
+    "path": "data/raw/medsl/1976-2024-house.tab",
+    "sha256": "76eec42483ee9f0fc5cf6e377442c783d1ae6eefa929729fd6561a69bab47f2a",
+    "url": "manual download, see data/SOURCES.md"
+  },
+  "medsl_house_meta": {
+    "accessed_at": "2026-11-04T12:42:23+00:00",
+    "bytes": 7048,
+    "path": "data/raw/medsl/house_dataset_metadata.json",
+    "sha256": "7f1e58721c198bfd7c1a4254b6704ba42aab6764e034ca456e1f7d536ce25c0b",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/IG0UN2"
+  },
+  "medsl_senate": {
+    "accessed_at": "2026-11-04T12:42:21+00:00",
+    "bytes": 530501,
+    "path": "data/raw/medsl/1976-2024-senate-state.csv",
+    "sha256": "6f745db1b4a0026ad837e74428f9ed6f3f77fa51eb6f858b58ebdbc186fdb3bd",
+    "url": "https://dataverse.harvard.edu/api/access/datafile/13887039?format=original"
+  },
+  "medsl_senate_meta": {
+    "accessed_at": "2026-11-04T12:42:22+00:00",
+    "bytes": 6796,
+    "path": "data/raw/medsl/senate_dataset_metadata.json",
+    "sha256": "33e42968de7a02488b4ac8eb975a152fe55d91fb8657b377e9a49aba5b16c0cd",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/PEJ5QU"
+  },
+  "senate_party_division": {
+    "accessed_at": "2026-11-04T12:42:18+00:00",
+    "bytes": 701400,
+    "path": "data/raw/senate/party_division.html",
+    "sha256": "2be84a8b5cc5c71ba08ee3bf499712e6b5131a9ef8a215ac83c9c3b5625cf9f0",
+    "url": "https://web.archive.org/web/20261102191213id_/https://www.senate.gov/about/parties-leadership/party-division.htm"
+  }
+}
