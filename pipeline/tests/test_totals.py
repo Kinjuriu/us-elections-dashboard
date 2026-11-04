@@ -206,9 +206,20 @@ def test_flip_definitions(senate):
     assert not pa.flipped_vs_last_election and pa.flipped_vs_holder and pa.holder_party == "DEM"
     mn = race(2008, "MN")  # Barkley's interim appointment ended in January 2003
     assert mn.holder_party == "GOP"
-    same = senate.dropna(subset=["previous_party", "holder_party", "winner_party"])
-    same = same[same.previous_party == same.holder_party]
-    assert (same.flipped_vs_last_election == same.flipped_vs_holder).all()
+    # Holder flips compare caucuses: a label change inside a caucus is party_changed only.
+    for y, s in [(2024, "AZ"), (2012, "CT"), (2006, "CT")]:
+        r = race(y, s)
+        assert not r.flipped_vs_holder and r.party_changed, (y, s)
+    vt = race(2006, "VT")  # Jeffords (I, caucusing D) to Sanders (I, caucusing D)
+    assert not vt.flipped_vs_holder and not vt.party_changed and vt.flipped_vs_last_election
+    for y, s in [(2012, "ME"), (2024, "WV")]:
+        r = race(y, s)
+        assert r.flipped_vs_holder and r.party_changed, (y, s)
+    # A caucus change is always a party change.
+    known = senate.dropna(subset=["flipped_vs_holder", "party_changed"])
+    assert not (known.flipped_vs_holder & ~known.party_changed).any()
+    major = senate[senate.winner_party.isin(["DEM", "GOP"])]
+    assert (major.winner_caucus == major.winner_party).all()
 
 
 def test_manual_results_resolve_knock_on_flips(senate):

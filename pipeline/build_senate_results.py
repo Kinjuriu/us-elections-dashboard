@@ -10,10 +10,15 @@ blanks or exhausted ballots are dropped from the denominator.
 Two flip definitions are kept:
 - flipped_vs_last_election: winner's party against previous_party, the party that
   won the last election for the same seat (same state and Senate class).
-- flipped_vs_holder (AP's convention, used on the site): winner's party against
-  holder_party, the party holding the seat on election day. That is previous_party
-  updated by any appointment or party switch in data/manual/senate_seat_changes.csv
-  dated between 3 January after the last election and this election day.
+- flipped_vs_holder (used on the site): true only when the seat moves from one
+  caucus to the other. holder_party is the party holding the seat on election day:
+  previous_party updated by any appointment or party switch in
+  data/manual/senate_seat_changes.csv dated between 3 January after the last
+  election and this election day. holder_caucus and winner_caucus are DEM or GOP;
+  an independent takes the caucus listed for them in data/manual/independents.csv
+  (elected independents) or senate_seat_changes.csv (switches and appointments).
+- party_changed: the winner's party label differs from holder_party, whether or
+  not the caucus changed (e.g. Independent to Democrat in AZ 2024).
 
 Election dates are the November general election day. Off-cycle specials missing
 from MEDSL (MA 2010 and 2013, NJ 2013, AL 2017) use their year's November date
@@ -142,16 +147,45 @@ def add_lineage(df: pd.DataFrame) -> pd.DataFrame:
         prev.append(last.winner_party)
     df["previous_party"] = prev
     df["flipped_vs_last_election"] = _flip(df.winner_party, df.previous_party)
-    df["holder_party"] = holder_on_election_day(df)
-    df["flipped_vs_holder"] = _flip(df.winner_party, df.holder_party)
+    df["winner_caucus"] = [_caucus(p, y, s) for p, y, s in zip(df.winner_party, df.year, df.state_po)]
+    holder = holder_on_election_day(df)
+    df["holder_party"] = [h[0] for h in holder]
+    df["holder_caucus"] = [h[1] for h in holder]
+    df["flipped_vs_holder"] = _flip(df.winner_caucus, df.holder_caucus)
+    df["party_changed"] = _flip(df.winner_party, df.holder_party)
     return df
+
+
+_INDEPENDENTS = None
+
+
+def _caucus(party, year: int, state_po: str):
+    """DEM or GOP for the major parties; for an elected independent, the caucus listed
+    in independents.csv for the Congress they joined (or sat in, for odd-year races)."""
+    global _INDEPENDENTS
+    if pd.isna(party):
+        return pd.NA
+    if party in ("DEM", "GOP"):
+        return party
+    if party != "IND":
+        return pd.NA
+    if _INDEPENDENTS is None:
+        _INDEPENDENTS = pd.read_csv(MANUAL / "independents.csv")
+    congress = (year - 1786 - year % 2) // 2
+    hit = _INDEPENDENTS[(_INDEPENDENTS.chamber == "senate") & (_INDEPENDENTS.congress == congress)
+                        & (_INDEPENDENTS.state_po == state_po)]
+    if len(hit) != 1:
+        raise ValueError(f"no single caucus entry for independent {state_po} {year} (Congress {congress})")
+    c = hit.caucuses_with.iloc[0]
+    return c if pd.notna(c) else pd.NA
 
 
 def _flip(winner: pd.Series, before: pd.Series) -> list:
     return [(w != p) if pd.notna(w) and pd.notna(p) else pd.NA for w, p in zip(winner, before)]
 
 
-def holder_on_election_day(df: pd.DataFrame) -> list:
+def holder_on_election_day(df: pd.DataFrame) -> list[tuple]:
+    """(party, caucus) holding each seat on election day."""
     changes = pd.read_csv(MANUAL / "senate_seat_changes.csv", parse_dates=["effective_date"])
     holders = []
     for r in df.itertuples():
@@ -163,7 +197,15 @@ def holder_on_election_day(df: pd.DataFrame) -> list:
         seat = changes[(changes.state_po == r.state_po) & (changes.senate_class == r.senate_class)
                        & (changes.effective_date > since)
                        & (changes.effective_date < pd.Timestamp(election_day(r.year)))]
-        holders.append(seat.sort_values("effective_date").party_in.iloc[-1] if len(seat) else r.previous_party)
+        if len(seat):
+            last = seat.sort_values("effective_date").iloc[-1]
+            caucus = last.caucuses_with if pd.notna(last.caucuses_with) else pd.NA
+            holders.append((last.party_in, caucus))
+        elif len(earlier):
+            prev = earlier[earlier.year == earlier.year.max()].sort_values("special").iloc[0]
+            holders.append((r.previous_party, prev.winner_caucus))
+        else:
+            holders.append((pd.NA, pd.NA))
     return holders
 
 
@@ -177,11 +219,12 @@ def build() -> pd.DataFrame:
     df["winner_pct"] = df.winner_pct.round(2)
     df["runner_up_pct"] = df.runner_up_pct.round(2)
     df["is_provisional"] = df.year >= PROVISIONAL_YEAR
-    for c in ("flipped_vs_last_election", "flipped_vs_holder"):
+    for c in ("flipped_vs_last_election", "flipped_vs_holder", "party_changed"):
         df[c] = df[c].astype("boolean")
     cols = ["year", "state", "state_po", "special", "winner_name", "winner_party", "runner_up_party",
             "winner_pct", "runner_up_pct", "margin_pts", "flipped_vs_last_election", "previous_party",
-            "flipped_vs_holder", "holder_party", "is_provisional", "source_id"]
+            "flipped_vs_holder", "holder_party", "holder_caucus", "winner_caucus", "party_changed",
+            "is_provisional", "source_id"]
     df = df.sort_values(["year", "state_po", "special"])
     write_csv(df[cols], "senate_results_by_state.csv")
     # Side detail kept out of the main file: seat class and MEDSL's own "unofficial" flag.

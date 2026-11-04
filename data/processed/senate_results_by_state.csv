@@ -1,490 +1,490 @@
-year,state,state_po,special,winner_name,winner_party,runner_up_party,winner_pct,runner_up_pct,margin_pts,flipped_vs_last_election,previous_party,flipped_vs_holder,holder_party,is_provisional,source_id
-2000,Arizona,AZ,False,JON KYL,GOP,IND,79.32,7.82,71.5,False,GOP,False,GOP,False,medsl_senate
-2000,California,CA,False,DIANNE FEINSTEIN,DEM,GOP,55.84,36.59,19.26,False,DEM,False,DEM,False,medsl_senate
-2000,Connecticut,CT,False,JOSEPH I. LIEBERMAN,DEM,GOP,63.21,34.17,29.04,False,DEM,False,DEM,False,medsl_senate
-2000,Delaware,DE,False,THOMAS R. CARPER,DEM,GOP,55.53,43.7,11.83,True,GOP,True,GOP,False,medsl_senate
-2000,Florida,FL,False,BILL NELSON,DEM,GOP,51.04,46.19,4.85,True,GOP,True,GOP,False,medsl_senate
-2000,Georgia,GA,True,ZELL MILLER,DEM,GOP,58.5,38.1,20.4,True,GOP,False,DEM,False,medsl_senate
-2000,Hawaii,HI,False,DANIEL K. AKAKA,DEM,GOP,72.68,24.51,48.18,False,DEM,False,DEM,False,medsl_senate
-2000,Indiana,IN,False,RICHARD G. LUGAR,GOP,DEM,66.56,31.85,34.71,False,GOP,False,GOP,False,medsl_senate
-2000,Massachusetts,MA,False,EDWARD M. KENNEDY,DEM,GOP,72.69,12.86,59.83,False,DEM,False,DEM,False,medsl_senate
-2000,Maryland,MD,False,PAUL S. SARBANES,DEM,GOP,63.18,36.73,26.44,False,DEM,False,DEM,False,medsl_senate
-2000,Maine,ME,False,OLYMPIA J. SNOWE,GOP,DEM,68.94,31.06,37.88,False,GOP,False,GOP,False,medsl_senate
-2000,Michigan,MI,False,DEBBIE STABENOW,DEM,GOP,49.47,47.86,1.61,True,GOP,True,GOP,False,medsl_senate
-2000,Minnesota,MN,False,MARK DAYTON,DEM,GOP,48.83,43.29,5.54,True,GOP,True,GOP,False,medsl_senate
-2000,Missouri,MO,False,MEL CARNAHAN,DEM,GOP,50.47,48.39,2.07,True,GOP,True,GOP,False,medsl_senate
-2000,Mississippi,MS,False,TRENT LOTT,GOP,DEM,65.88,31.59,34.29,False,GOP,False,GOP,False,medsl_senate
-2000,Montana,MT,False,CONRAD BURNS,GOP,DEM,50.55,47.24,3.32,False,GOP,False,GOP,False,medsl_senate
-2000,North Dakota,ND,False,KENT CONRAD,DEM,GOP,61.37,38.63,22.75,False,DEM,False,DEM,False,medsl_senate
-2000,Nebraska,NE,False,BEN NELSON,DEM,GOP,51.0,48.82,2.18,False,DEM,False,DEM,False,medsl_senate
-2000,New Jersey,NJ,False,JON S. CORZINE,DEM,GOP,50.11,47.1,3.02,False,DEM,False,DEM,False,medsl_senate
-2000,New Mexico,NM,False,JEFF BINGAMAN,DEM,GOP,61.7,38.25,23.45,False,DEM,False,DEM,False,medsl_senate
-2000,Nevada,NV,False,JOHN ENSIGN,GOP,DEM,55.09,39.69,15.4,True,DEM,True,DEM,False,medsl_senate
-2000,New York,NY,False,HILLARY RODHAM CLINTON,DEM,GOP,55.27,43.01,12.27,False,DEM,False,DEM,False,medsl_senate
-2000,Ohio,OH,False,MIKE DEWINE,GOP,DEM,59.92,35.85,24.06,False,GOP,False,GOP,False,medsl_senate
-2000,Pennsylvania,PA,False,RICK SANTORUM,GOP,DEM,52.42,45.51,6.91,False,GOP,False,GOP,False,medsl_senate
-2000,Rhode Island,RI,False,LINCOLN D. CHAFEE,GOP,DEM,56.88,41.15,15.73,False,GOP,False,GOP,False,medsl_senate
-2000,Tennessee,TN,False,BILL FRIST,GOP,DEM,65.1,32.21,32.89,False,GOP,False,GOP,False,medsl_senate
-2000,Texas,TX,False,KAY BAILEY HUTCHISON,GOP,DEM,65.08,32.31,32.77,False,GOP,False,GOP,False,medsl_senate
-2000,Utah,UT,False,ORRIN G. HATCH,GOP,DEM,65.58,31.51,34.07,False,GOP,False,GOP,False,medsl_senate
-2000,Virginia,VA,False,GEORGE F. ALLEN,GOP,DEM,52.26,47.68,4.58,True,DEM,True,DEM,False,medsl_senate
-2000,Vermont,VT,False,JAMES M. JEFFORDS,GOP,DEM,65.56,25.43,40.13,False,GOP,False,GOP,False,medsl_senate
-2000,Washington,WA,False,MARIA CANTWELL,DEM,GOP,48.73,48.64,0.09,True,GOP,True,GOP,False,medsl_senate
-2000,Wisconsin,WI,False,HERB KOHL,DEM,GOP,61.54,37.04,24.51,False,DEM,False,DEM,False,medsl_senate
-2000,West Virginia,WV,False,ROBERT C. BYRD,DEM,GOP,77.75,20.16,57.6,False,DEM,False,DEM,False,medsl_senate
-2000,Wyoming,WY,False,CRAIG THOMAS,GOP,DEM,73.77,22.04,51.73,False,GOP,False,GOP,False,medsl_senate
-2002,Alaska,AK,False,TED STEVENS,GOP,DEM,78.17,10.51,67.66,False,GOP,False,GOP,False,medsl_senate
-2002,Alabama,AL,False,JEFF SESSIONS,GOP,DEM,58.58,39.83,18.75,False,GOP,False,GOP,False,medsl_senate
-2002,Arkansas,AR,False,MARK PRYOR,DEM,GOP,53.9,46.1,7.79,True,GOP,True,GOP,False,medsl_senate
-2002,Colorado,CO,False,WAYNE ALLARD,GOP,DEM,50.7,45.77,4.93,False,GOP,False,GOP,False,medsl_senate
-2002,Delaware,DE,False,JOSEPH R. BIDEN JR.,DEM,GOP,58.22,40.8,17.42,False,DEM,False,DEM,False,medsl_senate
-2002,Georgia,GA,False,SAXBY CHAMBLISS,GOP,DEM,52.73,45.9,6.84,True,DEM,True,DEM,False,medsl_senate
-2002,Iowa,IA,False,TOM HARKIN,DEM,GOP,54.18,43.78,10.4,False,DEM,False,DEM,False,medsl_senate
-2002,Idaho,ID,False,LARRY E. CRAIG,GOP,DEM,65.16,32.55,32.61,False,GOP,False,GOP,False,medsl_senate
-2002,Illinois,IL,False,RICHARD J. DURBIN,DEM,GOP,60.33,38.02,22.31,False,DEM,False,DEM,False,medsl_senate
-2002,Kansas,KS,False,PAT ROBERTS,GOP,OTHER,82.52,9.1,73.42,False,GOP,False,GOP,False,medsl_senate
-2002,Kentucky,KY,False,MITCH MCCONNELL,GOP,DEM,64.68,35.32,29.35,False,GOP,False,GOP,False,medsl_senate
-2002,Louisiana,LA,False,Mary L. Landrieu,DEM,GOP,51.7,48.3,3.4,False,DEM,False,DEM,False,manual_senate_results
-2002,Massachusetts,MA,False,JOHN F. KERRY,DEM,OTHER,80.03,18.43,61.6,False,DEM,False,DEM,False,medsl_senate
-2002,Maine,ME,False,SUSAN M. COLLINS,GOP,DEM,58.44,41.56,16.87,False,GOP,False,GOP,False,medsl_senate
-2002,Michigan,MI,False,CARL LEVIN,DEM,GOP,60.61,37.89,22.72,False,DEM,False,DEM,False,medsl_senate
-2002,Minnesota,MN,False,NORM COLEMAN,GOP,DEM,49.53,47.34,2.19,True,DEM,True,DEM,False,medsl_senate
-2002,Missouri,MO,True,JIM TALENT,GOP,DEM,49.8,48.67,1.13,True,DEM,True,DEM,False,medsl_senate
-2002,Mississippi,MS,False,THAD COCHRAN,GOP,OTHER,84.58,15.42,69.16,False,GOP,False,GOP,False,medsl_senate
-2002,Montana,MT,False,MAX BAUCUS,DEM,GOP,62.74,31.73,31.0,False,DEM,False,DEM,False,medsl_senate
-2002,North Carolina,NC,False,ELIZABETH H. DOLE,GOP,DEM,53.56,44.96,8.61,False,GOP,False,GOP,False,medsl_senate
-2002,Nebraska,NE,False,CHUCK HAGEL,GOP,DEM,82.76,14.64,68.13,False,GOP,False,GOP,False,medsl_senate
-2002,New Hampshire,NH,False,JOHN E. SUNUNU,GOP,DEM,50.82,46.4,4.42,False,GOP,False,GOP,False,medsl_senate
-2002,New Jersey,NJ,False,FRANK R. LAUTENBERG,DEM,GOP,53.88,43.95,9.93,False,DEM,False,DEM,False,medsl_senate
-2002,New Mexico,NM,False,PETE V. DOMENICI,GOP,DEM,65.04,34.96,30.09,False,GOP,False,GOP,False,medsl_senate
-2002,Oklahoma,OK,False,JAMES M. INHOFE,GOP,DEM,57.3,36.31,20.99,False,GOP,False,GOP,False,medsl_senate
-2002,Oregon,OR,False,GORDON SMITH,GOP,DEM,56.21,39.61,16.6,False,GOP,False,GOP,False,medsl_senate
-2002,Rhode Island,RI,False,JACK REED,DEM,GOP,78.43,21.57,56.85,False,DEM,False,DEM,False,medsl_senate
-2002,South Carolina,SC,False,LINDSEY O. GRAHAM,GOP,DEM,54.4,44.19,10.21,False,GOP,False,GOP,False,medsl_senate
-2002,South Dakota,SD,False,TIM JOHNSON,DEM,GOP,49.62,49.47,0.16,False,DEM,False,DEM,False,medsl_senate
-2002,Tennessee,TN,False,LAMAR ALEXANDER,GOP,DEM,54.28,44.34,9.94,False,GOP,False,GOP,False,medsl_senate
-2002,Texas,TX,False,JOHN CORNYN,GOP,DEM,55.3,43.33,11.97,False,GOP,False,GOP,False,medsl_senate
-2002,Virginia,VA,False,JOHN W. WARNER,GOP,IND,82.58,9.74,72.83,False,GOP,False,GOP,False,medsl_senate
-2002,West Virginia,WV,False,JOHN D. ROCKEFELLER IV,DEM,GOP,63.11,36.89,26.22,False,DEM,False,DEM,False,medsl_senate
-2002,Wyoming,WY,False,MICHAEL B. ENZI,GOP,DEM,72.95,27.05,45.91,False,GOP,False,GOP,False,medsl_senate
-2004,Alaska,AK,False,LISA MURKOWSKI,GOP,DEM,48.58,45.55,3.03,False,GOP,False,GOP,False,medsl_senate
-2004,Alabama,AL,False,RICHARD C. SHELBY,GOP,DEM,67.55,32.35,35.19,False,GOP,False,GOP,False,medsl_senate
-2004,Arkansas,AR,False,BLANCHE L. LINCOLN,DEM,GOP,55.9,44.07,11.83,False,DEM,False,DEM,False,medsl_senate
-2004,Arizona,AZ,False,JOHN MCCAIN,GOP,DEM,76.74,20.62,56.12,False,GOP,False,GOP,False,medsl_senate
-2004,California,CA,False,BARBARA BOXER,DEM,GOP,57.71,37.8,19.91,False,DEM,False,DEM,False,medsl_senate
-2004,Colorado,CO,False,KEN SALAZAR,DEM,GOP,51.3,46.53,4.77,True,GOP,True,GOP,False,medsl_senate
-2004,Connecticut,CT,False,CHRISTOPHER J. DODD,DEM,GOP,66.35,32.13,34.22,False,DEM,False,DEM,False,medsl_senate
-2004,Florida,FL,False,MEL MARTINEZ,GOP,DEM,49.43,48.32,1.11,True,DEM,True,DEM,False,medsl_senate
-2004,Georgia,GA,False,JOHNNY ISAKSON,GOP,DEM,57.88,39.98,17.9,True,DEM,True,DEM,False,medsl_senate
-2004,Hawaii,HI,False,DANIEL K. INOUYE,DEM,GOP,75.51,20.99,54.52,False,DEM,False,DEM,False,medsl_senate
-2004,Iowa,IA,False,CHARLES E. GRASSLEY,GOP,DEM,70.18,27.88,42.31,False,GOP,False,GOP,False,medsl_senate
-2004,Idaho,ID,False,MIKE CRAPO,GOP,,99.18,0.82,98.36,False,GOP,False,GOP,False,medsl_senate
-2004,Illinois,IL,False,BARACK OBAMA,DEM,GOP,69.97,27.05,42.92,True,GOP,True,GOP,False,medsl_senate
-2004,Indiana,IN,False,EVAN BAYH,DEM,GOP,61.65,37.23,24.42,False,DEM,False,DEM,False,medsl_senate
-2004,Kansas,KS,False,SAM BROWNBACK,GOP,DEM,69.16,27.49,41.68,False,GOP,False,GOP,False,medsl_senate
-2004,Kentucky,KY,False,JIM BUNNING,GOP,DEM,50.66,49.34,1.31,False,GOP,False,GOP,False,medsl_senate
-2004,Louisiana,LA,False,DAVID VITTER,GOP,DEM,51.03,29.34,21.69,True,DEM,True,DEM,False,medsl_senate
-2004,Maryland,MD,False,BARBARA A. MIKULSKI,DEM,GOP,64.8,33.72,31.08,False,DEM,False,DEM,False,medsl_senate
-2004,Missouri,MO,False,CHRISTOPHER S. BOND,GOP,DEM,56.09,42.8,13.3,False,GOP,False,GOP,False,medsl_senate
-2004,North Carolina,NC,False,RICHARD BURR,GOP,DEM,51.6,47.02,4.58,True,DEM,True,DEM,False,medsl_senate
-2004,North Dakota,ND,False,BYRON L. DORGAN,DEM,GOP,68.28,31.72,36.56,False,DEM,False,DEM,False,medsl_senate
-2004,New Hampshire,NH,False,JUDD GREGG,GOP,DEM,66.24,33.75,32.49,False,GOP,False,GOP,False,medsl_senate
-2004,Nevada,NV,False,HARRY REID,DEM,GOP,61.08,35.14,25.94,False,DEM,False,DEM,False,medsl_senate
-2004,New York,NY,False,CHARLES E. SCHUMER,DEM,GOP,71.16,24.24,46.92,False,DEM,False,DEM,False,medsl_senate
-2004,Ohio,OH,False,GEORGE V. VOINOVICH,GOP,DEM,63.85,36.15,27.7,False,GOP,False,GOP,False,medsl_senate
-2004,Oklahoma,OK,False,TOM COBURN,GOP,DEM,52.77,41.24,11.52,False,GOP,False,GOP,False,medsl_senate
-2004,Oregon,OR,False,RON WYDEN,DEM,GOP,63.39,31.75,31.65,False,DEM,False,DEM,False,medsl_senate
-2004,Pennsylvania,PA,False,ARLEN SPECTER,GOP,DEM,52.62,41.99,10.63,False,GOP,False,GOP,False,medsl_senate
-2004,South Carolina,SC,False,JIM DEMINT,GOP,DEM,53.67,44.1,9.57,True,DEM,True,DEM,False,medsl_senate
-2004,South Dakota,SD,False,JOHN THUNE,GOP,DEM,50.58,49.42,1.15,True,DEM,True,DEM,False,medsl_senate
-2004,Utah,UT,False,ROBERT F. BENNETT,GOP,DEM,68.73,28.4,40.33,False,GOP,False,GOP,False,medsl_senate
-2004,Vermont,VT,False,PATRICK J. LEAHY,DEM,GOP,70.63,24.54,46.08,False,DEM,False,DEM,False,medsl_senate
-2004,Washington,WA,False,PATTY MURRAY,DEM,GOP,54.98,42.74,12.24,False,DEM,False,DEM,False,medsl_senate
-2004,Wisconsin,WI,False,RUSSEL D. FEINGOLD,DEM,GOP,55.37,44.12,11.24,False,DEM,False,DEM,False,medsl_senate
-2006,Arizona,AZ,False,JON KYL,GOP,DEM,53.34,43.5,9.84,False,GOP,False,GOP,False,medsl_senate
-2006,California,CA,False,DIANNE FEINSTEIN,DEM,GOP,59.43,35.02,24.42,False,DEM,False,DEM,False,medsl_senate
-2006,Connecticut,CT,False,JOSEPH I. LIEBERMAN,IND,DEM,49.71,39.73,9.98,True,DEM,True,DEM,False,medsl_senate
-2006,Delaware,DE,False,THOMAS R. CARPER,DEM,GOP,70.2,28.7,41.5,False,DEM,False,DEM,False,medsl_senate
-2006,Florida,FL,False,BILL NELSON,DEM,GOP,60.3,38.1,22.21,False,DEM,False,DEM,False,medsl_senate
-2006,Hawaii,HI,False,DANIEL K. AKAKA,DEM,GOP,61.35,36.78,24.57,False,DEM,False,DEM,False,medsl_senate
-2006,Indiana,IN,False,RICHARD G. LUGAR,GOP,OTHER,87.36,12.59,74.77,False,GOP,False,GOP,False,medsl_senate
-2006,Massachusetts,MA,False,EDWARD M. KENNEDY,DEM,GOP,69.3,30.55,38.75,False,DEM,False,DEM,False,medsl_senate
-2006,Maryland,MD,False,BENJAMIN L. CARDIN,DEM,GOP,54.21,44.2,10.01,False,DEM,False,DEM,False,medsl_senate
-2006,Maine,ME,False,OLYMPIA J. SNOWE,GOP,DEM,74.4,20.75,53.65,False,GOP,False,GOP,False,medsl_senate
-2006,Michigan,MI,False,DEBBIE STABENOW,DEM,GOP,56.91,41.26,15.65,False,DEM,False,DEM,False,medsl_senate
-2006,Minnesota,MN,False,AMY KLOBUCHAR,DEM,GOP,58.06,37.94,20.12,False,DEM,False,DEM,False,medsl_senate
-2006,Missouri,MO,False,CLAIRE MCCASKILL,DEM,GOP,49.58,47.31,2.27,True,GOP,True,GOP,False,medsl_senate
-2006,Mississippi,MS,False,TRENT LOTT,GOP,DEM,63.58,34.87,28.71,False,GOP,False,GOP,False,medsl_senate
-2006,Montana,MT,False,JON TESTER,DEM,GOP,49.16,48.29,0.88,True,GOP,True,GOP,False,medsl_senate
-2006,North Dakota,ND,False,KENT CONRAD,DEM,GOP,68.83,29.53,39.3,False,DEM,False,DEM,False,medsl_senate
-2006,Nebraska,NE,False,E. BENJAMIN NELSON,DEM,GOP,63.88,36.12,27.77,False,DEM,False,DEM,False,medsl_senate
-2006,New Jersey,NJ,False,ROBERT MENENDEZ,DEM,GOP,53.37,44.34,9.02,False,DEM,False,DEM,False,medsl_senate
-2006,New Mexico,NM,False,JEFF BINGAMAN,DEM,GOP,70.61,29.33,41.27,False,DEM,False,DEM,False,medsl_senate
-2006,Nevada,NV,False,JOHN ENSIGN,GOP,DEM,55.36,40.99,14.37,False,GOP,False,GOP,False,medsl_senate
-2006,New York,NY,False,HILLARY RODHAM CLINTON,DEM,GOP,67.0,31.01,36.0,False,DEM,False,DEM,False,medsl_senate
-2006,Ohio,OH,False,SHERROD BROWN,DEM,GOP,56.16,43.82,12.35,True,GOP,True,GOP,False,medsl_senate
-2006,Pennsylvania,PA,False,"BOB CASEY, JR.",DEM,GOP,58.64,41.28,17.35,True,GOP,True,GOP,False,medsl_senate
-2006,Rhode Island,RI,False,SHELDON WHITEHOUSE,DEM,GOP,53.52,46.48,7.04,True,GOP,True,GOP,False,medsl_senate
-2006,Tennessee,TN,False,BOB CORKER,GOP,DEM,50.71,47.99,2.72,False,GOP,False,GOP,False,medsl_senate
-2006,Texas,TX,False,KAY BAILEY HUTCHISON,GOP,DEM,61.69,36.04,25.65,False,GOP,False,GOP,False,medsl_senate
-2006,Utah,UT,False,ORRIN G. HATCH,GOP,DEM,62.36,31.06,31.3,False,GOP,False,GOP,False,medsl_senate
-2006,Virginia,VA,False,"JAMES H. ""JIM"" WEBB, JR.",DEM,GOP,49.59,49.2,0.39,True,GOP,True,GOP,False,medsl_senate
-2006,Vermont,VT,False,BERNARD SANDERS,IND,GOP,65.41,32.36,33.04,True,GOP,False,IND,False,medsl_senate
-2006,Washington,WA,False,MARIA CANTWELL,DEM,GOP,56.85,39.93,16.92,False,DEM,False,DEM,False,medsl_senate
-2006,Wisconsin,WI,False,HERB KOHL,DEM,GOP,67.31,29.48,37.83,False,DEM,False,DEM,False,medsl_senate
-2006,West Virginia,WV,False,ROBERT C. BYRD,DEM,GOP,77.05,22.95,54.1,False,DEM,False,DEM,False,medsl_senate
-2006,Wyoming,WY,False,CRAIG THOMAS,GOP,DEM,69.99,29.86,40.13,False,GOP,False,GOP,False,medsl_senate
-2008,Alaska,AK,False,MARK BEGICH,DEM,GOP,47.77,46.52,1.24,True,GOP,True,GOP,False,medsl_senate
-2008,Alabama,AL,False,JEFF SESSIONS,GOP,DEM,63.36,36.52,26.84,False,GOP,False,GOP,False,medsl_senate
-2008,Arkansas,AR,False,MARK L. PRYOR,DEM,OTHER,79.53,20.47,59.07,False,DEM,False,DEM,False,medsl_senate
-2008,Colorado,CO,False,MARK UDALL,DEM,GOP,52.8,42.49,10.3,True,GOP,True,GOP,False,medsl_senate
-2008,Delaware,DE,False,JOSEPH R. BIDEN JR.,DEM,GOP,64.69,35.31,29.37,False,DEM,False,DEM,False,medsl_senate
-2008,Georgia,GA,False,SAXBY CHAMBLISS,GOP,DEM,57.44,42.56,14.88,False,GOP,False,GOP,False,medsl_senate
-2008,Iowa,IA,False,TOM HARKIN,DEM,GOP,62.66,37.26,25.39,False,DEM,False,DEM,False,medsl_senate
-2008,Idaho,ID,False,JIM RISCH,GOP,DEM,57.65,34.11,23.55,False,GOP,False,GOP,False,medsl_senate
-2008,Illinois,IL,False,RICHARD J. DURBIN,DEM,GOP,67.84,28.53,39.31,False,DEM,False,DEM,False,medsl_senate
-2008,Kansas,KS,False,PAT ROBERTS,GOP,DEM,60.06,36.46,23.6,False,GOP,False,GOP,False,medsl_senate
-2008,Kentucky,KY,False,MITCH MCCONNELL,GOP,DEM,52.97,47.03,5.93,False,GOP,False,GOP,False,medsl_senate
-2008,Louisiana,LA,False,MARY L. LANDRIEU,DEM,GOP,52.11,45.72,6.39,False,DEM,False,DEM,False,medsl_senate
-2008,Massachusetts,MA,False,JOHN F. KERRY,DEM,GOP,65.86,30.93,34.93,False,DEM,False,DEM,False,medsl_senate
-2008,Maine,ME,False,SUSAN M. COLLINS,GOP,DEM,61.33,38.58,22.75,False,GOP,False,GOP,False,medsl_senate
-2008,Michigan,MI,False,CARL LEVIN,DEM,GOP,62.66,33.85,28.82,False,DEM,False,DEM,False,medsl_senate
-2008,Minnesota,MN,False,AL FRANKEN,DEM,GOP,41.99,41.98,0.01,True,GOP,True,GOP,False,medsl_senate
-2008,Mississippi,MS,False,THAD COCHRAN,GOP,DEM,61.44,38.56,22.87,False,GOP,False,GOP,False,medsl_senate
-2008,Mississippi,MS,True,ROGER F. WICKER,GOP,IND,54.96,45.04,9.92,False,GOP,False,GOP,False,medsl_senate
-2008,Montana,MT,False,MAX BAUCUS,DEM,GOP,72.92,27.08,45.83,False,DEM,False,DEM,False,medsl_senate
-2008,North Carolina,NC,False,KAY HAGAN,DEM,GOP,52.65,44.18,8.47,True,GOP,True,GOP,False,medsl_senate
-2008,Nebraska,NE,False,MIKE JOHANNS,GOP,DEM,57.52,40.06,17.46,False,GOP,False,GOP,False,medsl_senate
-2008,New Hampshire,NH,False,JEANNE SHAHEEN,DEM,GOP,51.59,45.25,6.34,True,GOP,True,GOP,False,medsl_senate
-2008,New Jersey,NJ,False,FRANK R. LAUTENBERG,DEM,GOP,56.03,41.95,14.08,False,DEM,False,DEM,False,medsl_senate
-2008,New Mexico,NM,False,TOM UDALL,DEM,GOP,61.33,38.67,22.66,True,GOP,True,GOP,False,medsl_senate
-2008,Oklahoma,OK,False,JAMES M. INHOFE,GOP,DEM,56.68,39.18,17.5,False,GOP,False,GOP,False,medsl_senate
-2008,Oregon,OR,False,JEFF MERKLEY,DEM,GOP,48.9,45.55,3.35,True,GOP,True,GOP,False,medsl_senate
-2008,Rhode Island,RI,False,JACK REED,DEM,GOP,73.07,26.47,46.6,False,DEM,False,DEM,False,medsl_senate
-2008,South Carolina,SC,False,LINDSEY GRAHAM,GOP,DEM,57.52,42.25,15.28,False,GOP,False,GOP,False,medsl_senate
-2008,South Dakota,SD,False,TIM JOHNSON,DEM,GOP,62.49,37.51,24.98,False,DEM,False,DEM,False,medsl_senate
-2008,Tennessee,TN,False,LAMAR ALEXANDER,GOP,DEM,65.14,31.64,33.5,False,GOP,False,GOP,False,medsl_senate
-2008,Texas,TX,False,JOHN CORNYN,GOP,DEM,54.82,42.84,11.98,False,GOP,False,GOP,False,medsl_senate
-2008,Virginia,VA,False,MARK R. WARNER,DEM,GOP,65.03,33.73,31.3,True,GOP,True,GOP,False,medsl_senate
-2008,West Virginia,WV,False,JOHN D. ROCKEFELLER IV,DEM,GOP,63.73,36.26,27.47,False,DEM,False,DEM,False,medsl_senate
-2008,Wyoming,WY,False,MICHAEL B. ENZI,GOP,DEM,75.63,24.26,51.38,False,GOP,False,GOP,False,medsl_senate
-2008,Wyoming,WY,True,JOHN BARRASSO,GOP,DEM,73.35,26.53,46.83,False,GOP,False,GOP,False,medsl_senate
-2010,Alaska,AK,False,LISA MURKOWSKI,GOP,GOP,39.57,35.55,4.01,False,GOP,False,GOP,False,medsl_senate
-2010,Alabama,AL,False,RICHARD C. SHELBY,GOP,DEM,65.18,34.71,30.47,False,GOP,False,GOP,False,medsl_senate
-2010,Arkansas,AR,False,JOHN BOOZMAN,GOP,DEM,57.9,36.95,20.96,True,DEM,True,DEM,False,medsl_senate
-2010,Arizona,AZ,False,JOHN MCCAIN,GOP,DEM,58.86,34.65,24.21,False,GOP,False,GOP,False,medsl_senate
-2010,California,CA,False,BARBARA BOXER,DEM,GOP,52.18,42.17,10.01,False,DEM,False,DEM,False,medsl_senate
-2010,Colorado,CO,False,MICHAEL F. BENNET,DEM,GOP,48.05,46.42,1.63,False,DEM,False,DEM,False,medsl_senate
-2010,Connecticut,CT,False,RICHARD BLUMENTHAL,DEM,GOP,55.16,43.22,11.94,False,DEM,False,DEM,False,medsl_senate
-2010,Delaware,DE,True,CHRISTOPHER A. COONS,DEM,GOP,56.61,40.03,16.58,False,DEM,False,DEM,False,medsl_senate
-2010,Florida,FL,False,MARCO RUBIO,GOP,IND,48.89,29.71,19.19,False,GOP,False,GOP,False,medsl_senate
-2010,Georgia,GA,False,JOHNNY ISAKSON,GOP,DEM,58.31,39.0,19.31,False,GOP,False,GOP,False,medsl_senate
-2010,Hawaii,HI,False,DANIEL K. INOUYE,DEM,GOP,74.81,21.57,53.24,False,DEM,False,DEM,False,medsl_senate
-2010,Iowa,IA,False,CHUCK GRASSLEY,GOP,DEM,64.35,33.3,31.05,False,GOP,False,GOP,False,medsl_senate
-2010,Idaho,ID,False,MIKE CRAPO,GOP,DEM,71.18,24.93,46.25,False,GOP,False,GOP,False,medsl_senate
-2010,Illinois,IL,True,MARK STEVEN KIRK,GOP,DEM,48.01,46.42,1.6,True,DEM,True,DEM,False,medsl_senate
-2010,Indiana,IN,False,DAN COATS,GOP,DEM,54.58,40.0,14.58,True,DEM,True,DEM,False,medsl_senate
-2010,Kansas,KS,False,JERRY MORAN,GOP,DEM,70.09,26.38,43.72,False,GOP,False,GOP,False,medsl_senate
-2010,Kentucky,KY,False,RAND PAUL,GOP,DEM,55.73,44.25,11.48,False,GOP,False,GOP,False,medsl_senate
-2010,Louisiana,LA,False,DAVID VITTER,GOP,DEM,56.55,37.67,18.88,False,GOP,False,GOP,False,medsl_senate
-2010,Massachusetts,MA,True,Scott P. Brown,GOP,DEM,51.86,47.1,4.76,True,DEM,True,DEM,False,manual_senate_results
-2010,Maryland,MD,False,BARBARA MIKULSKI,DEM,GOP,62.19,35.75,26.44,False,DEM,False,DEM,False,medsl_senate
-2010,Missouri,MO,False,ROY BLUNT,GOP,DEM,54.23,40.63,13.6,False,GOP,False,GOP,False,medsl_senate
-2010,North Carolina,NC,False,RICHARD BURR,GOP,DEM,54.81,43.05,11.77,False,GOP,False,GOP,False,medsl_senate
-2010,North Dakota,ND,False,JOHN HOEVEN,GOP,DEM,76.17,22.2,53.97,True,DEM,True,DEM,False,medsl_senate
-2010,New Hampshire,NH,False,KELLY AYOTTE,GOP,DEM,60.09,36.85,23.24,False,GOP,False,GOP,False,medsl_senate
-2010,Nevada,NV,False,HARRY REID,DEM,GOP,50.29,44.55,5.74,False,DEM,False,DEM,False,medsl_senate
-2010,New York,NY,False,CHARLES E. SCHUMER,DEM,GOP,66.32,32.21,34.11,False,DEM,False,DEM,False,medsl_senate
-2010,New York,NY,True,KIRSTEN E. GILLIBRAND,DEM,GOP,62.95,35.11,27.84,False,DEM,False,DEM,False,medsl_senate
-2010,Ohio,OH,False,ROB PORTMAN,GOP,DEM,56.85,39.4,17.44,False,GOP,False,GOP,False,medsl_senate
-2010,Oklahoma,OK,False,THOMAS A. COBURN,GOP,DEM,70.64,26.13,44.5,False,GOP,False,GOP,False,medsl_senate
-2010,Oregon,OR,False,RON WYDEN,DEM,GOP,57.22,39.25,17.98,False,DEM,False,DEM,False,medsl_senate
-2010,Pennsylvania,PA,False,PAT TOOMEY,GOP,DEM,51.01,48.99,2.02,False,GOP,True,DEM,False,medsl_senate
-2010,South Carolina,SC,False,JIM DEMINT,GOP,DEM,61.48,27.65,33.83,False,GOP,False,GOP,False,medsl_senate
-2010,South Dakota,SD,False,JOHN THUNE,GOP,,100.0,,,False,GOP,False,GOP,False,medsl_senate
-2010,Utah,UT,False,MIKE LEE,GOP,DEM,61.58,32.76,28.82,False,GOP,False,GOP,False,medsl_senate
-2010,Vermont,VT,False,PATRICK J. LEAHY,DEM,GOP,64.33,30.91,33.41,False,DEM,False,DEM,False,medsl_senate
-2010,Washington,WA,False,PATTY MURRAY,DEM,GOP,52.36,47.64,4.73,False,DEM,False,DEM,False,medsl_senate
-2010,Wisconsin,WI,False,RON JOHNSON,GOP,DEM,51.87,47.03,4.84,True,DEM,True,DEM,False,medsl_senate
-2010,West Virginia,WV,True,JOE MANCHIN III,DEM,GOP,53.47,43.4,10.07,False,DEM,False,DEM,False,medsl_senate
-2012,Arizona,AZ,False,JEFF FLAKE,GOP,DEM,49.23,46.2,3.03,False,GOP,False,GOP,False,medsl_senate
-2012,California,CA,False,DIANNE FEINSTEIN,DEM,GOP,62.52,37.48,25.05,False,DEM,False,DEM,False,medsl_senate
-2012,Connecticut,CT,False,CHRISTOPHER S. MURPHY,DEM,GOP,54.82,43.07,11.75,True,IND,True,IND,False,medsl_senate
-2012,Delaware,DE,False,THOMAS R. CARPER,DEM,GOP,66.42,28.95,37.47,False,DEM,False,DEM,False,medsl_senate
-2012,Florida,FL,False,BILL NELSON,DEM,GOP,55.23,42.23,13.01,False,DEM,False,DEM,False,medsl_senate
-2012,Hawaii,HI,False,MAZIE K. HIRONO,DEM,GOP,62.6,37.4,25.2,False,DEM,False,DEM,False,medsl_senate
-2012,Indiana,IN,False,JOE DONNELLY,DEM,GOP,50.04,44.28,5.76,True,GOP,True,GOP,False,medsl_senate
-2012,Massachusetts,MA,False,ELIZABETH A. WARREN,DEM,GOP,53.74,46.19,7.55,True,GOP,True,GOP,False,medsl_senate
-2012,Maryland,MD,False,BENJAMIN L. CARDIN,DEM,GOP,55.98,26.33,29.65,False,DEM,False,DEM,False,medsl_senate
-2012,Maine,ME,False,ANGUS KING,IND,GOP,52.89,30.74,22.15,True,GOP,True,GOP,False,medsl_senate
-2012,Michigan,MI,False,DEBBIE STABENOW,DEM,GOP,58.8,37.98,20.81,False,DEM,False,DEM,False,medsl_senate
-2012,Minnesota,MN,False,AMY KLOBUCHAR,DEM,GOP,65.23,30.53,34.7,False,DEM,False,DEM,False,medsl_senate
-2012,Missouri,MO,False,CLAIRE MCCASKILL,DEM,GOP,54.81,39.11,15.7,False,DEM,False,DEM,False,medsl_senate
-2012,Mississippi,MS,False,ROGER F. WICKER,GOP,DEM,57.16,40.55,16.6,False,GOP,False,GOP,False,medsl_senate
-2012,Montana,MT,False,JON TESTER,DEM,GOP,48.58,44.86,3.72,False,DEM,False,DEM,False,medsl_senate
-2012,North Dakota,ND,False,HEIDI HEITKAMP,DEM,GOP,50.24,49.32,0.91,False,DEM,False,DEM,False,medsl_senate
-2012,Nebraska,NE,False,DEB FISCHER,GOP,DEM,57.77,42.23,15.55,True,DEM,True,DEM,False,medsl_senate
-2012,New Jersey,NJ,False,ROBERT MENENDEZ,DEM,GOP,58.87,39.37,19.49,False,DEM,False,DEM,False,medsl_senate
-2012,New Mexico,NM,False,MARTIN HEINRICH,DEM,GOP,51.01,45.28,5.73,False,DEM,False,DEM,False,medsl_senate
-2012,Nevada,NV,False,DEAN HELLER,GOP,DEM,45.87,44.71,1.16,False,GOP,False,GOP,False,medsl_senate
-2012,New York,NY,False,KIRSTEN E. GILLIBRAND,DEM,GOP,72.2,26.36,45.84,False,DEM,False,DEM,False,medsl_senate
-2012,Ohio,OH,False,SHERROD BROWN,DEM,GOP,50.7,44.7,6.0,False,DEM,False,DEM,False,medsl_senate
-2012,Pennsylvania,PA,False,"ROBERT P. CASEY, JR.",DEM,GOP,53.69,44.59,9.1,False,DEM,False,DEM,False,medsl_senate
-2012,Rhode Island,RI,False,SHELDON WHITEHOUSE,DEM,GOP,64.81,34.97,29.85,False,DEM,False,DEM,False,medsl_senate
-2012,Tennessee,TN,False,BOB CORKER,GOP,DEM,64.89,30.41,34.48,False,GOP,False,GOP,False,medsl_senate
-2012,Texas,TX,False,TED CRUZ,GOP,DEM,56.46,40.62,15.83,False,GOP,False,GOP,False,medsl_senate
-2012,Utah,UT,False,ORRIN G. HATCH,GOP,DEM,65.31,29.98,35.33,False,GOP,False,GOP,False,medsl_senate
-2012,Virginia,VA,False,TIMOTHY M. KAINE,DEM,GOP,52.87,46.96,5.91,False,DEM,False,DEM,False,medsl_senate
-2012,Vermont,VT,False,BERNARD SANDERS,IND,GOP,71.0,24.9,46.1,False,IND,False,IND,False,medsl_senate
-2012,Washington,WA,False,MARIA CANTWELL,DEM,GOP,60.45,39.55,20.9,False,DEM,False,DEM,False,medsl_senate
-2012,Wisconsin,WI,False,TAMMY BALDWIN,DEM,GOP,51.41,45.86,5.55,False,DEM,False,DEM,False,medsl_senate
-2012,West Virginia,WV,False,JOE MANCHIN III,DEM,GOP,60.57,36.47,24.1,False,DEM,False,DEM,False,medsl_senate
-2012,Wyoming,WY,False,JOHN BARRASSO,GOP,DEM,75.65,21.65,54.0,False,GOP,False,GOP,False,medsl_senate
-2013,Massachusetts,MA,True,Edward J. Markey,DEM,GOP,54.8,44.6,10.2,False,DEM,False,DEM,False,manual_senate_results
-2013,New Jersey,NJ,True,Cory Booker,DEM,GOP,54.92,44.02,10.9,False,DEM,True,GOP,False,manual_senate_results
-2014,Alaska,AK,False,DAN SULLIVAN,GOP,DEM,47.96,45.83,2.13,True,DEM,True,DEM,False,medsl_senate
-2014,Alabama,AL,False,JEFF SESSIONS,GOP,,97.25,2.75,94.5,False,GOP,False,GOP,False,medsl_senate
-2014,Arkansas,AR,False,TOM COTTON,GOP,DEM,56.5,39.43,17.07,True,DEM,True,DEM,False,medsl_senate
-2014,Colorado,CO,False,CORY GARDNER,GOP,DEM,48.2,46.26,1.94,True,DEM,True,DEM,False,medsl_senate
-2014,Delaware,DE,False,CHRISTOPHER A. COONS,DEM,GOP,55.83,42.23,13.6,False,DEM,False,DEM,False,medsl_senate
-2014,Georgia,GA,False,DAVID A. PERDUE,GOP,DEM,52.89,45.21,7.68,False,GOP,False,GOP,False,medsl_senate
-2014,Hawaii,HI,True,BRIAN SCHATZ,DEM,GOP,69.77,27.7,42.07,False,DEM,False,DEM,False,medsl_senate
-2014,Iowa,IA,False,JONI ERNST,GOP,DEM,52.1,43.76,8.34,True,DEM,True,DEM,False,medsl_senate
-2014,Idaho,ID,False,JAMES E. RISCH,GOP,DEM,65.33,34.67,30.66,False,GOP,False,GOP,False,medsl_senate
-2014,Illinois,IL,False,RICHARD J. DURBIN,DEM,GOP,53.55,42.69,10.85,False,DEM,False,DEM,False,medsl_senate
-2014,Kansas,KS,False,PAT ROBERTS,GOP,IND,53.15,42.53,10.62,False,GOP,False,GOP,False,medsl_senate
-2014,Kentucky,KY,False,MICH MCCONNELL,GOP,DEM,56.19,40.72,15.47,False,GOP,False,GOP,False,medsl_senate
-2014,Louisiana,LA,False,Bill Cassidy,GOP,DEM,55.93,44.07,11.86,True,DEM,True,DEM,False,manual_senate_results
-2014,Massachusetts,MA,False,EDWARD J. MARKEY,DEM,GOP,61.87,37.98,23.88,False,DEM,False,DEM,False,medsl_senate
-2014,Maine,ME,False,SUSAN M. COLLINS,GOP,DEM,68.46,31.5,36.96,False,GOP,False,GOP,False,medsl_senate
-2014,Michigan,MI,False,GARY C. PETERS,DEM,GOP,54.61,41.33,13.29,False,DEM,False,DEM,False,medsl_senate
-2014,Minnesota,MN,False,AL FRANKEN,DEM,GOP,53.15,42.91,10.24,False,DEM,False,DEM,False,medsl_senate
-2014,Mississippi,MS,False,THAD COCHRAN,GOP,DEM,59.9,37.89,22.01,False,GOP,False,GOP,False,medsl_senate
-2014,Montana,MT,False,STEVE DAINES,GOP,DEM,57.79,40.07,17.72,True,DEM,True,DEM,False,medsl_senate
-2014,North Carolina,NC,False,THOM TILLIS,GOP,DEM,48.82,47.26,1.56,True,DEM,True,DEM,False,medsl_senate
-2014,Nebraska,NE,False,BEN SASSE,GOP,DEM,64.34,31.49,32.85,False,GOP,False,GOP,False,medsl_senate
-2014,New Hampshire,NH,False,JEANNE SHAHEEN,DEM,GOP,51.46,48.21,3.24,False,DEM,False,DEM,False,medsl_senate
-2014,New Jersey,NJ,False,CORY A. BOOKER,DEM,GOP,55.84,42.33,13.51,False,DEM,False,DEM,False,medsl_senate
-2014,New Mexico,NM,False,TOM UDALL,DEM,GOP,55.56,44.44,11.12,False,DEM,False,DEM,False,medsl_senate
-2014,Oklahoma,OK,False,JAMES M. INHOFE,GOP,DEM,68.01,28.55,39.46,False,GOP,False,GOP,False,medsl_senate
-2014,Oklahoma,OK,True,JAMES LANKFORD,GOP,DEM,67.85,28.98,38.87,False,GOP,False,GOP,False,medsl_senate
-2014,Oregon,OR,False,JEFF MERKLEY,DEM,GOP,55.73,36.87,18.86,False,DEM,False,DEM,False,medsl_senate
-2014,Rhode Island,RI,False,JACK REED,DEM,GOP,70.58,29.25,41.34,False,DEM,False,DEM,False,medsl_senate
-2014,South Carolina,SC,False,LINDSEY GRAHAM,GOP,DEM,54.27,38.78,15.48,False,GOP,False,GOP,False,medsl_senate
-2014,South Carolina,SC,True,TIM SCOTT,GOP,DEM,61.12,37.09,24.02,False,GOP,False,GOP,False,medsl_senate
-2014,South Dakota,SD,False,MIKE ROUNDS,GOP,DEM,50.37,29.51,20.86,True,DEM,True,DEM,False,medsl_senate
-2014,Tennessee,TN,False,LAMAR ALEXANDER,GOP,DEM,61.87,31.87,30.0,False,GOP,False,GOP,False,medsl_senate
-2014,Texas,TX,False,JOHN CORNYN,GOP,DEM,61.56,34.36,27.2,False,GOP,False,GOP,False,medsl_senate
-2014,Virginia,VA,False,MARK R. WARNER,DEM,GOP,49.15,48.34,0.81,False,DEM,False,DEM,False,medsl_senate
-2014,West Virginia,WV,False,SHELLEY MOORE CAPITO,GOP,DEM,62.12,34.46,27.65,True,DEM,True,DEM,False,medsl_senate
-2014,Wyoming,WY,False,MICHAEL B. ENZI,GOP,DEM,72.19,17.45,54.74,False,GOP,False,GOP,False,medsl_senate
-2016,Alaska,AK,False,LISA MURKOWSKI,GOP,OTHER,44.36,29.16,15.2,False,GOP,False,GOP,False,medsl_senate
-2016,Alabama,AL,False,RICHARD C. SHELBY,GOP,DEM,63.96,35.87,28.09,False,GOP,False,GOP,False,medsl_senate
-2016,Arkansas,AR,False,JOHN BOOZMAN,GOP,DEM,59.77,36.17,23.6,False,GOP,False,GOP,False,medsl_senate
-2016,Arizona,AZ,False,JOHN MCCAIN,GOP,DEM,53.71,40.75,12.96,False,GOP,False,GOP,False,medsl_senate
-2016,California,CA,False,KAMALA D. HARRIS,DEM,DEM,61.6,38.4,23.21,False,DEM,False,DEM,False,medsl_senate
-2016,Colorado,CO,False,MICHAEL F. BENNET,DEM,GOP,49.97,44.31,5.66,False,DEM,False,DEM,False,medsl_senate
-2016,Connecticut,CT,False,RICHARD BLUMENTHAL,DEM,GOP,63.19,34.62,28.57,False,DEM,False,DEM,False,medsl_senate
-2016,Florida,FL,False,MARCO RUBIO,GOP,DEM,51.98,44.31,7.67,False,GOP,False,GOP,False,medsl_senate
-2016,Georgia,GA,False,JOHNNY ISAKSON,GOP,DEM,54.78,41.03,13.75,False,GOP,False,GOP,False,medsl_senate
-2016,Hawaii,HI,False,BRIAN SCHATZ,DEM,GOP,73.6,22.24,51.36,False,DEM,False,DEM,False,medsl_senate
-2016,Iowa,IA,False,CHUCK GRASSLEY,GOP,DEM,60.09,35.66,24.43,False,GOP,False,GOP,False,medsl_senate
-2016,Idaho,ID,False,MIKE CRAPO,GOP,DEM,66.13,27.73,38.41,False,GOP,False,GOP,False,medsl_senate
-2016,Illinois,IL,False,TAMMY DUCKWORTH,DEM,GOP,54.86,39.78,15.08,True,GOP,True,GOP,False,medsl_senate
-2016,Indiana,IN,False,TODD C. YOUNG,GOP,DEM,52.11,42.41,9.7,False,GOP,False,GOP,False,medsl_senate
-2016,Kansas,KS,False,JERRY MORAN,GOP,DEM,62.18,32.24,29.94,False,GOP,False,GOP,False,medsl_senate
-2016,Kentucky,KY,False,RAND PAUL,GOP,DEM,57.27,42.72,14.55,False,GOP,False,GOP,False,medsl_senate
-2016,Louisiana,LA,False,John Kennedy,GOP,DEM,60.65,39.35,21.3,False,GOP,False,GOP,False,manual_senate_results
-2016,Maryland,MD,False,CHRIS VAN HOLLEN,DEM,GOP,60.89,35.67,25.21,False,DEM,False,DEM,False,medsl_senate
-2016,Missouri,MO,False,ROY BLUNT,GOP,DEM,49.18,46.39,2.79,False,GOP,False,GOP,False,medsl_senate
-2016,North Carolina,NC,False,RICHARD BURR,GOP,DEM,51.06,45.37,5.7,False,GOP,False,GOP,False,medsl_senate
-2016,North Dakota,ND,False,JOHN HOEVEN,GOP,DEM,78.48,16.97,61.51,False,GOP,False,GOP,False,medsl_senate
-2016,New Hampshire,NH,False,MAGGIE HASSAN,DEM,GOP,47.98,47.84,0.14,True,GOP,True,GOP,False,medsl_senate
-2016,Nevada,NV,False,CATHERINE CORTEZ MASTO,DEM,GOP,47.1,44.67,2.43,False,DEM,False,DEM,False,medsl_senate
-2016,New York,NY,False,CHARLES E. SCHUMER,DEM,GOP,70.6,27.17,43.44,False,DEM,False,DEM,False,medsl_senate
-2016,Ohio,OH,False,ROB PORTMAN,GOP,DEM,58.03,37.16,20.87,False,GOP,False,GOP,False,medsl_senate
-2016,Oklahoma,OK,False,JAMES LANKFORD,GOP,DEM,67.74,24.58,43.16,False,GOP,False,GOP,False,medsl_senate
-2016,Oregon,OR,False,RON WYDEN,DEM,GOP,56.6,33.35,23.25,False,DEM,False,DEM,False,medsl_senate
-2016,Pennsylvania,PA,False,PATRICK J. TOOMEY,GOP,DEM,48.77,47.34,1.43,False,GOP,False,GOP,False,medsl_senate
-2016,South Carolina,SC,False,TIM SCOTT,GOP,DEM,60.57,36.93,23.64,False,GOP,False,GOP,False,medsl_senate
-2016,South Dakota,SD,False,JOHN R. THUNE,GOP,DEM,71.83,28.17,43.66,False,GOP,False,GOP,False,medsl_senate
-2016,Utah,UT,False,MIKE LEE,GOP,DEM,68.15,27.06,41.09,False,GOP,False,GOP,False,medsl_senate
-2016,Vermont,VT,False,PATRICK J. LEAHY,DEM,GOP,61.26,33.03,28.24,False,DEM,False,DEM,False,medsl_senate
-2016,Washington,WA,False,PATTY MURRAY,DEM,GOP,59.01,40.99,18.03,False,DEM,False,DEM,False,medsl_senate
-2016,Wisconsin,WI,False,RON JOHNSON,GOP,DEM,50.17,46.81,3.36,False,GOP,False,GOP,False,medsl_senate
-2017,Alabama,AL,True,Doug Jones,DEM,GOP,49.97,48.34,1.63,True,GOP,True,GOP,False,manual_senate_results
-2018,Arizona,AZ,False,KYRSTEN SINEMA,DEM,GOP,49.96,47.61,2.34,True,GOP,True,GOP,False,medsl_senate
-2018,California,CA,False,DIANNE FEINSTEIN,DEM,DEM,54.16,45.84,8.33,False,DEM,False,DEM,False,medsl_senate
-2018,Connecticut,CT,False,CHRISTOPHER S MURPHY,DEM,GOP,59.53,39.35,20.18,False,DEM,False,DEM,False,medsl_senate
-2018,Delaware,DE,False,THOMAS R CARPER,DEM,GOP,59.95,37.82,22.13,False,DEM,False,DEM,False,medsl_senate
-2018,Florida,FL,False,RICK SCOTT,GOP,DEM,50.05,49.93,0.12,True,DEM,True,DEM,False,medsl_senate
-2018,Hawaii,HI,False,MAZIE K. HIRONO,DEM,GOP,71.15,28.85,42.3,False,DEM,False,DEM,False,medsl_senate
-2018,Indiana,IN,False,MIKE BRAUN,GOP,DEM,50.73,44.84,5.89,True,DEM,True,DEM,False,medsl_senate
-2018,Massachusetts,MA,False,ELIZABETH A. WARREN,DEM,GOP,60.34,36.17,24.16,False,DEM,False,DEM,False,medsl_senate
-2018,Maryland,MD,False,BEN CARDIN,DEM,GOP,64.86,30.31,34.55,False,DEM,False,DEM,False,medsl_senate
-2018,Maine,ME,False,"ANGUS S. KING, JR.",IND,GOP,54.31,35.23,19.08,False,IND,False,IND,False,medsl_senate
-2018,Michigan,MI,False,DEBBIE STABENOW,DEM,GOP,52.26,45.76,6.51,False,DEM,False,DEM,False,medsl_senate
-2018,Minnesota,MN,False,AMY KLOBUCHAR,DEM,GOP,60.31,36.21,24.1,False,DEM,False,DEM,False,medsl_senate
-2018,Minnesota,MN,True,TINA SMITH,DEM,GOP,52.97,42.35,10.62,False,DEM,False,DEM,False,medsl_senate
-2018,Missouri,MO,False,JOSH HAWLEY,GOP,DEM,51.38,45.57,5.81,True,DEM,True,DEM,False,medsl_senate
-2018,Mississippi,MS,False,ROGER F. WICKER,GOP,DEM,58.49,39.47,19.02,False,GOP,False,GOP,False,medsl_senate
-2018,Mississippi,MS,True,Cindy Hyde-Smith,GOP,DEM,53.63,46.37,7.26,False,GOP,False,GOP,False,manual_senate_results
-2018,Montana,MT,False,JON TESTER,DEM,GOP,50.33,46.78,3.55,False,DEM,False,DEM,False,medsl_senate
-2018,North Dakota,ND,False,KEVIN CRAMER,GOP,DEM,55.11,44.27,10.84,True,DEM,True,DEM,False,medsl_senate
-2018,Nebraska,NE,False,DEB FISCHER,GOP,DEM,57.69,38.62,19.06,False,GOP,False,GOP,False,medsl_senate
-2018,New Jersey,NJ,False,ROBERT MENENDEZ,DEM,GOP,54.01,42.83,11.18,False,DEM,False,DEM,False,medsl_senate
-2018,New Mexico,NM,False,MARTIN T HEINRICH,DEM,GOP,54.09,30.53,23.56,False,DEM,False,DEM,False,medsl_senate
-2018,Nevada,NV,False,JACKY ROSEN,DEM,GOP,50.41,45.38,5.03,True,GOP,True,GOP,False,medsl_senate
-2018,New York,NY,False,KIRSTEN E. GILLIBRAND,DEM,GOP,67.0,33.0,34.0,False,DEM,False,DEM,False,medsl_senate
-2018,Ohio,OH,False,SHERROD BROWN,DEM,GOP,53.41,46.57,6.85,False,DEM,False,DEM,False,medsl_senate
-2018,Pennsylvania,PA,False,ROBERT P CASEY JR,DEM,GOP,55.61,42.74,12.87,False,DEM,False,DEM,False,medsl_senate
-2018,Rhode Island,RI,False,SHELDON WHITEHOUSE,DEM,GOP,61.44,38.33,23.11,False,DEM,False,DEM,False,medsl_senate
-2018,Tennessee,TN,False,MARSHA BLACKBURN,GOP,DEM,54.71,43.92,10.79,False,GOP,False,GOP,False,medsl_senate
-2018,Texas,TX,False,TED CRUZ,GOP,DEM,50.89,48.33,2.57,False,GOP,False,GOP,False,medsl_senate
-2018,Utah,UT,False,MITT ROMNEY,GOP,DEM,62.59,30.91,31.68,False,GOP,False,GOP,False,medsl_senate
-2018,Virginia,VA,False,TIMOTHY M. KAINE,DEM,GOP,57.0,41.01,16.0,False,DEM,False,DEM,False,medsl_senate
-2018,Vermont,VT,False,BERNIE SANDERS,IND,GOP,67.32,27.39,39.93,False,IND,False,IND,False,medsl_senate
-2018,Washington,WA,False,MARIA CANTWELL,DEM,GOP,58.43,41.57,16.87,False,DEM,False,DEM,False,medsl_senate
-2018,Wisconsin,WI,False,TAMMY BALDWIN,DEM,GOP,55.42,44.58,10.84,False,DEM,False,DEM,False,medsl_senate
-2018,West Virginia,WV,False,JOE MANCHIN,DEM,GOP,49.55,46.3,3.25,False,DEM,False,DEM,False,medsl_senate
-2018,Wyoming,WY,False,JOHN BARRASSO,GOP,DEM,66.96,30.1,36.86,False,GOP,False,GOP,False,medsl_senate
-2020,Alaska,AK,False,DAN SULLIVAN,GOP,DEM,53.9,41.19,12.7,False,GOP,False,GOP,False,medsl_senate
-2020,Alabama,AL,False,TOMMY TUBERVILLE,GOP,DEM,60.1,39.74,20.36,True,DEM,True,DEM,False,medsl_senate
-2020,Arkansas,AR,False,TOM COTTON,GOP,OTHER,66.53,33.47,33.06,False,GOP,False,GOP,False,medsl_senate
-2020,Arizona,AZ,True,MARK KELLY,DEM,GOP,51.16,48.81,2.35,True,GOP,True,GOP,False,medsl_senate
-2020,Colorado,CO,False,JOHN W. HICKENLOOPER,DEM,GOP,53.5,44.18,9.32,True,GOP,True,GOP,False,medsl_senate
-2020,Delaware,DE,False,CHRISTOPHER A. COONS,DEM,GOP,59.44,37.9,21.54,False,DEM,False,DEM,False,medsl_senate
-2020,Georgia,GA,False,JON OSSOFF,DEM,GOP,50.62,49.38,1.23,True,GOP,True,GOP,False,medsl_senate
-2020,Georgia,GA,True,RAPHAEL WARNOCK,DEM,GOP,51.04,48.96,2.09,True,GOP,True,GOP,False,medsl_senate
-2020,Iowa,IA,False,JONI ERNST,GOP,DEM,51.74,45.15,6.59,False,GOP,False,GOP,False,medsl_senate
-2020,Idaho,ID,False,JIM RISCH,GOP,DEM,62.62,33.25,29.38,False,GOP,False,GOP,False,medsl_senate
-2020,Illinois,IL,False,RICHARD J. DURBIN,DEM,GOP,54.93,38.87,16.07,False,DEM,False,DEM,False,medsl_senate
-2020,Kansas,KS,False,ROGER MARSHALL,GOP,DEM,53.22,41.79,11.44,False,GOP,False,GOP,False,medsl_senate
-2020,Kentucky,KY,False,MITCH MCCONNELL,GOP,DEM,57.76,38.23,19.53,False,GOP,False,GOP,False,medsl_senate
-2020,Louisiana,LA,False,"""BILL"" CASSIDY",GOP,DEM,59.32,19.02,40.3,False,GOP,False,GOP,False,medsl_senate
-2020,Massachusetts,MA,False,EDWARD J. MARKEY,DEM,GOP,66.15,33.04,33.11,False,DEM,False,DEM,False,medsl_senate
-2020,Maine,ME,False,SUSAN MARGARET COLLINS,GOP,DEM,50.98,42.39,8.6,False,GOP,False,GOP,False,medsl_senate
-2020,Michigan,MI,False,GARY PETERS,DEM,GOP,49.9,48.22,1.69,False,DEM,False,DEM,False,medsl_senate
-2020,Minnesota,MN,False,TINA SMITH,DEM,GOP,48.74,43.5,5.24,False,DEM,False,DEM,False,medsl_senate
-2020,Mississippi,MS,False,CINDY HYDE-SMITH,GOP,DEM,54.11,44.13,9.98,False,GOP,False,GOP,False,medsl_senate
-2020,Montana,MT,False,STEVE DAINES,GOP,DEM,55.01,44.99,10.02,False,GOP,False,GOP,False,medsl_senate
-2020,North Carolina,NC,False,THOM TILLIS,GOP,DEM,48.69,46.94,1.75,False,GOP,False,GOP,False,medsl_senate
-2020,Nebraska,NE,False,BEN SASSE,GOP,DEM,62.74,24.43,38.31,False,GOP,False,GOP,False,medsl_senate
-2020,New Hampshire,NH,False,JEANNE SHAHEEN,DEM,GOP,56.64,40.99,15.65,False,DEM,False,DEM,False,medsl_senate
-2020,New Jersey,NJ,False,CORY BOOKER,DEM,GOP,57.23,40.92,16.31,False,DEM,False,DEM,False,medsl_senate
-2020,New Mexico,NM,False,BEN R. LUJAN,DEM,GOP,51.73,45.62,6.11,False,DEM,False,DEM,False,medsl_senate
-2020,Oklahoma,OK,False,JIM INHOFE ,GOP,DEM,62.91,32.75,30.16,False,GOP,False,GOP,False,medsl_senate
-2020,Oregon,OR,False,JEFF MERKLEY,DEM,GOP,56.91,39.32,17.59,False,DEM,False,DEM,False,medsl_senate
-2020,Rhode Island,RI,False,JOHN F. REED,DEM,GOP,66.48,33.35,33.12,False,DEM,False,DEM,False,medsl_senate
-2020,South Carolina,SC,False,LINDSEY GRAHAM,GOP,DEM,54.44,44.17,10.27,False,GOP,False,GOP,False,medsl_senate
-2020,South Dakota,SD,False,MIKE ROUNDS,GOP,DEM,65.74,34.26,31.47,False,GOP,False,GOP,False,medsl_senate
-2020,Tennessee,TN,False,BILL HAGERTY,GOP,DEM,62.2,35.16,27.04,False,GOP,False,GOP,False,medsl_senate
-2020,Texas,TX,False,JOHN CORNYN,GOP,DEM,53.51,43.87,9.64,False,GOP,False,GOP,False,medsl_senate
-2020,Virginia,VA,False,MARK R. WARNER,DEM,GOP,55.99,43.91,12.08,False,DEM,False,DEM,False,medsl_senate
-2020,West Virginia,WV,False,SHELLEY MOORE CAPITO,GOP,DEM,70.28,27.0,43.28,False,GOP,False,GOP,False,medsl_senate
-2020,Wyoming,WY,False,CYNTHIA M. LUMMIS,GOP,,72.85,26.76,46.09,False,GOP,False,GOP,False,medsl_senate
-2022,Alaska,AK,False,"MURKOWSKI, LISA",GOP,,43.39,42.62,0.77,False,GOP,False,GOP,False,medsl_senate
-2022,Alabama,AL,False,KATIE BRITT,GOP,DEM,66.62,30.88,35.74,False,GOP,False,GOP,False,medsl_senate
-2022,Arkansas,AR,False,JOHN BOOZMAN,GOP,DEM,65.73,31.09,34.64,False,GOP,False,GOP,False,medsl_senate
-2022,Arizona,AZ,False,MARK KELLY,DEM,GOP,51.39,46.51,4.89,False,DEM,False,DEM,False,medsl_senate
-2022,California,CA,False,ALEX PADILLA,DEM,GOP,61.06,38.94,22.13,False,DEM,False,DEM,False,medsl_senate
-2022,California,CA,True,ALEX PADILLA,DEM,GOP,60.89,39.11,21.79,False,DEM,False,DEM,False,medsl_senate
-2022,Colorado,CO,False,MICHAEL BENNET,DEM,GOP,55.88,41.26,14.62,False,DEM,False,DEM,False,medsl_senate
-2022,Florida,FL,False,MARCO RUBIO,GOP,DEM,57.68,41.27,16.41,False,GOP,False,GOP,False,medsl_senate
-2022,Georgia,GA,False,RAPHAEL WARNOCK,DEM,GOP,51.4,48.6,2.81,False,DEM,False,DEM,False,medsl_senate
-2022,Hawaii,HI,False,"SCHATZ, BRIAN",DEM,GOP,71.21,26.04,45.17,False,DEM,False,DEM,False,medsl_senate
-2022,Iowa,IA,False,CHUCK GRASSLEY,GOP,DEM,56.01,43.84,12.18,False,GOP,False,GOP,False,medsl_senate
-2022,Idaho,ID,False,MIKE CRAPO,GOP,DEM,60.68,28.74,31.94,False,GOP,False,GOP,False,medsl_senate
-2022,Illinois,IL,False,TAMMY DUCKWORTH,DEM,GOP,56.82,41.5,15.32,False,DEM,False,DEM,False,medsl_senate
-2022,Indiana,IN,False,TODD YOUNG,GOP,DEM,58.62,37.87,20.74,False,GOP,False,GOP,False,medsl_senate
-2022,Kansas,KS,False,JERRY MORAN,GOP,DEM,60.0,37.04,22.96,False,GOP,False,GOP,False,medsl_senate
-2022,Kentucky,KY,False,RAND PAUL,GOP,DEM,61.8,38.19,23.62,False,GOP,False,GOP,False,medsl_senate
-2022,Louisiana,LA,False,JOHN KENNEDY,GOP,DEM,61.56,17.85,43.71,False,GOP,False,GOP,False,medsl_senate
-2022,Maryland,MD,False,CHRIS VAN HOLLEN,DEM,GOP,65.77,34.07,31.69,False,DEM,False,DEM,False,medsl_senate
-2022,Missouri,MO,False,ERIC SCHMITT,GOP,DEM,56.83,43.17,13.65,False,GOP,False,GOP,False,medsl_senate
-2022,North Carolina,NC,False,TED BUDD,GOP,DEM,50.5,47.27,3.23,False,GOP,False,GOP,False,medsl_senate
-2022,North Dakota,ND,False,JOHN HOEVEN,GOP,DEM,56.41,24.98,31.43,False,GOP,False,GOP,False,medsl_senate
-2022,New Hampshire,NH,False,MAGGIE HASSAN,DEM,GOP,53.54,44.39,9.16,False,DEM,False,DEM,False,medsl_senate
-2022,Nevada,NV,False,"CORTEZ MASTO, CATHERINE",DEM,GOP,48.81,48.04,0.78,False,DEM,False,DEM,False,medsl_senate
-2022,New York,NY,False,CHARLES E. SCHUMER,DEM,GOP,56.78,42.77,14.01,False,DEM,False,DEM,False,medsl_senate
-2022,Ohio,OH,False,JD VANCE,GOP,DEM,53.03,46.92,6.11,False,GOP,False,GOP,False,medsl_senate
-2022,Oklahoma,OK,False,JAMES LANKFORD,GOP,DEM,64.3,32.1,32.2,False,GOP,False,GOP,False,medsl_senate
-2022,Oklahoma,OK,True,MARKWAYNE MULLIN,GOP,DEM,61.77,35.24,26.53,False,GOP,False,GOP,False,medsl_senate
-2022,Oregon,OR,False,WYDEN RON,DEM,GOP,55.83,40.92,14.91,False,DEM,False,DEM,False,medsl_senate
-2022,Pennsylvania,PA,False,JOHN K FETTERMAN,DEM,GOP,51.25,46.33,4.91,True,GOP,True,GOP,False,medsl_senate
-2022,South Carolina,SC,False,TIM SCOTT,GOP,DEM,62.88,37.01,25.87,False,GOP,False,GOP,False,medsl_senate
-2022,South Dakota,SD,False,JOHN R THUNE,GOP,DEM,69.63,26.15,43.48,False,GOP,False,GOP,False,medsl_senate
-2022,Utah,UT,False,MIKE LEE,GOP,IND,53.15,42.74,10.41,False,GOP,False,GOP,False,medsl_senate
-2022,Vermont,VT,False,PETER WELCH,DEM,GOP,68.4,28.0,40.4,False,DEM,False,DEM,False,medsl_senate
-2022,Washington,WA,False,PATTY MURRAY,DEM,GOP,57.15,42.63,14.52,False,DEM,False,DEM,False,medsl_senate
-2022,Wisconsin,WI,False,RON JOHNSON,GOP,DEM,50.41,49.41,1.01,False,GOP,False,GOP,False,medsl_senate
-2024,Arizona,AZ,False,RUBEN GALLEGO,DEM,GOP,50.07,47.66,2.41,False,DEM,True,IND,False,medsl_senate
-2024,California,CA,False,ADAM B. SCHIFF,DEM,GOP,58.87,41.13,17.75,False,DEM,False,DEM,False,medsl_senate
-2024,California,CA,True,ADAM B. SCHIFF,DEM,GOP,58.75,41.25,17.5,False,DEM,False,DEM,False,medsl_senate
-2024,Connecticut,CT,False,CHRISTOPHER S. MURPHY,DEM,GOP,58.58,39.7,18.88,False,DEM,False,DEM,False,medsl_senate
-2024,Delaware,DE,False,LISA BLUNT ROCHESTER,DEM,GOP,56.59,39.5,17.09,False,DEM,False,DEM,False,medsl_senate
-2024,Florida,FL,False,RICK SCOTT,GOP,DEM,55.57,42.79,12.78,False,GOP,False,GOP,False,medsl_senate
-2024,Hawaii,HI,False,MAZIE K. HIRONO,DEM,GOP,64.61,31.9,32.71,False,DEM,False,DEM,False,medsl_senate
-2024,Indiana,IN,False,JIM BANKS,GOP,DEM,58.64,38.77,19.87,False,GOP,False,GOP,False,medsl_senate
-2024,Massachusetts,MA,False,ELIZABETH ANN WARREN,DEM,GOP,59.81,40.0,19.81,False,DEM,False,DEM,False,medsl_senate
-2024,Maryland,MD,False,ANGELA ALSOBROOKS,DEM,GOP,54.64,42.84,11.8,False,DEM,False,DEM,False,medsl_senate
-2024,Maine,ME,False,ANGUS S. KING JR.,IND,GOP,52.07,34.64,17.43,False,IND,False,IND,False,medsl_senate
-2024,Michigan,MI,False,ELISSA SLOTKIN,DEM,GOP,48.64,48.3,0.34,False,DEM,False,DEM,False,medsl_senate
-2024,Minnesota,MN,False,AMY KLOBUCHAR,DEM,GOP,56.2,40.5,15.7,False,DEM,False,DEM,False,medsl_senate
-2024,Missouri,MO,False,JOSH HAWLEY,GOP,DEM,55.57,41.84,13.73,False,GOP,False,GOP,False,medsl_senate
-2024,Mississippi,MS,False,ROGER F. WICKER,GOP,DEM,62.81,37.19,25.62,False,GOP,False,GOP,False,medsl_senate
-2024,Montana,MT,False,TIM SHEEHY,GOP,DEM,52.64,45.5,7.14,True,DEM,True,DEM,False,medsl_senate
-2024,North Dakota,ND,False,KEVIN CRAMER,GOP,DEM,66.31,33.38,32.93,False,GOP,False,GOP,False,medsl_senate
-2024,Nebraska,NE,False,DEB FISCHER,GOP,OTHER,53.19,46.52,6.67,False,GOP,False,GOP,False,medsl_senate
-2024,Nebraska,NE,True,PETE RICKETTS,GOP,DEM,62.58,37.42,25.16,False,GOP,False,GOP,False,medsl_senate
-2024,New Jersey,NJ,False,ANDY KIM,DEM,GOP,53.61,43.99,9.62,False,DEM,False,DEM,False,medsl_senate
-2024,New Mexico,NM,False,MARTIN HEINRICH,DEM,GOP,55.06,44.94,10.11,False,DEM,False,DEM,False,medsl_senate
-2024,Nevada,NV,False,JACKY S. ROSEN,DEM,GOP,47.87,46.22,1.64,False,DEM,False,DEM,False,medsl_senate
-2024,New York,NY,False,KIRSTEN E. GILLIBRAND,DEM,GOP,58.81,40.53,18.29,False,DEM,False,DEM,False,medsl_senate
-2024,Ohio,OH,False,BERNIE MORENO,GOP,DEM,50.09,46.47,3.62,True,DEM,True,DEM,False,medsl_senate
-2024,Pennsylvania,PA,False,DAVE MCCORMICK,GOP,DEM,48.82,48.6,0.22,True,DEM,True,DEM,False,medsl_senate
-2024,Rhode Island,RI,False,SHELDON WHITEHOUSE,DEM,GOP,59.9,39.85,20.05,False,DEM,False,DEM,False,medsl_senate
-2024,Tennessee,TN,False,MARSHA BLACKBURN,GOP,DEM,63.8,34.16,29.63,False,GOP,False,GOP,False,medsl_senate
-2024,Texas,TX,False,TED CRUZ,GOP,DEM,53.05,44.56,8.5,False,GOP,False,GOP,False,medsl_senate
-2024,Utah,UT,False,JOHN CURTIS,GOP,DEM,62.5,31.74,30.76,False,GOP,False,GOP,False,medsl_senate
-2024,Virginia,VA,False,TIMOTHY M. KAINE,DEM,GOP,54.37,45.44,8.93,False,DEM,False,DEM,False,medsl_senate
-2024,Vermont,VT,False,BERNIE SANDERS,IND,GOP,63.16,32.07,31.08,False,IND,False,IND,False,medsl_senate
-2024,Washington,WA,False,MARIA CANTWELL,DEM,OTHER,59.09,40.64,18.45,False,DEM,False,DEM,False,medsl_senate
-2024,Wisconsin,WI,False,TAMMY BALDWIN,DEM,GOP,49.33,48.48,0.85,False,DEM,False,DEM,False,medsl_senate
-2024,West Virginia,WV,False,JIM JUSTICE,GOP,DEM,68.75,27.76,41.0,True,DEM,True,IND,False,medsl_senate
-2024,Wyoming,WY,False,JOHN BARRASSO,GOP,DEM,75.11,24.12,50.99,False,GOP,False,GOP,False,medsl_senate
-2026,Alaska,AK,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Alabama,AL,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Arkansas,AR,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Colorado,CO,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,Delaware,DE,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,Florida,FL,True,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Georgia,GA,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,Iowa,IA,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Idaho,ID,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Illinois,IL,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,Kansas,KS,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Kentucky,KY,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Louisiana,LA,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Massachusetts,MA,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,Maine,ME,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Michigan,MI,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,Minnesota,MN,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,Mississippi,MS,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Montana,MT,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,North Carolina,NC,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Nebraska,NE,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,New Hampshire,NH,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,New Jersey,NJ,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,New Mexico,NM,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,Ohio,OH,True,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Oklahoma,OK,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Oregon,OR,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,Rhode Island,RI,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,South Carolina,SC,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,South Dakota,SD,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Tennessee,TN,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Texas,TX,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Virginia,VA,False,,,,,,,,DEM,,DEM,True,manual_2026_provisional
-2026,West Virginia,WV,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
-2026,Wyoming,WY,False,,,,,,,,GOP,,GOP,True,manual_2026_provisional
+year,state,state_po,special,winner_name,winner_party,runner_up_party,winner_pct,runner_up_pct,margin_pts,flipped_vs_last_election,previous_party,flipped_vs_holder,holder_party,holder_caucus,winner_caucus,party_changed,is_provisional,source_id
+2000,Arizona,AZ,False,JON KYL,GOP,IND,79.32,7.82,71.5,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2000,California,CA,False,DIANNE FEINSTEIN,DEM,GOP,55.84,36.59,19.26,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,Connecticut,CT,False,JOSEPH I. LIEBERMAN,DEM,GOP,63.21,34.17,29.04,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,Delaware,DE,False,THOMAS R. CARPER,DEM,GOP,55.53,43.7,11.83,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2000,Florida,FL,False,BILL NELSON,DEM,GOP,51.04,46.19,4.85,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2000,Georgia,GA,True,ZELL MILLER,DEM,GOP,58.5,38.1,20.4,True,GOP,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,Hawaii,HI,False,DANIEL K. AKAKA,DEM,GOP,72.68,24.51,48.18,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,Indiana,IN,False,RICHARD G. LUGAR,GOP,DEM,66.56,31.85,34.71,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2000,Massachusetts,MA,False,EDWARD M. KENNEDY,DEM,GOP,72.69,12.86,59.83,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,Maryland,MD,False,PAUL S. SARBANES,DEM,GOP,63.18,36.73,26.44,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,Maine,ME,False,OLYMPIA J. SNOWE,GOP,DEM,68.94,31.06,37.88,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2000,Michigan,MI,False,DEBBIE STABENOW,DEM,GOP,49.47,47.86,1.61,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2000,Minnesota,MN,False,MARK DAYTON,DEM,GOP,48.83,43.29,5.54,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2000,Missouri,MO,False,MEL CARNAHAN,DEM,GOP,50.47,48.39,2.07,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2000,Mississippi,MS,False,TRENT LOTT,GOP,DEM,65.88,31.59,34.29,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2000,Montana,MT,False,CONRAD BURNS,GOP,DEM,50.55,47.24,3.32,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2000,North Dakota,ND,False,KENT CONRAD,DEM,GOP,61.37,38.63,22.75,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,Nebraska,NE,False,BEN NELSON,DEM,GOP,51.0,48.82,2.18,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,New Jersey,NJ,False,JON S. CORZINE,DEM,GOP,50.11,47.1,3.02,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,New Mexico,NM,False,JEFF BINGAMAN,DEM,GOP,61.7,38.25,23.45,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,Nevada,NV,False,JOHN ENSIGN,GOP,DEM,55.09,39.69,15.4,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2000,New York,NY,False,HILLARY RODHAM CLINTON,DEM,GOP,55.27,43.01,12.27,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,Ohio,OH,False,MIKE DEWINE,GOP,DEM,59.92,35.85,24.06,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2000,Pennsylvania,PA,False,RICK SANTORUM,GOP,DEM,52.42,45.51,6.91,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2000,Rhode Island,RI,False,LINCOLN D. CHAFEE,GOP,DEM,56.88,41.15,15.73,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2000,Tennessee,TN,False,BILL FRIST,GOP,DEM,65.1,32.21,32.89,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2000,Texas,TX,False,KAY BAILEY HUTCHISON,GOP,DEM,65.08,32.31,32.77,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2000,Utah,UT,False,ORRIN G. HATCH,GOP,DEM,65.58,31.51,34.07,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2000,Virginia,VA,False,GEORGE F. ALLEN,GOP,DEM,52.26,47.68,4.58,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2000,Vermont,VT,False,JAMES M. JEFFORDS,GOP,DEM,65.56,25.43,40.13,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2000,Washington,WA,False,MARIA CANTWELL,DEM,GOP,48.73,48.64,0.09,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2000,Wisconsin,WI,False,HERB KOHL,DEM,GOP,61.54,37.04,24.51,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,West Virginia,WV,False,ROBERT C. BYRD,DEM,GOP,77.75,20.16,57.6,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2000,Wyoming,WY,False,CRAIG THOMAS,GOP,DEM,73.77,22.04,51.73,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Alaska,AK,False,TED STEVENS,GOP,DEM,78.17,10.51,67.66,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Alabama,AL,False,JEFF SESSIONS,GOP,DEM,58.58,39.83,18.75,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Arkansas,AR,False,MARK PRYOR,DEM,GOP,53.9,46.1,7.79,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2002,Colorado,CO,False,WAYNE ALLARD,GOP,DEM,50.7,45.77,4.93,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Delaware,DE,False,JOSEPH R. BIDEN JR.,DEM,GOP,58.22,40.8,17.42,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2002,Georgia,GA,False,SAXBY CHAMBLISS,GOP,DEM,52.73,45.9,6.84,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2002,Iowa,IA,False,TOM HARKIN,DEM,GOP,54.18,43.78,10.4,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2002,Idaho,ID,False,LARRY E. CRAIG,GOP,DEM,65.16,32.55,32.61,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Illinois,IL,False,RICHARD J. DURBIN,DEM,GOP,60.33,38.02,22.31,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2002,Kansas,KS,False,PAT ROBERTS,GOP,OTHER,82.52,9.1,73.42,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Kentucky,KY,False,MITCH MCCONNELL,GOP,DEM,64.68,35.32,29.35,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Louisiana,LA,False,Mary L. Landrieu,DEM,GOP,51.7,48.3,3.4,False,DEM,False,DEM,DEM,DEM,False,False,manual_senate_results
+2002,Massachusetts,MA,False,JOHN F. KERRY,DEM,OTHER,80.03,18.43,61.6,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2002,Maine,ME,False,SUSAN M. COLLINS,GOP,DEM,58.44,41.56,16.87,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Michigan,MI,False,CARL LEVIN,DEM,GOP,60.61,37.89,22.72,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2002,Minnesota,MN,False,NORM COLEMAN,GOP,DEM,49.53,47.34,2.19,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2002,Missouri,MO,True,JIM TALENT,GOP,DEM,49.8,48.67,1.13,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2002,Mississippi,MS,False,THAD COCHRAN,GOP,OTHER,84.58,15.42,69.16,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Montana,MT,False,MAX BAUCUS,DEM,GOP,62.74,31.73,31.0,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2002,North Carolina,NC,False,ELIZABETH H. DOLE,GOP,DEM,53.56,44.96,8.61,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Nebraska,NE,False,CHUCK HAGEL,GOP,DEM,82.76,14.64,68.13,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,New Hampshire,NH,False,JOHN E. SUNUNU,GOP,DEM,50.82,46.4,4.42,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,New Jersey,NJ,False,FRANK R. LAUTENBERG,DEM,GOP,53.88,43.95,9.93,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2002,New Mexico,NM,False,PETE V. DOMENICI,GOP,DEM,65.04,34.96,30.09,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Oklahoma,OK,False,JAMES M. INHOFE,GOP,DEM,57.3,36.31,20.99,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Oregon,OR,False,GORDON SMITH,GOP,DEM,56.21,39.61,16.6,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Rhode Island,RI,False,JACK REED,DEM,GOP,78.43,21.57,56.85,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2002,South Carolina,SC,False,LINDSEY O. GRAHAM,GOP,DEM,54.4,44.19,10.21,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,South Dakota,SD,False,TIM JOHNSON,DEM,GOP,49.62,49.47,0.16,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2002,Tennessee,TN,False,LAMAR ALEXANDER,GOP,DEM,54.28,44.34,9.94,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Texas,TX,False,JOHN CORNYN,GOP,DEM,55.3,43.33,11.97,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,Virginia,VA,False,JOHN W. WARNER,GOP,IND,82.58,9.74,72.83,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2002,West Virginia,WV,False,JOHN D. ROCKEFELLER IV,DEM,GOP,63.11,36.89,26.22,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2002,Wyoming,WY,False,MICHAEL B. ENZI,GOP,DEM,72.95,27.05,45.91,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,Alaska,AK,False,LISA MURKOWSKI,GOP,DEM,48.58,45.55,3.03,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,Alabama,AL,False,RICHARD C. SHELBY,GOP,DEM,67.55,32.35,35.19,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,Arkansas,AR,False,BLANCHE L. LINCOLN,DEM,GOP,55.9,44.07,11.83,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2004,Arizona,AZ,False,JOHN MCCAIN,GOP,DEM,76.74,20.62,56.12,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,California,CA,False,BARBARA BOXER,DEM,GOP,57.71,37.8,19.91,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2004,Colorado,CO,False,KEN SALAZAR,DEM,GOP,51.3,46.53,4.77,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2004,Connecticut,CT,False,CHRISTOPHER J. DODD,DEM,GOP,66.35,32.13,34.22,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2004,Florida,FL,False,MEL MARTINEZ,GOP,DEM,49.43,48.32,1.11,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2004,Georgia,GA,False,JOHNNY ISAKSON,GOP,DEM,57.88,39.98,17.9,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2004,Hawaii,HI,False,DANIEL K. INOUYE,DEM,GOP,75.51,20.99,54.52,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2004,Iowa,IA,False,CHARLES E. GRASSLEY,GOP,DEM,70.18,27.88,42.31,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,Idaho,ID,False,MIKE CRAPO,GOP,,99.18,0.82,98.36,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,Illinois,IL,False,BARACK OBAMA,DEM,GOP,69.97,27.05,42.92,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2004,Indiana,IN,False,EVAN BAYH,DEM,GOP,61.65,37.23,24.42,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2004,Kansas,KS,False,SAM BROWNBACK,GOP,DEM,69.16,27.49,41.68,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,Kentucky,KY,False,JIM BUNNING,GOP,DEM,50.66,49.34,1.31,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,Louisiana,LA,False,DAVID VITTER,GOP,DEM,51.03,29.34,21.69,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2004,Maryland,MD,False,BARBARA A. MIKULSKI,DEM,GOP,64.8,33.72,31.08,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2004,Missouri,MO,False,CHRISTOPHER S. BOND,GOP,DEM,56.09,42.8,13.3,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,North Carolina,NC,False,RICHARD BURR,GOP,DEM,51.6,47.02,4.58,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2004,North Dakota,ND,False,BYRON L. DORGAN,DEM,GOP,68.28,31.72,36.56,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2004,New Hampshire,NH,False,JUDD GREGG,GOP,DEM,66.24,33.75,32.49,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,Nevada,NV,False,HARRY REID,DEM,GOP,61.08,35.14,25.94,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2004,New York,NY,False,CHARLES E. SCHUMER,DEM,GOP,71.16,24.24,46.92,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2004,Ohio,OH,False,GEORGE V. VOINOVICH,GOP,DEM,63.85,36.15,27.7,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,Oklahoma,OK,False,TOM COBURN,GOP,DEM,52.77,41.24,11.52,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,Oregon,OR,False,RON WYDEN,DEM,GOP,63.39,31.75,31.65,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2004,Pennsylvania,PA,False,ARLEN SPECTER,GOP,DEM,52.62,41.99,10.63,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,South Carolina,SC,False,JIM DEMINT,GOP,DEM,53.67,44.1,9.57,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2004,South Dakota,SD,False,JOHN THUNE,GOP,DEM,50.58,49.42,1.15,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2004,Utah,UT,False,ROBERT F. BENNETT,GOP,DEM,68.73,28.4,40.33,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2004,Vermont,VT,False,PATRICK J. LEAHY,DEM,GOP,70.63,24.54,46.08,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2004,Washington,WA,False,PATTY MURRAY,DEM,GOP,54.98,42.74,12.24,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2004,Wisconsin,WI,False,RUSSEL D. FEINGOLD,DEM,GOP,55.37,44.12,11.24,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Arizona,AZ,False,JON KYL,GOP,DEM,53.34,43.5,9.84,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2006,California,CA,False,DIANNE FEINSTEIN,DEM,GOP,59.43,35.02,24.42,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Connecticut,CT,False,JOSEPH I. LIEBERMAN,IND,DEM,49.71,39.73,9.98,True,DEM,False,DEM,DEM,DEM,True,False,medsl_senate
+2006,Delaware,DE,False,THOMAS R. CARPER,DEM,GOP,70.2,28.7,41.5,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Florida,FL,False,BILL NELSON,DEM,GOP,60.3,38.1,22.21,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Hawaii,HI,False,DANIEL K. AKAKA,DEM,GOP,61.35,36.78,24.57,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Indiana,IN,False,RICHARD G. LUGAR,GOP,OTHER,87.36,12.59,74.77,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2006,Massachusetts,MA,False,EDWARD M. KENNEDY,DEM,GOP,69.3,30.55,38.75,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Maryland,MD,False,BENJAMIN L. CARDIN,DEM,GOP,54.21,44.2,10.01,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Maine,ME,False,OLYMPIA J. SNOWE,GOP,DEM,74.4,20.75,53.65,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2006,Michigan,MI,False,DEBBIE STABENOW,DEM,GOP,56.91,41.26,15.65,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Minnesota,MN,False,AMY KLOBUCHAR,DEM,GOP,58.06,37.94,20.12,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Missouri,MO,False,CLAIRE MCCASKILL,DEM,GOP,49.58,47.31,2.27,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2006,Mississippi,MS,False,TRENT LOTT,GOP,DEM,63.58,34.87,28.71,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2006,Montana,MT,False,JON TESTER,DEM,GOP,49.16,48.29,0.88,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2006,North Dakota,ND,False,KENT CONRAD,DEM,GOP,68.83,29.53,39.3,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Nebraska,NE,False,E. BENJAMIN NELSON,DEM,GOP,63.88,36.12,27.77,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,New Jersey,NJ,False,ROBERT MENENDEZ,DEM,GOP,53.37,44.34,9.02,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,New Mexico,NM,False,JEFF BINGAMAN,DEM,GOP,70.61,29.33,41.27,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Nevada,NV,False,JOHN ENSIGN,GOP,DEM,55.36,40.99,14.37,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2006,New York,NY,False,HILLARY RODHAM CLINTON,DEM,GOP,67.0,31.01,36.0,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Ohio,OH,False,SHERROD BROWN,DEM,GOP,56.16,43.82,12.35,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2006,Pennsylvania,PA,False,"BOB CASEY, JR.",DEM,GOP,58.64,41.28,17.35,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2006,Rhode Island,RI,False,SHELDON WHITEHOUSE,DEM,GOP,53.52,46.48,7.04,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2006,Tennessee,TN,False,BOB CORKER,GOP,DEM,50.71,47.99,2.72,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2006,Texas,TX,False,KAY BAILEY HUTCHISON,GOP,DEM,61.69,36.04,25.65,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2006,Utah,UT,False,ORRIN G. HATCH,GOP,DEM,62.36,31.06,31.3,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2006,Virginia,VA,False,"JAMES H. ""JIM"" WEBB, JR.",DEM,GOP,49.59,49.2,0.39,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2006,Vermont,VT,False,BERNARD SANDERS,IND,GOP,65.41,32.36,33.04,True,GOP,False,IND,DEM,DEM,False,False,medsl_senate
+2006,Washington,WA,False,MARIA CANTWELL,DEM,GOP,56.85,39.93,16.92,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Wisconsin,WI,False,HERB KOHL,DEM,GOP,67.31,29.48,37.83,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,West Virginia,WV,False,ROBERT C. BYRD,DEM,GOP,77.05,22.95,54.1,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2006,Wyoming,WY,False,CRAIG THOMAS,GOP,DEM,69.99,29.86,40.13,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Alaska,AK,False,MARK BEGICH,DEM,GOP,47.77,46.52,1.24,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2008,Alabama,AL,False,JEFF SESSIONS,GOP,DEM,63.36,36.52,26.84,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Arkansas,AR,False,MARK L. PRYOR,DEM,OTHER,79.53,20.47,59.07,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2008,Colorado,CO,False,MARK UDALL,DEM,GOP,52.8,42.49,10.3,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2008,Delaware,DE,False,JOSEPH R. BIDEN JR.,DEM,GOP,64.69,35.31,29.37,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2008,Georgia,GA,False,SAXBY CHAMBLISS,GOP,DEM,57.44,42.56,14.88,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Iowa,IA,False,TOM HARKIN,DEM,GOP,62.66,37.26,25.39,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2008,Idaho,ID,False,JIM RISCH,GOP,DEM,57.65,34.11,23.55,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Illinois,IL,False,RICHARD J. DURBIN,DEM,GOP,67.84,28.53,39.31,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2008,Kansas,KS,False,PAT ROBERTS,GOP,DEM,60.06,36.46,23.6,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Kentucky,KY,False,MITCH MCCONNELL,GOP,DEM,52.97,47.03,5.93,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Louisiana,LA,False,MARY L. LANDRIEU,DEM,GOP,52.11,45.72,6.39,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2008,Massachusetts,MA,False,JOHN F. KERRY,DEM,GOP,65.86,30.93,34.93,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2008,Maine,ME,False,SUSAN M. COLLINS,GOP,DEM,61.33,38.58,22.75,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Michigan,MI,False,CARL LEVIN,DEM,GOP,62.66,33.85,28.82,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2008,Minnesota,MN,False,AL FRANKEN,DEM,GOP,41.99,41.98,0.01,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2008,Mississippi,MS,False,THAD COCHRAN,GOP,DEM,61.44,38.56,22.87,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Mississippi,MS,True,ROGER F. WICKER,GOP,IND,54.96,45.04,9.92,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Montana,MT,False,MAX BAUCUS,DEM,GOP,72.92,27.08,45.83,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2008,North Carolina,NC,False,KAY HAGAN,DEM,GOP,52.65,44.18,8.47,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2008,Nebraska,NE,False,MIKE JOHANNS,GOP,DEM,57.52,40.06,17.46,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,New Hampshire,NH,False,JEANNE SHAHEEN,DEM,GOP,51.59,45.25,6.34,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2008,New Jersey,NJ,False,FRANK R. LAUTENBERG,DEM,GOP,56.03,41.95,14.08,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2008,New Mexico,NM,False,TOM UDALL,DEM,GOP,61.33,38.67,22.66,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2008,Oklahoma,OK,False,JAMES M. INHOFE,GOP,DEM,56.68,39.18,17.5,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Oregon,OR,False,JEFF MERKLEY,DEM,GOP,48.9,45.55,3.35,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2008,Rhode Island,RI,False,JACK REED,DEM,GOP,73.07,26.47,46.6,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2008,South Carolina,SC,False,LINDSEY GRAHAM,GOP,DEM,57.52,42.25,15.28,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,South Dakota,SD,False,TIM JOHNSON,DEM,GOP,62.49,37.51,24.98,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2008,Tennessee,TN,False,LAMAR ALEXANDER,GOP,DEM,65.14,31.64,33.5,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Texas,TX,False,JOHN CORNYN,GOP,DEM,54.82,42.84,11.98,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Virginia,VA,False,MARK R. WARNER,DEM,GOP,65.03,33.73,31.3,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2008,West Virginia,WV,False,JOHN D. ROCKEFELLER IV,DEM,GOP,63.73,36.26,27.47,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2008,Wyoming,WY,False,MICHAEL B. ENZI,GOP,DEM,75.63,24.26,51.38,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2008,Wyoming,WY,True,JOHN BARRASSO,GOP,DEM,73.35,26.53,46.83,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Alaska,AK,False,LISA MURKOWSKI,GOP,GOP,39.57,35.55,4.01,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Alabama,AL,False,RICHARD C. SHELBY,GOP,DEM,65.18,34.71,30.47,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Arkansas,AR,False,JOHN BOOZMAN,GOP,DEM,57.9,36.95,20.96,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2010,Arizona,AZ,False,JOHN MCCAIN,GOP,DEM,58.86,34.65,24.21,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,California,CA,False,BARBARA BOXER,DEM,GOP,52.18,42.17,10.01,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2010,Colorado,CO,False,MICHAEL F. BENNET,DEM,GOP,48.05,46.42,1.63,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2010,Connecticut,CT,False,RICHARD BLUMENTHAL,DEM,GOP,55.16,43.22,11.94,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2010,Delaware,DE,True,CHRISTOPHER A. COONS,DEM,GOP,56.61,40.03,16.58,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2010,Florida,FL,False,MARCO RUBIO,GOP,IND,48.89,29.71,19.19,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Georgia,GA,False,JOHNNY ISAKSON,GOP,DEM,58.31,39.0,19.31,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Hawaii,HI,False,DANIEL K. INOUYE,DEM,GOP,74.81,21.57,53.24,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2010,Iowa,IA,False,CHUCK GRASSLEY,GOP,DEM,64.35,33.3,31.05,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Idaho,ID,False,MIKE CRAPO,GOP,DEM,71.18,24.93,46.25,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Illinois,IL,True,MARK STEVEN KIRK,GOP,DEM,48.01,46.42,1.6,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2010,Indiana,IN,False,DAN COATS,GOP,DEM,54.58,40.0,14.58,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2010,Kansas,KS,False,JERRY MORAN,GOP,DEM,70.09,26.38,43.72,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Kentucky,KY,False,RAND PAUL,GOP,DEM,55.73,44.25,11.48,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Louisiana,LA,False,DAVID VITTER,GOP,DEM,56.55,37.67,18.88,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Massachusetts,MA,True,Scott P. Brown,GOP,DEM,51.86,47.1,4.76,True,DEM,True,DEM,DEM,GOP,True,False,manual_senate_results
+2010,Maryland,MD,False,BARBARA MIKULSKI,DEM,GOP,62.19,35.75,26.44,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2010,Missouri,MO,False,ROY BLUNT,GOP,DEM,54.23,40.63,13.6,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,North Carolina,NC,False,RICHARD BURR,GOP,DEM,54.81,43.05,11.77,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,North Dakota,ND,False,JOHN HOEVEN,GOP,DEM,76.17,22.2,53.97,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2010,New Hampshire,NH,False,KELLY AYOTTE,GOP,DEM,60.09,36.85,23.24,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Nevada,NV,False,HARRY REID,DEM,GOP,50.29,44.55,5.74,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2010,New York,NY,False,CHARLES E. SCHUMER,DEM,GOP,66.32,32.21,34.11,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2010,New York,NY,True,KIRSTEN E. GILLIBRAND,DEM,GOP,62.95,35.11,27.84,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2010,Ohio,OH,False,ROB PORTMAN,GOP,DEM,56.85,39.4,17.44,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Oklahoma,OK,False,THOMAS A. COBURN,GOP,DEM,70.64,26.13,44.5,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Oregon,OR,False,RON WYDEN,DEM,GOP,57.22,39.25,17.98,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2010,Pennsylvania,PA,False,PAT TOOMEY,GOP,DEM,51.01,48.99,2.02,False,GOP,True,DEM,DEM,GOP,True,False,medsl_senate
+2010,South Carolina,SC,False,JIM DEMINT,GOP,DEM,61.48,27.65,33.83,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,South Dakota,SD,False,JOHN THUNE,GOP,,100.0,,,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Utah,UT,False,MIKE LEE,GOP,DEM,61.58,32.76,28.82,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2010,Vermont,VT,False,PATRICK J. LEAHY,DEM,GOP,64.33,30.91,33.41,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2010,Washington,WA,False,PATTY MURRAY,DEM,GOP,52.36,47.64,4.73,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2010,Wisconsin,WI,False,RON JOHNSON,GOP,DEM,51.87,47.03,4.84,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2010,West Virginia,WV,True,JOE MANCHIN III,DEM,GOP,53.47,43.4,10.07,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Arizona,AZ,False,JEFF FLAKE,GOP,DEM,49.23,46.2,3.03,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2012,California,CA,False,DIANNE FEINSTEIN,DEM,GOP,62.52,37.48,25.05,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Connecticut,CT,False,CHRISTOPHER S. MURPHY,DEM,GOP,54.82,43.07,11.75,True,IND,False,IND,DEM,DEM,True,False,medsl_senate
+2012,Delaware,DE,False,THOMAS R. CARPER,DEM,GOP,66.42,28.95,37.47,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Florida,FL,False,BILL NELSON,DEM,GOP,55.23,42.23,13.01,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Hawaii,HI,False,MAZIE K. HIRONO,DEM,GOP,62.6,37.4,25.2,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Indiana,IN,False,JOE DONNELLY,DEM,GOP,50.04,44.28,5.76,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2012,Massachusetts,MA,False,ELIZABETH A. WARREN,DEM,GOP,53.74,46.19,7.55,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2012,Maryland,MD,False,BENJAMIN L. CARDIN,DEM,GOP,55.98,26.33,29.65,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Maine,ME,False,ANGUS KING,IND,GOP,52.89,30.74,22.15,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2012,Michigan,MI,False,DEBBIE STABENOW,DEM,GOP,58.8,37.98,20.81,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Minnesota,MN,False,AMY KLOBUCHAR,DEM,GOP,65.23,30.53,34.7,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Missouri,MO,False,CLAIRE MCCASKILL,DEM,GOP,54.81,39.11,15.7,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Mississippi,MS,False,ROGER F. WICKER,GOP,DEM,57.16,40.55,16.6,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2012,Montana,MT,False,JON TESTER,DEM,GOP,48.58,44.86,3.72,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,North Dakota,ND,False,HEIDI HEITKAMP,DEM,GOP,50.24,49.32,0.91,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Nebraska,NE,False,DEB FISCHER,GOP,DEM,57.77,42.23,15.55,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2012,New Jersey,NJ,False,ROBERT MENENDEZ,DEM,GOP,58.87,39.37,19.49,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,New Mexico,NM,False,MARTIN HEINRICH,DEM,GOP,51.01,45.28,5.73,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Nevada,NV,False,DEAN HELLER,GOP,DEM,45.87,44.71,1.16,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2012,New York,NY,False,KIRSTEN E. GILLIBRAND,DEM,GOP,72.2,26.36,45.84,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Ohio,OH,False,SHERROD BROWN,DEM,GOP,50.7,44.7,6.0,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Pennsylvania,PA,False,"ROBERT P. CASEY, JR.",DEM,GOP,53.69,44.59,9.1,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Rhode Island,RI,False,SHELDON WHITEHOUSE,DEM,GOP,64.81,34.97,29.85,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Tennessee,TN,False,BOB CORKER,GOP,DEM,64.89,30.41,34.48,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2012,Texas,TX,False,TED CRUZ,GOP,DEM,56.46,40.62,15.83,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2012,Utah,UT,False,ORRIN G. HATCH,GOP,DEM,65.31,29.98,35.33,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2012,Virginia,VA,False,TIMOTHY M. KAINE,DEM,GOP,52.87,46.96,5.91,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Vermont,VT,False,BERNARD SANDERS,IND,GOP,71.0,24.9,46.1,False,IND,False,IND,DEM,DEM,False,False,medsl_senate
+2012,Washington,WA,False,MARIA CANTWELL,DEM,GOP,60.45,39.55,20.9,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Wisconsin,WI,False,TAMMY BALDWIN,DEM,GOP,51.41,45.86,5.55,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,West Virginia,WV,False,JOE MANCHIN III,DEM,GOP,60.57,36.47,24.1,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2012,Wyoming,WY,False,JOHN BARRASSO,GOP,DEM,75.65,21.65,54.0,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2013,Massachusetts,MA,True,Edward J. Markey,DEM,GOP,54.8,44.6,10.2,False,DEM,False,DEM,DEM,DEM,False,False,manual_senate_results
+2013,New Jersey,NJ,True,Cory Booker,DEM,GOP,54.92,44.02,10.9,False,DEM,True,GOP,GOP,DEM,True,False,manual_senate_results
+2014,Alaska,AK,False,DAN SULLIVAN,GOP,DEM,47.96,45.83,2.13,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2014,Alabama,AL,False,JEFF SESSIONS,GOP,,97.25,2.75,94.5,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,Arkansas,AR,False,TOM COTTON,GOP,DEM,56.5,39.43,17.07,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2014,Colorado,CO,False,CORY GARDNER,GOP,DEM,48.2,46.26,1.94,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2014,Delaware,DE,False,CHRISTOPHER A. COONS,DEM,GOP,55.83,42.23,13.6,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2014,Georgia,GA,False,DAVID A. PERDUE,GOP,DEM,52.89,45.21,7.68,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,Hawaii,HI,True,BRIAN SCHATZ,DEM,GOP,69.77,27.7,42.07,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2014,Iowa,IA,False,JONI ERNST,GOP,DEM,52.1,43.76,8.34,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2014,Idaho,ID,False,JAMES E. RISCH,GOP,DEM,65.33,34.67,30.66,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,Illinois,IL,False,RICHARD J. DURBIN,DEM,GOP,53.55,42.69,10.85,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2014,Kansas,KS,False,PAT ROBERTS,GOP,IND,53.15,42.53,10.62,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,Kentucky,KY,False,MICH MCCONNELL,GOP,DEM,56.19,40.72,15.47,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,Louisiana,LA,False,Bill Cassidy,GOP,DEM,55.93,44.07,11.86,True,DEM,True,DEM,DEM,GOP,True,False,manual_senate_results
+2014,Massachusetts,MA,False,EDWARD J. MARKEY,DEM,GOP,61.87,37.98,23.88,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2014,Maine,ME,False,SUSAN M. COLLINS,GOP,DEM,68.46,31.5,36.96,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,Michigan,MI,False,GARY C. PETERS,DEM,GOP,54.61,41.33,13.29,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2014,Minnesota,MN,False,AL FRANKEN,DEM,GOP,53.15,42.91,10.24,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2014,Mississippi,MS,False,THAD COCHRAN,GOP,DEM,59.9,37.89,22.01,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,Montana,MT,False,STEVE DAINES,GOP,DEM,57.79,40.07,17.72,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2014,North Carolina,NC,False,THOM TILLIS,GOP,DEM,48.82,47.26,1.56,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2014,Nebraska,NE,False,BEN SASSE,GOP,DEM,64.34,31.49,32.85,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,New Hampshire,NH,False,JEANNE SHAHEEN,DEM,GOP,51.46,48.21,3.24,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2014,New Jersey,NJ,False,CORY A. BOOKER,DEM,GOP,55.84,42.33,13.51,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2014,New Mexico,NM,False,TOM UDALL,DEM,GOP,55.56,44.44,11.12,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2014,Oklahoma,OK,False,JAMES M. INHOFE,GOP,DEM,68.01,28.55,39.46,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,Oklahoma,OK,True,JAMES LANKFORD,GOP,DEM,67.85,28.98,38.87,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,Oregon,OR,False,JEFF MERKLEY,DEM,GOP,55.73,36.87,18.86,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2014,Rhode Island,RI,False,JACK REED,DEM,GOP,70.58,29.25,41.34,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2014,South Carolina,SC,False,LINDSEY GRAHAM,GOP,DEM,54.27,38.78,15.48,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,South Carolina,SC,True,TIM SCOTT,GOP,DEM,61.12,37.09,24.02,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,South Dakota,SD,False,MIKE ROUNDS,GOP,DEM,50.37,29.51,20.86,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2014,Tennessee,TN,False,LAMAR ALEXANDER,GOP,DEM,61.87,31.87,30.0,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,Texas,TX,False,JOHN CORNYN,GOP,DEM,61.56,34.36,27.2,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2014,Virginia,VA,False,MARK R. WARNER,DEM,GOP,49.15,48.34,0.81,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2014,West Virginia,WV,False,SHELLEY MOORE CAPITO,GOP,DEM,62.12,34.46,27.65,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2014,Wyoming,WY,False,MICHAEL B. ENZI,GOP,DEM,72.19,17.45,54.74,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Alaska,AK,False,LISA MURKOWSKI,GOP,OTHER,44.36,29.16,15.2,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Alabama,AL,False,RICHARD C. SHELBY,GOP,DEM,63.96,35.87,28.09,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Arkansas,AR,False,JOHN BOOZMAN,GOP,DEM,59.77,36.17,23.6,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Arizona,AZ,False,JOHN MCCAIN,GOP,DEM,53.71,40.75,12.96,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,California,CA,False,KAMALA D. HARRIS,DEM,DEM,61.6,38.4,23.21,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2016,Colorado,CO,False,MICHAEL F. BENNET,DEM,GOP,49.97,44.31,5.66,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2016,Connecticut,CT,False,RICHARD BLUMENTHAL,DEM,GOP,63.19,34.62,28.57,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2016,Florida,FL,False,MARCO RUBIO,GOP,DEM,51.98,44.31,7.67,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Georgia,GA,False,JOHNNY ISAKSON,GOP,DEM,54.78,41.03,13.75,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Hawaii,HI,False,BRIAN SCHATZ,DEM,GOP,73.6,22.24,51.36,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2016,Iowa,IA,False,CHUCK GRASSLEY,GOP,DEM,60.09,35.66,24.43,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Idaho,ID,False,MIKE CRAPO,GOP,DEM,66.13,27.73,38.41,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Illinois,IL,False,TAMMY DUCKWORTH,DEM,GOP,54.86,39.78,15.08,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2016,Indiana,IN,False,TODD C. YOUNG,GOP,DEM,52.11,42.41,9.7,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Kansas,KS,False,JERRY MORAN,GOP,DEM,62.18,32.24,29.94,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Kentucky,KY,False,RAND PAUL,GOP,DEM,57.27,42.72,14.55,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Louisiana,LA,False,John Kennedy,GOP,DEM,60.65,39.35,21.3,False,GOP,False,GOP,GOP,GOP,False,False,manual_senate_results
+2016,Maryland,MD,False,CHRIS VAN HOLLEN,DEM,GOP,60.89,35.67,25.21,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2016,Missouri,MO,False,ROY BLUNT,GOP,DEM,49.18,46.39,2.79,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,North Carolina,NC,False,RICHARD BURR,GOP,DEM,51.06,45.37,5.7,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,North Dakota,ND,False,JOHN HOEVEN,GOP,DEM,78.48,16.97,61.51,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,New Hampshire,NH,False,MAGGIE HASSAN,DEM,GOP,47.98,47.84,0.14,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2016,Nevada,NV,False,CATHERINE CORTEZ MASTO,DEM,GOP,47.1,44.67,2.43,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2016,New York,NY,False,CHARLES E. SCHUMER,DEM,GOP,70.6,27.17,43.44,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2016,Ohio,OH,False,ROB PORTMAN,GOP,DEM,58.03,37.16,20.87,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Oklahoma,OK,False,JAMES LANKFORD,GOP,DEM,67.74,24.58,43.16,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Oregon,OR,False,RON WYDEN,DEM,GOP,56.6,33.35,23.25,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2016,Pennsylvania,PA,False,PATRICK J. TOOMEY,GOP,DEM,48.77,47.34,1.43,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,South Carolina,SC,False,TIM SCOTT,GOP,DEM,60.57,36.93,23.64,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,South Dakota,SD,False,JOHN R. THUNE,GOP,DEM,71.83,28.17,43.66,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Utah,UT,False,MIKE LEE,GOP,DEM,68.15,27.06,41.09,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2016,Vermont,VT,False,PATRICK J. LEAHY,DEM,GOP,61.26,33.03,28.24,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2016,Washington,WA,False,PATTY MURRAY,DEM,GOP,59.01,40.99,18.03,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2016,Wisconsin,WI,False,RON JOHNSON,GOP,DEM,50.17,46.81,3.36,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2017,Alabama,AL,True,Doug Jones,DEM,GOP,49.97,48.34,1.63,True,GOP,True,GOP,GOP,DEM,True,False,manual_senate_results
+2018,Arizona,AZ,False,KYRSTEN SINEMA,DEM,GOP,49.96,47.61,2.34,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2018,California,CA,False,DIANNE FEINSTEIN,DEM,DEM,54.16,45.84,8.33,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Connecticut,CT,False,CHRISTOPHER S MURPHY,DEM,GOP,59.53,39.35,20.18,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Delaware,DE,False,THOMAS R CARPER,DEM,GOP,59.95,37.82,22.13,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Florida,FL,False,RICK SCOTT,GOP,DEM,50.05,49.93,0.12,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2018,Hawaii,HI,False,MAZIE K. HIRONO,DEM,GOP,71.15,28.85,42.3,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Indiana,IN,False,MIKE BRAUN,GOP,DEM,50.73,44.84,5.89,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2018,Massachusetts,MA,False,ELIZABETH A. WARREN,DEM,GOP,60.34,36.17,24.16,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Maryland,MD,False,BEN CARDIN,DEM,GOP,64.86,30.31,34.55,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Maine,ME,False,"ANGUS S. KING, JR.",IND,GOP,54.31,35.23,19.08,False,IND,False,IND,DEM,DEM,False,False,medsl_senate
+2018,Michigan,MI,False,DEBBIE STABENOW,DEM,GOP,52.26,45.76,6.51,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Minnesota,MN,False,AMY KLOBUCHAR,DEM,GOP,60.31,36.21,24.1,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Minnesota,MN,True,TINA SMITH,DEM,GOP,52.97,42.35,10.62,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Missouri,MO,False,JOSH HAWLEY,GOP,DEM,51.38,45.57,5.81,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2018,Mississippi,MS,False,ROGER F. WICKER,GOP,DEM,58.49,39.47,19.02,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2018,Mississippi,MS,True,Cindy Hyde-Smith,GOP,DEM,53.63,46.37,7.26,False,GOP,False,GOP,GOP,GOP,False,False,manual_senate_results
+2018,Montana,MT,False,JON TESTER,DEM,GOP,50.33,46.78,3.55,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,North Dakota,ND,False,KEVIN CRAMER,GOP,DEM,55.11,44.27,10.84,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2018,Nebraska,NE,False,DEB FISCHER,GOP,DEM,57.69,38.62,19.06,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2018,New Jersey,NJ,False,ROBERT MENENDEZ,DEM,GOP,54.01,42.83,11.18,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,New Mexico,NM,False,MARTIN T HEINRICH,DEM,GOP,54.09,30.53,23.56,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Nevada,NV,False,JACKY ROSEN,DEM,GOP,50.41,45.38,5.03,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2018,New York,NY,False,KIRSTEN E. GILLIBRAND,DEM,GOP,67.0,33.0,34.0,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Ohio,OH,False,SHERROD BROWN,DEM,GOP,53.41,46.57,6.85,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Pennsylvania,PA,False,ROBERT P CASEY JR,DEM,GOP,55.61,42.74,12.87,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Rhode Island,RI,False,SHELDON WHITEHOUSE,DEM,GOP,61.44,38.33,23.11,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Tennessee,TN,False,MARSHA BLACKBURN,GOP,DEM,54.71,43.92,10.79,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2018,Texas,TX,False,TED CRUZ,GOP,DEM,50.89,48.33,2.57,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2018,Utah,UT,False,MITT ROMNEY,GOP,DEM,62.59,30.91,31.68,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2018,Virginia,VA,False,TIMOTHY M. KAINE,DEM,GOP,57.0,41.01,16.0,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Vermont,VT,False,BERNIE SANDERS,IND,GOP,67.32,27.39,39.93,False,IND,False,IND,DEM,DEM,False,False,medsl_senate
+2018,Washington,WA,False,MARIA CANTWELL,DEM,GOP,58.43,41.57,16.87,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Wisconsin,WI,False,TAMMY BALDWIN,DEM,GOP,55.42,44.58,10.84,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,West Virginia,WV,False,JOE MANCHIN,DEM,GOP,49.55,46.3,3.25,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2018,Wyoming,WY,False,JOHN BARRASSO,GOP,DEM,66.96,30.1,36.86,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Alaska,AK,False,DAN SULLIVAN,GOP,DEM,53.9,41.19,12.7,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Alabama,AL,False,TOMMY TUBERVILLE,GOP,DEM,60.1,39.74,20.36,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2020,Arkansas,AR,False,TOM COTTON,GOP,OTHER,66.53,33.47,33.06,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Arizona,AZ,True,MARK KELLY,DEM,GOP,51.16,48.81,2.35,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2020,Colorado,CO,False,JOHN W. HICKENLOOPER,DEM,GOP,53.5,44.18,9.32,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2020,Delaware,DE,False,CHRISTOPHER A. COONS,DEM,GOP,59.44,37.9,21.54,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2020,Georgia,GA,False,JON OSSOFF,DEM,GOP,50.62,49.38,1.23,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2020,Georgia,GA,True,RAPHAEL WARNOCK,DEM,GOP,51.04,48.96,2.09,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2020,Iowa,IA,False,JONI ERNST,GOP,DEM,51.74,45.15,6.59,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Idaho,ID,False,JIM RISCH,GOP,DEM,62.62,33.25,29.38,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Illinois,IL,False,RICHARD J. DURBIN,DEM,GOP,54.93,38.87,16.07,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2020,Kansas,KS,False,ROGER MARSHALL,GOP,DEM,53.22,41.79,11.44,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Kentucky,KY,False,MITCH MCCONNELL,GOP,DEM,57.76,38.23,19.53,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Louisiana,LA,False,"""BILL"" CASSIDY",GOP,DEM,59.32,19.02,40.3,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Massachusetts,MA,False,EDWARD J. MARKEY,DEM,GOP,66.15,33.04,33.11,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2020,Maine,ME,False,SUSAN MARGARET COLLINS,GOP,DEM,50.98,42.39,8.6,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Michigan,MI,False,GARY PETERS,DEM,GOP,49.9,48.22,1.69,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2020,Minnesota,MN,False,TINA SMITH,DEM,GOP,48.74,43.5,5.24,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2020,Mississippi,MS,False,CINDY HYDE-SMITH,GOP,DEM,54.11,44.13,9.98,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Montana,MT,False,STEVE DAINES,GOP,DEM,55.01,44.99,10.02,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,North Carolina,NC,False,THOM TILLIS,GOP,DEM,48.69,46.94,1.75,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Nebraska,NE,False,BEN SASSE,GOP,DEM,62.74,24.43,38.31,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,New Hampshire,NH,False,JEANNE SHAHEEN,DEM,GOP,56.64,40.99,15.65,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2020,New Jersey,NJ,False,CORY BOOKER,DEM,GOP,57.23,40.92,16.31,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2020,New Mexico,NM,False,BEN R. LUJAN,DEM,GOP,51.73,45.62,6.11,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2020,Oklahoma,OK,False,JIM INHOFE ,GOP,DEM,62.91,32.75,30.16,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Oregon,OR,False,JEFF MERKLEY,DEM,GOP,56.91,39.32,17.59,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2020,Rhode Island,RI,False,JOHN F. REED,DEM,GOP,66.48,33.35,33.12,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2020,South Carolina,SC,False,LINDSEY GRAHAM,GOP,DEM,54.44,44.17,10.27,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,South Dakota,SD,False,MIKE ROUNDS,GOP,DEM,65.74,34.26,31.47,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Tennessee,TN,False,BILL HAGERTY,GOP,DEM,62.2,35.16,27.04,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Texas,TX,False,JOHN CORNYN,GOP,DEM,53.51,43.87,9.64,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Virginia,VA,False,MARK R. WARNER,DEM,GOP,55.99,43.91,12.08,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2020,West Virginia,WV,False,SHELLEY MOORE CAPITO,GOP,DEM,70.28,27.0,43.28,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Wyoming,WY,False,CYNTHIA M. LUMMIS,GOP,,72.85,26.76,46.09,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Alaska,AK,False,"MURKOWSKI, LISA",GOP,,43.39,42.62,0.77,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Alabama,AL,False,KATIE BRITT,GOP,DEM,66.62,30.88,35.74,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Arkansas,AR,False,JOHN BOOZMAN,GOP,DEM,65.73,31.09,34.64,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Arizona,AZ,False,MARK KELLY,DEM,GOP,51.39,46.51,4.89,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,California,CA,False,ALEX PADILLA,DEM,GOP,61.06,38.94,22.13,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,California,CA,True,ALEX PADILLA,DEM,GOP,60.89,39.11,21.79,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,Colorado,CO,False,MICHAEL BENNET,DEM,GOP,55.88,41.26,14.62,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,Florida,FL,False,MARCO RUBIO,GOP,DEM,57.68,41.27,16.41,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Georgia,GA,False,RAPHAEL WARNOCK,DEM,GOP,51.4,48.6,2.81,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,Hawaii,HI,False,"SCHATZ, BRIAN",DEM,GOP,71.21,26.04,45.17,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,Iowa,IA,False,CHUCK GRASSLEY,GOP,DEM,56.01,43.84,12.18,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Idaho,ID,False,MIKE CRAPO,GOP,DEM,60.68,28.74,31.94,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Illinois,IL,False,TAMMY DUCKWORTH,DEM,GOP,56.82,41.5,15.32,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,Indiana,IN,False,TODD YOUNG,GOP,DEM,58.62,37.87,20.74,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Kansas,KS,False,JERRY MORAN,GOP,DEM,60.0,37.04,22.96,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Kentucky,KY,False,RAND PAUL,GOP,DEM,61.8,38.19,23.62,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Louisiana,LA,False,JOHN KENNEDY,GOP,DEM,61.56,17.85,43.71,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Maryland,MD,False,CHRIS VAN HOLLEN,DEM,GOP,65.77,34.07,31.69,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,Missouri,MO,False,ERIC SCHMITT,GOP,DEM,56.83,43.17,13.65,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,North Carolina,NC,False,TED BUDD,GOP,DEM,50.5,47.27,3.23,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,North Dakota,ND,False,JOHN HOEVEN,GOP,DEM,56.41,24.98,31.43,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,New Hampshire,NH,False,MAGGIE HASSAN,DEM,GOP,53.54,44.39,9.16,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,Nevada,NV,False,"CORTEZ MASTO, CATHERINE",DEM,GOP,48.81,48.04,0.78,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,New York,NY,False,CHARLES E. SCHUMER,DEM,GOP,56.78,42.77,14.01,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,Ohio,OH,False,JD VANCE,GOP,DEM,53.03,46.92,6.11,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Oklahoma,OK,False,JAMES LANKFORD,GOP,DEM,64.3,32.1,32.2,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Oklahoma,OK,True,MARKWAYNE MULLIN,GOP,DEM,61.77,35.24,26.53,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Oregon,OR,False,WYDEN RON,DEM,GOP,55.83,40.92,14.91,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,Pennsylvania,PA,False,JOHN K FETTERMAN,DEM,GOP,51.25,46.33,4.91,True,GOP,True,GOP,GOP,DEM,True,False,medsl_senate
+2022,South Carolina,SC,False,TIM SCOTT,GOP,DEM,62.88,37.01,25.87,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,South Dakota,SD,False,JOHN R THUNE,GOP,DEM,69.63,26.15,43.48,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Utah,UT,False,MIKE LEE,GOP,IND,53.15,42.74,10.41,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Vermont,VT,False,PETER WELCH,DEM,GOP,68.4,28.0,40.4,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,Washington,WA,False,PATTY MURRAY,DEM,GOP,57.15,42.63,14.52,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2022,Wisconsin,WI,False,RON JOHNSON,GOP,DEM,50.41,49.41,1.01,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2024,Arizona,AZ,False,RUBEN GALLEGO,DEM,GOP,50.07,47.66,2.41,False,DEM,False,IND,DEM,DEM,True,False,medsl_senate
+2024,California,CA,False,ADAM B. SCHIFF,DEM,GOP,58.87,41.13,17.75,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,California,CA,True,ADAM B. SCHIFF,DEM,GOP,58.75,41.25,17.5,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Connecticut,CT,False,CHRISTOPHER S. MURPHY,DEM,GOP,58.58,39.7,18.88,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Delaware,DE,False,LISA BLUNT ROCHESTER,DEM,GOP,56.59,39.5,17.09,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Florida,FL,False,RICK SCOTT,GOP,DEM,55.57,42.79,12.78,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2024,Hawaii,HI,False,MAZIE K. HIRONO,DEM,GOP,64.61,31.9,32.71,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Indiana,IN,False,JIM BANKS,GOP,DEM,58.64,38.77,19.87,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2024,Massachusetts,MA,False,ELIZABETH ANN WARREN,DEM,GOP,59.81,40.0,19.81,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Maryland,MD,False,ANGELA ALSOBROOKS,DEM,GOP,54.64,42.84,11.8,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Maine,ME,False,ANGUS S. KING JR.,IND,GOP,52.07,34.64,17.43,False,IND,False,IND,DEM,DEM,False,False,medsl_senate
+2024,Michigan,MI,False,ELISSA SLOTKIN,DEM,GOP,48.64,48.3,0.34,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Minnesota,MN,False,AMY KLOBUCHAR,DEM,GOP,56.2,40.5,15.7,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Missouri,MO,False,JOSH HAWLEY,GOP,DEM,55.57,41.84,13.73,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2024,Mississippi,MS,False,ROGER F. WICKER,GOP,DEM,62.81,37.19,25.62,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2024,Montana,MT,False,TIM SHEEHY,GOP,DEM,52.64,45.5,7.14,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2024,North Dakota,ND,False,KEVIN CRAMER,GOP,DEM,66.31,33.38,32.93,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2024,Nebraska,NE,False,DEB FISCHER,GOP,OTHER,53.19,46.52,6.67,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2024,Nebraska,NE,True,PETE RICKETTS,GOP,DEM,62.58,37.42,25.16,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2024,New Jersey,NJ,False,ANDY KIM,DEM,GOP,53.61,43.99,9.62,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,New Mexico,NM,False,MARTIN HEINRICH,DEM,GOP,55.06,44.94,10.11,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Nevada,NV,False,JACKY S. ROSEN,DEM,GOP,47.87,46.22,1.64,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,New York,NY,False,KIRSTEN E. GILLIBRAND,DEM,GOP,58.81,40.53,18.29,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Ohio,OH,False,BERNIE MORENO,GOP,DEM,50.09,46.47,3.62,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2024,Pennsylvania,PA,False,DAVE MCCORMICK,GOP,DEM,48.82,48.6,0.22,True,DEM,True,DEM,DEM,GOP,True,False,medsl_senate
+2024,Rhode Island,RI,False,SHELDON WHITEHOUSE,DEM,GOP,59.9,39.85,20.05,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Tennessee,TN,False,MARSHA BLACKBURN,GOP,DEM,63.8,34.16,29.63,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2024,Texas,TX,False,TED CRUZ,GOP,DEM,53.05,44.56,8.5,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2024,Utah,UT,False,JOHN CURTIS,GOP,DEM,62.5,31.74,30.76,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2024,Virginia,VA,False,TIMOTHY M. KAINE,DEM,GOP,54.37,45.44,8.93,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Vermont,VT,False,BERNIE SANDERS,IND,GOP,63.16,32.07,31.08,False,IND,False,IND,DEM,DEM,False,False,medsl_senate
+2024,Washington,WA,False,MARIA CANTWELL,DEM,OTHER,59.09,40.64,18.45,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,Wisconsin,WI,False,TAMMY BALDWIN,DEM,GOP,49.33,48.48,0.85,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
+2024,West Virginia,WV,False,JIM JUSTICE,GOP,DEM,68.75,27.76,41.0,True,DEM,True,IND,DEM,GOP,True,False,medsl_senate
+2024,Wyoming,WY,False,JOHN BARRASSO,GOP,DEM,75.11,24.12,50.99,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2026,Alaska,AK,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Alabama,AL,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Arkansas,AR,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Colorado,CO,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,Delaware,DE,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,Florida,FL,True,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Georgia,GA,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,Iowa,IA,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Idaho,ID,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Illinois,IL,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,Kansas,KS,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Kentucky,KY,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Louisiana,LA,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Massachusetts,MA,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,Maine,ME,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Michigan,MI,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,Minnesota,MN,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,Mississippi,MS,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Montana,MT,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,North Carolina,NC,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Nebraska,NE,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,New Hampshire,NH,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,New Jersey,NJ,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,New Mexico,NM,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,Ohio,OH,True,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Oklahoma,OK,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Oregon,OR,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,Rhode Island,RI,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,South Carolina,SC,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,South Dakota,SD,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Tennessee,TN,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Texas,TX,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Virginia,VA,False,,,,,,,,DEM,,DEM,DEM,,,True,manual_2026_provisional
+2026,West Virginia,WV,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
+2026,Wyoming,WY,False,,,,,,,,GOP,,GOP,GOP,,,True,manual_2026_provisional
