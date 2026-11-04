@@ -1,6 +1,6 @@
 # Step 07 report: data for the next round of visuals
 
-**A (county shift) and B (members, women, age) are built. C is dropped to the backlog. E is still blocked.** `run_all.py` runs end to end: exit 0, 36 tests pass, and the existing processed files are unchanged. Nothing was estimated or typed from memory.
+**A (county shift), B (members, women, age) and E (governors) are built. C is dropped to the backlog.** `run_all.py` runs end to end: exit 0, 36 tests pass, and the existing processed files are unchanged. Nothing was estimated or typed from memory.
 
 ## B. Who serves in Congress: built
 
@@ -57,19 +57,35 @@ CAWP's site returns HTTP 403 to scripts, so for 1991 to 2021 I used the Congress
 - **Gaps:** the New Mexico 2024 Libertarian cells are `NA` in the source and stay missing (no effect on the two parties). Vermont 2024 candidate votes are 0.9% under `totalvotes` and DC 2024 is 0.8% over. Every other state and year is within the 0.5% target, and the test lists those two as known exceptions.
 - **Tests:** every key joins to the atlas; no county is missing in any year; state vote totals within 0.5%; margins and shifts recompute exactly.
 
-## E. Governors: still blocked
+## E. Governors: built from Wikipedia (CC BY-SA 4.0)
 
-- **NGA:** its former-governors database sits in a script-driven search page, and I could find no reuse terms anywhere on nga.org; the footer says "All rights reserved". Under your rule I did not use it.
-- **State official lists:** this would need 50 separate state sources, with exact start dates, for 26 years. I could not do that reliably from scripts, and I would not fill the gaps from memory. I did not start it.
-- **Not usable:** the Dataverse "United States Governors 1775-2020" (doi:10.7910/DVN/RYY3OW, CC BY 4.0) drops governors who were still in office when it was compiled. Governors present by year: 48 in 2012, 46 in 2015, 37 in 2016, 26 in 2018, 1 in 2020 (50 states needed).
-- **Decision for you:** (1) you accept NGA's facts and I scrape them, (2) allow Wikipedia (CC BY-SA), or (3) leave the governors map in the backlog.
+- **Source:** Wikipedia's "List of governors of <State>" pages, as you decided. `download.py` fetches each page through the Wikipedia API, keeps only its tables in `data/raw/wikipedia_governors/` (7.4MB) and records the revision id and time in the manifest. Wikipedia sometimes refuses bursts of requests, so the download retries with a pause.
+- **Outputs, built by `pipeline/build_governors.py` (added to `run_all.py`):**
+  - `governors_terms.csv`: 247 terms overlapping 2000 to 2025. Columns as you asked, plus `party_note` for the three mid-term party changes. `source_url` is the page's permalink.
+  - `governors_by_year.csv`: 1,300 rows (50 states, 2000 to 2025), the governor in office on 1 January.
+- **Licence:** both files are marked CC BY-SA 4.0 and Wikipedia is credited in `data/SOURCES.md`. The rest of the data stays CC0.
+- **Party changes in a term:** the pages show the party at the start of a term and give a switch only in a footnote. Three governors switched: Crist (FL, Republican to Independent, April 2010), Chafee (RI, Independent to Democratic, 30 May 2013) and Justice (WV, Democratic to Republican, August 2017). I put these in `data/manual/governor_party_changes.csv`, with the footnote wording and source. This changes 1 January parties for Crist 2011, Chafee 2014 and 2015, and Justice 2018 to 2025. The build stops if a page lists two parties on a term with no row in that file. A scan of all 50 pages for other switch footnotes found only these three (Mississippi's Amy Tuck was a lieutenant governor).
+- **Not changed:** `Democratic-Farmer-Labor` (Minnesota, 14 year-rows) and `Reform/Independence` (Ventura, 4 rows) are kept as written. Decide how the map groups them.
+- **Dates:** pages end a term either on the last day or on the successor's start day, so consecutive terms are 0 or 1 days apart. I did not adjust them.
+- **Tests (6, all pass):** 50 governors in each of the 26 years, one per state; no gap or overlap between consecutive terms in a state (0 or 1 days apart); only the last term in a state is open-ended; each by-year row matches a term in force on 1 January; the three party switches give the right 1 January party.
+- **Spot checks against official state sites (5 states):**
+
+| State | Term in our file | Official site | Result |
+|---|---|---|---|
+| Ohio | DeWine from 14 Jan 2019 | governor.ohio.gov, swearing-in 14 Jan 2019 (Kasich's term ends the same day) | matches |
+| Michigan | Whitmer from 1 Jan 2019 | michigan.gov/whitmer, sworn in 1 Jan 2019 | matches |
+| Texas | Abbott from 20 Jan 2015 | lrl.texas.gov and tsl.texas.gov governors lists, 20 Jan 2015 | matches |
+| New York | Hochul from 24 Aug 2021 | governor.ny.gov, sworn in at midnight on 24 Aug 2021 | matches |
+| Florida | DeSantis from 8 Jan 2019 | flgov.com and dos.fl.gov, 8 Jan 2019 | matches |
+
+  - **West Virginia was not confirmed.** I tried it as a fifth check first. governorjustice.wv.gov gives no swearing-in date, and I could not reach the state's governors book (404). Its only confirmation is that the state lists Justice as a Republican today. His January 2017 start and August 2017 switch rest on Wikipedia alone. I replaced it with Florida.
+  - The official pages were read through search results, not page by page, for Ohio, Michigan, Texas, New York and Florida. Several state sites block scripted requests or returned 404 at the addresses I guessed.
 
 ## Backlog
 
 - **Issue priority heatmap (C):** dropped for now, as you decided. The CES 2024 file and questionnaires I had downloaded are deleted, and no ANES work was started. Nothing for it is in the pipeline. Reason on record: CES 2024 has no "most important issue" question, and ANES needs a registered download.
-- **Governors map (E):** see above.
 
 ## Open questions
 
-1. Which governors source do you want (NGA, Wikipedia, or backlog)?
+1. How should the map group `Democratic-Farmer-Labor` and `Reform/Independence`?
 2. Is the CRS stand-in fine for the cross-check, or will you check CAWP's tables by hand?

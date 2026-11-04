@@ -121,6 +121,21 @@ Seats are counted by **caucus**: the president's party plus the independents who
   - Not joined: rows with no FIPS (CT statewide write-ins 2016, ME UOCAVA 2016, RI federal precinct 2016 and 2020) and Bedford city VA (51515, 2016, zero votes, merged into Bedford County in 2013). The file keeps Connecticut's old counties in every year, matching us-atlas, so the 2022 planning-region change does not appear. Virginia's independent cities are separate units in both.
   - us-atlas counties with no data: Kalawao, HI (15005). Alaska's boroughs are not in the file by design. Territories are out of scope.
 
+### `wikipedia_governors` (CC BY-SA 4.0, the only share-alike source)
+- **Title:** "List of governors of <State>" for each of the 50 states
+- **Publisher:** Wikipedia, English edition, https://en.wikipedia.org. Text and tables by Wikipedia contributors, licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). **Credit: Wikipedia contributors.** `governors_terms.csv` and `governors_by_year.csv` are adapted from these pages and are CC BY-SA 4.0 too. They must be shared under the same licence. The rest of the project's data stays CC0.
+- **Files:** `data/raw/wikipedia_governors/<PO>.html` holds only the `wikitable` elements of each page. The manifest gives each page's revision id (permalink with `oldid`) and the time it was accessed. Rows in `governors_terms.csv` carry that permalink in `source_url`.
+- **Outputs, built by `pipeline/build_governors.py`:**
+  - `governors_terms.csv`: every term overlapping 2000 to 2025, with `party` as the page lists it for the start of the term, `left_office` blank for a governor still in office, and `party_note` where the party changed mid-term.
+  - `governors_by_year.csv`: the governor in office on 1 January of each year, 2000 to 2025: the term with the latest start on or before that day that has not yet ended.
+- **Mid-term party changes:** `data/manual/governor_party_changes.csv`, from the footnotes on the pages: Crist (FL, to Independent, April 2010), Chafee (RI, to Democratic, 30 May 2013) and Justice (WV, to Republican, August 2017). The build stops if a page lists two parties for a term with no row there. `governors_by_year.csv` uses the new party for any 1 January after the change.
+- **Caveats:**
+  - Parties are as Wikipedia gives them: `Democratic-Farmer-Labor` (Minnesota) and `Reform/Independence` (Ventura) are kept as written and are not merged into `Democratic` or `Independent`.
+  - Pages end a term on the last day in office or on the day the successor starts, so consecutive terms are 0 or 1 days apart. Dates are not adjusted.
+  - Where a governor was acting or succeeded from another office, the page lists them as a governor and so do we.
+  - Governors-elect who take office in 2027 are not included.
+  - Spot checks against official state websites are in `review/07-report.md`.
+
 ### `manual` women cross-check
 - **File:** `data/manual/women_crosscheck.csv`: published totals of women by Congress, used only by a test and the step 07 report. 1991 to 2021 come from the Congressional Research Service report R43244 (CAWP's site blocks scripts); 2025 from CAWP's 2 January 2025 press release.
 
