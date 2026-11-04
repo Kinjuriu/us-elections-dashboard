@@ -21,8 +21,13 @@ function init(root: HTMLElement) {
   const signed = (n: number) => (n > 0 ? `+${n}` : String(n));
 
   /** "Democrats -22   Republicans +23", from the earlier Congress to the later. */
-  function changeHtml(a: HeaderChamber, b: HeaderChamber, yA: number, yB: number, cA: number, cB: number): string {
-    if (cA === cB) return `${yA} and ${yB}: the same Congress, so no change`;
+  function changeHtml(yA: HeaderYear, yB: HeaderYear, id: 'house' | 'senate'): string {
+    // An even year shown with another year's bars has no results entered yet.
+    const pending = [yA, yB].find((y) => y.year % 2 === 0 && y.year !== y.shownYear);
+    if (pending) return `No change shown: ${pending.year} results are not yet entered`;
+    if (yA.congress === yB.congress) return `${yA.year} and ${yB.year}: the same Congress, so no change`;
+    const a = yA[id];
+    const b = yB[id];
     if (a.balance.dem === null || b.balance.dem === null || a.balance.gop === null || b.balance.gop === null) {
       return 'No change shown: results for one of these years are not yet entered';
     }
@@ -32,7 +37,7 @@ function init(root: HTMLElement) {
       ['Republicans', b.balance.gop - a.balance.gop],
     ] as [string, number][];
     if (ind(a) || ind(b)) parts.push(['Independents', ind(b) - ind(a)]);
-    return `<span class="hbars__delta">${yA} to ${yB}:</span>` +
+    return `<span class="hbars__delta">${yA.shownYear} to ${yB.shownYear}:</span>` +
       parts.map(([who, n]) => `<span class="hbars__delta">${who} ${signed(n)}</span>`).join('');
   }
 
@@ -69,7 +74,7 @@ function init(root: HTMLElement) {
       paint(primary, first);
       if (second) {
         paint(compare, second);
-        change.innerHTML = changeHtml(first[id], second[id], first.shownYear, second.shownYear, first.congress, second.congress);
+        change.innerHTML = changeHtml(first, second, id);
       }
       compare.hidden = !second;
       change.hidden = !second;

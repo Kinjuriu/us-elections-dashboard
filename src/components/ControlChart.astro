@@ -1,0 +1,437 @@
+---
+// Chart 1: who controlled Congress, one column per Congress from the 80th
+// (elected 1946) to the 120th (elected 2026). House row above Senate row;
+// each bar splits the chamber's seats Democrats from the left, Republicans
+// from the right, with a black tick at half the seats. A thin band above
+// shows the president's party; a strip under each row shows the party with
+// the majority for most of the Congress; shading marks unified government.
+//
+// Marks are SVG, text is HTML laid over it (so no label falls below 12px
+// however wide the chart is drawn). Wide layout from 1024px; below that,
+// one row per Congress. src/scripts/control-chart.ts adds the readout,
+// selection and clicks.
+import type { ControlChart, ControlCell } from '../lib/chartData';
+
+interface Props {
+  chart: ControlChart;
+  selectedCongress: number;
+  /** Congresses whose election year the year control offers. */
+  clickableFrom: number;
+}
+const { chart, selectedCongress, clickableFrom } = Astro.props;
+const cs = chart.congresses;
+const n = cs.length;
+
+// ---- Wide geometry: x in 0..1000 units (stretched to the width), y in px ----
+const W = 1000;
+const colW = W / n;
+const GAP = 3;
+// 14px of shading above and below the rows, so unified government reads as a band.
+const Y = { band: [14, 22], house: [30, 74], houseMaj: [77, 82], senate: [94, 138], senateMaj: [141, 146] } as const;
+const H = 160;
+const pct = (x: number) => +((x / W) * 100).toFixed(3);
+const colX = (i: number) => i * colW + GAP / 2;
+const barW = colW - GAP;
+
+const FILL: Record<string, string> = {
+  dem: 'var(--dem)', 'ind-dem': 'var(--ind)', other: 'var(--ink-3)', vacant: 'var(--paper)',
+  'ind-unknown': 'var(--ind)', missing: 'var(--no-race)', 'ind-gop': 'var(--ind)', gop: 'var(--gop)',
+};
+const partyFill = (p: string | null) => (p === 'DEM' ? 'var(--dem)' : p === 'GOP' ? 'var(--gop)' : p ? 'var(--ind)' : 'none');
+
+/** Segments of one bar, Democrats from the left, as fractions of the chamber. */
+function segments(c: ControlCell): { kind: string; from: number; to: number }[] {
+  const b = c.balance;
+  const parts: [string, number][] = b.dem === null || b.gop === null
+    ? [['missing', c.total]]
+    : [['dem', b.dem], ['ind-dem', b.indDem], ['other', b.other], ['vacant', b.vacant],
+       ['ind-unknown', b.indUnknown], ['missing', c.total - b.dem - b.gop - b.indDem - b.indGop - b.indUnknown - b.other - b.vacant],
+       ['ind-gop', b.indGop], ['gop', b.gop]];
+  let at = 0;
+  return parts.filter(([, v]) => v > 0).map(([kind, v]) => {
+    const seg = { kind, from: at / c.total, to: (at + v) / c.total };
+    at += v;
+    return seg;
+  });
+}
+
+// ---- Shift labels above the wide chart ----
+// Each label sits in a row above the plot with a leader line down to its
+// column. A leader must never cross another label's text, so a label whose
+// span covers another's column has to sit above it. Try every choice of
+// left or right alignment and keep the one needing the fewest rows.
+const PX_PER_CHAR = 6.4;
+const PLOT_PX_MIN = 880;
+type Align = 'start' | 'end';
+const shiftGeo = chart.shifts.map((s) => {
+  const i = cs.findIndex((c) => c.congress === s.congress);
+  return { s, x: pct(colX(i) + barW / 2), w: (Math.max(s.heading.length, s.detail.length) * PX_PER_CHAR / PLOT_PX_MIN) * 100 + 1.5 };
+});
+const spanOf = (g: (typeof shiftGeo)[number], a: Align): [number, number] => (a === 'start' ? [g.x - 0.3, g.x + g.w] : [g.x - g.w, g.x + 0.3]);
+function layoutShifts(aligns: Align[]): number[] | null {
+  const spans = shiftGeo.map((g, k) => spanOf(g, aligns[k]));
+  if (spans.some(([a, b]) => a < 0 || b > 100)) return null;
+  const k = shiftGeo.length;
+  // above[j][k]: label j must sit above label k (k's column is under j's text).
+  const mustAbove = (j: number, q: number) => j !== q && shiftGeo[q].x > spans[j][0] && shiftGeo[q].x < spans[j][1];
+  const rows: number[] = Array(k).fill(-1);
+  for (let pass = 0; pass < k; pass++) {
+    // Place labels whose required-above labels are all placed.
+    const next = [...Array(k).keys()].find((q) => rows[q] < 0 && [...Array(k).keys()].every((j) => !mustAbove(j, q) || rows[j] >= 0));
+    if (next === undefined) return null; // a cycle: two labels cover each other's columns
+    let r = Math.max(0, ...[...Array(k).keys()].filter((j) => mustAbove(j, next)).map((j) => rows[j] + 1));
+    while ([...Array(k).keys()].some((j) => rows[j] === r && spans[j][0] < spans[next][1] && spans[j][1] > spans[next][0])) r++;
+    rows[next] = r;
+  }
+  return rows;
+}
+let best: { aligns: Align[]; rows: number[] } | null = null;
+for (let mask = 0; mask < 1 << shiftGeo.length; mask++) {
+  const aligns = shiftGeo.map((_, k) => ((mask >> k) & 1 ? 'end' : 'start') as Align);
+  const rows = layoutShifts(aligns);
+  if (rows && (!best || Math.max(...rows) < Math.max(...best.rows))) best = { aligns, rows };
+}
+if (shiftGeo.length && !best) throw new Error('Chart 1: no layout for the shift labels without crossing leaders');
+const placed = shiftGeo.map((g, k) => ({ s: g.s, x: g.x, row: best!.rows[k], align: best!.aligns[k] }));
+const rowsUsed = shiftGeo.length ? Array(Math.max(...best!.rows) + 1).fill(0) : [];
+const ROW_H = 40;
+const annH = rowsUsed.length * ROW_H + 8;
+
+const axisEvery = 5;
+const isClickable = (c: (typeof cs)[number]) => c.congress >= clickableFrom;
+const sel = cs.findIndex((c) => c.congress === selectedCongress);
+const noteFor = (c: (typeof cs)[number]) => [c.house.noteNo, c.senate.noteNo].filter(Boolean);
+const shiftFor = new Map(chart.shifts.map((s) => [s.congress, s]));
+const unifiedAt = new Set(cs.filter((c) => c.unified).map((c) => c.congress));
+---
+<div class="cc" data-cc data-selected={selectedCongress}>
+  <ul class="cc__legend" aria-label="Key">
+    <li><span class="cc__sw" style="background:var(--dem)"></span>Democrat</li>
+    <li><span class="cc__sw" style="background:var(--gop)"></span>Republican</li>
+    <li><span class="cc__sw" style="background:var(--ind)"></span>Independent, next to the party they caucus with</li>
+    <li><span class="cc__sw cc__sw--tick"></span>Half the seats</li>
+    <li><span class="cc__sw cc__sw--strip"></span>Strip under each row: majority for most of the Congress</li>
+    <li><span class="cc__sw cc__sw--unified"></span>Shaded: one party held the presidency, House and Senate</li>
+  </ul>
+
+  <!-- Wide: a timeline, one column per Congress -->
+  <div class="cc__wide">
+    <div class="cc__gutter" aria-hidden="true" style={`padding-top:${annH}px`}>
+      <span style={`top:${annH + (Y.band[0] + Y.band[1]) / 2}px`}>President</span>
+      <span style={`top:${annH + (Y.house[0] + Y.houseMaj[1]) / 2}px`}>House</span>
+      <span style={`top:${annH + (Y.senate[0] + Y.senateMaj[1]) / 2}px`}>Senate</span>
+    </div>
+    <div class="cc__plot" data-cc-plot>
+      <div class="cc__ann" aria-hidden="true" style={`height:${annH}px`}>
+        {placed.map((p) => (
+          <>
+            <p class={`cc__shift cc__shift--${p.align}`} style={`left:${p.x}%;top:${p.row * ROW_H}px`}>
+              <span class="cc__shift-head">{p.s.heading}</span>
+              <span class="cc__shift-detail">{p.s.detail}</span>
+            </p>
+            <span class="cc__leader" style={`left:${p.x}%;top:${p.row * ROW_H + ROW_H - 4}px;height:${annH - p.row * ROW_H - ROW_H + 4}px`}></span>
+          </>
+        ))}
+      </div>
+      <svg class="cc__svg" aria-hidden="true" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" style={`height:${H}px`}>
+        {chart.unifiedRuns.map((r) => {
+          const a = cs.findIndex((c) => c.congress === r.from);
+          const b = cs.findIndex((c) => c.congress === r.to);
+          return <rect x={a * colW} y="0" width={(b - a + 1) * colW} height={H} fill="var(--paper-2)" />;
+        })}
+        {cs.map((c, i) => (
+          <g>
+            <rect x={colX(i)} y={Y.band[0]} width={barW} height={Y.band[1] - Y.band[0]} fill={partyFill(c.presidentParty)} />
+            {(['house', 'senate'] as const).map((ch) => {
+              const [y0, y1] = Y[ch];
+              const [m0, m1] = ch === 'house' ? Y.houseMaj : Y.senateMaj;
+              const cell = c[ch];
+              return (
+                <>
+                  {segments(cell).map((s) => (
+                    <rect
+                      x={+(colX(i) + s.from * barW).toFixed(3)}
+                      y={y0}
+                      width={+((s.to - s.from) * barW).toFixed(3)}
+                      height={y1 - y0}
+                      fill={FILL[s.kind]}
+                    />
+                  ))}
+                  {segments(cell).filter((s) => s.kind === 'vacant' || s.kind === 'missing').map((s) => (
+                    <rect class="cc__outline" x={+(colX(i) + s.from * barW).toFixed(3)} y={y0 + 0.5} width={+((s.to - s.from) * barW).toFixed(3)} height={y1 - y0 - 1} />
+                  ))}
+                  <line class="cc__tick" x1={colX(i) + barW / 2} x2={colX(i) + barW / 2} y1={y0 - 2} y2={y1 + 2} />
+                  {cell.majority && <rect x={colX(i)} y={m0} width={barW} height={m1 - m0} fill={partyFill(cell.majority)} />}
+                </>
+              );
+            })}
+          </g>
+        ))}
+        <rect class="cc__sel" data-cc-sel x={sel >= 0 ? colX(sel) - 1 : 0} y={Y.band[0] - 6} width={barW + 2} height={Y.senateMaj[1] - Y.band[0] + 12} visibility={sel >= 0 ? 'visible' : 'hidden'} />
+        <rect class="cc__hover" data-cc-hover x="0" y={Y.band[0] - 6} width={barW + 2} height={Y.senateMaj[1] - Y.band[0] + 12} visibility="hidden" />
+      </svg>
+      <div class="cc__marks" aria-hidden="true">
+        {cs.map((c, i) => noteFor(c).length > 0 && (
+          <span style={`left:${pct(colX(i) + barW / 2)}%`}>{noteFor(c).join(',')}</span>
+        ))}
+      </div>
+      <div class="cc__axis" aria-hidden="true">
+        {cs.map((c, i) => (i % axisEvery === 0 || i === n - 1) && (
+          <span style={`left:${pct(colX(i) + barW / 2)}%`}>{c.startYear}</span>
+        ))}
+      </div>
+      <div class="cc__hits" data-cc-hits>
+        {cs.map((c, i) => isClickable(c) && (
+          <button
+            type="button"
+            class="cc__hit"
+            data-congress={c.congress}
+            data-year={c.electionYear}
+            aria-pressed={String(c.congress === selectedCongress)}
+            aria-label={`Show the ${c.electionYear} election: ${c.summary}`}
+            style={`left:${pct(i * colW)}%;width:${pct(colW)}%;top:${annH}px;height:${H}px`}
+          ></button>
+        ))}
+      </div>
+    </div>
+  </div>
+
+  <!-- Narrow: one row per Congress -->
+  <div class="cc__narrow">
+    <div class="cc__nrow cc__nrow--head" aria-hidden="true">
+      <span></span><span class="cc__nyear">Term</span><span>House</span><span>Senate</span>
+    </div>
+    {cs.map((c) => {
+      const shift = shiftFor.get(c.congress);
+      const marks = noteFor(c);
+      return (
+        <>
+          <div class:list={['cc__nrow', { 'is-unified': unifiedAt.has(c.congress), 'is-selected': c.congress === selectedCongress }]} data-congress={c.congress}>
+            <span class="cc__npres" style={`background:${partyFill(c.presidentParty)}`} aria-hidden="true"></span>
+            {isClickable(c) ? (
+              <button type="button" class="cc__nyear cc__nbtn" data-year={c.electionYear} aria-pressed={String(c.congress === selectedCongress)} aria-label={`Show the ${c.electionYear} election: ${c.summary}`}>{c.startYear}</button>
+            ) : (
+              <span class="cc__nyear">{c.startYear}</span>
+            )}
+            {(['house', 'senate'] as const).map((ch) => (
+              <svg class="cc__nbar" viewBox="0 0 100 16" preserveAspectRatio="none" aria-hidden="true">
+                {segments(c[ch]).map((s) => (
+                  <rect x={+(s.from * 100).toFixed(3)} y="0" width={+((s.to - s.from) * 100).toFixed(3)} height="11" fill={FILL[s.kind]} />
+                ))}
+                {segments(c[ch]).filter((s) => s.kind === 'vacant' || s.kind === 'missing').map((s) => (
+                  <rect class="cc__outline" x={+(s.from * 100).toFixed(3)} y="0.5" width={+((s.to - s.from) * 100).toFixed(3)} height="10" />
+                ))}
+                <line class="cc__tick" x1="50" x2="50" y1="0" y2="11" />
+                {c[ch].majority && <rect x="0" y="13" width="100" height="3" fill={partyFill(c[ch].majority)} />}
+              </svg>
+            ))}
+            {marks.length > 0 && <span class="cc__nmark" aria-hidden="true">{marks.join(',')}</span>}
+          </div>
+          {shift && <p class="cc__nshift"><strong>{shift.heading}.</strong> {shift.detail}.</p>}
+        </>
+      );
+    })}
+  </div>
+
+  <p class="cc__readout" data-cc-readout aria-live="polite">{cs[sel]?.summary}</p>
+
+  <details class="cc__table">
+    <summary>All the numbers</summary>
+    <table>
+      <caption class="visually-hidden">Seats at the opening of each Congress, and the president</caption>
+      <thead>
+        <tr>
+          <th scope="col">Congress</th><th scope="col">Years</th><th scope="col">President</th>
+          <th scope="col">House D</th><th scope="col">R</th><th scope="col">Other</th><th scope="col">Majority</th>
+          <th scope="col">Senate D</th><th scope="col">R</th><th scope="col">Other</th><th scope="col">Majority</th>
+        </tr>
+      </thead>
+      <tbody>
+        {cs.map((c) => (
+          <tr>
+            <th scope="row">{c.congress}</th>
+            <td>{c.yearsServed.replace('-', ' to ')}{c.house.provisional ? ' (provisional)' : ''}</td>
+            <td>{c.president} ({c.presidentParty === 'DEM' ? 'D' : 'R'})</td>
+            {(['house', 'senate'] as const).map((ch) => {
+              const b = c[ch].balance;
+              const other = b.indDem + b.indGop + b.indUnknown + b.other + b.vacant;
+              const parts = [
+                b.indDem + b.indGop + b.indUnknown ? `${b.indDem + b.indGop + b.indUnknown} I` : '',
+                b.other ? `${b.other} other` : '',
+                b.vacant ? `${b.vacant} vacant` : '',
+              ].filter(Boolean).join(', ');
+              return (
+                <>
+                  <td>{b.dem ?? 'n/a'}</td><td>{b.gop ?? 'n/a'}</td><td>{b.dem === null ? 'n/a' : other ? parts : '0'}</td>
+                  <td>{c[ch].majority === 'DEM' ? 'D' : c[ch].majority === 'GOP' ? 'R' : 'n/a'}{c[ch].noteNo ? ` (note ${c[ch].noteNo})` : ''}</td>
+                </>
+              );
+            })}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </details>
+  <script type="application/json" data-cc-data set:html={JSON.stringify(cs.map((c) => ({ congress: c.congress, summary: c.summary })))}></script>
+</div>
+
+<script>
+  import '../scripts/control-chart';
+</script>
+
+<style>
+  .cc { --cc-gutter: 88px; position: relative; }
+  .cc__legend {
+    list-style: none;
+    margin: 0 0 var(--sp-5);
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    font-size: var(--fs-1);
+    color: var(--ink-2);
+  }
+  .cc__legend li { display: inline-flex; align-items: center; gap: 6px; }
+  .cc__sw { display: inline-block; width: 12px; height: 12px; flex: none; }
+  .cc__sw--tick { width: 2px; height: 14px; margin-inline: 5px; background: var(--ink); }
+  .cc__sw--strip { height: 4px; background: linear-gradient(90deg, var(--dem) 50%, var(--gop) 50%); }
+  .cc__sw--unified { background: var(--paper-2); box-shadow: inset 0 0 0 1px var(--rule); }
+
+  .cc__tick { stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .cc__outline { fill: none; stroke: var(--ink-3); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .cc__sel { fill: none; stroke: var(--ink); stroke-width: 2; vector-effect: non-scaling-stroke; }
+  .cc__hover { fill: none; stroke: var(--ink-2); stroke-width: 1; vector-effect: non-scaling-stroke; pointer-events: none; }
+
+  /* ---- Wide ---- */
+  .cc__wide { display: none; }
+  .cc__narrow { display: grid; gap: 2px; }
+  @media (min-width: 1024px) {
+    .cc__wide {
+      display: grid;
+      grid-template-columns: var(--cc-gutter) minmax(0, 1fr);
+    }
+    .cc__narrow { display: none; }
+  }
+  .cc__hits { position: absolute; inset: 0; pointer-events: none; }
+  .cc__gutter { position: relative; }
+  .cc__gutter span {
+    position: absolute;
+    left: 0;
+    transform: translateY(-50%);
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+  .cc__plot { position: relative; min-width: 0; }
+  .cc__ann { position: relative; }
+  .cc__shift {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    max-width: none;
+    white-space: nowrap;
+    padding-inline: 6px;
+    line-height: 1.3;
+  }
+  .cc__shift--end { transform: translateX(-100%); text-align: right; }
+  .cc__shift-head { font-family: var(--font-label); font-weight: 600; font-size: var(--fs-1); }
+  .cc__shift-detail { font-size: 12px; color: var(--ink-2); }
+  .cc__leader { position: absolute; width: 1px; background: var(--ink-2); }
+  .cc__svg { display: block; width: 100%; overflow: visible; }
+  .cc__marks, .cc__axis { position: relative; height: 18px; }
+  .cc__marks span, .cc__axis span {
+    position: absolute;
+    transform: translateX(-50%);
+    font-family: var(--font-label);
+    font-size: 12px;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .cc__axis span { color: var(--ink-2); }
+  .cc__hit {
+    position: absolute;
+    appearance: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+  .cc__hit:focus-visible { outline: 2px solid var(--ink); outline-offset: -2px; }
+
+  /* ---- Narrow ---- */
+  .cc__nrow {
+    display: grid;
+    grid-template-columns: 6px 44px minmax(0, 1fr) minmax(0, 1fr) 14px;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: 24px;
+    padding-right: 2px;
+  }
+  .cc__nrow.is-unified { background: var(--paper-2); }
+  .cc__nrow.is-selected { box-shadow: inset 0 0 0 2px var(--ink); }
+  .cc__nrow--head {
+    font-family: var(--font-label);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .cc__npres { align-self: stretch; }
+  .cc__nyear {
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .cc__nbtn {
+    appearance: none;
+    padding: 2px 4px;
+    margin-left: -4px;
+    border: 1px solid var(--rule);
+    border-radius: var(--radius-control);
+    background: var(--paper);
+    text-align: left;
+    cursor: pointer;
+    color: var(--ink);
+  }
+  .cc__nbtn:hover { border-color: var(--ink-3); }
+  .cc__nbtn[aria-pressed='true'] { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+  .cc__nbar { width: 100%; height: 16px; display: block; }
+  .cc__nmark { font-family: var(--font-label); font-size: 12px; font-weight: 600; }
+  .cc__nshift {
+    margin: 2px 0 6px calc(6px + var(--sp-2));
+    font-size: var(--fs-1);
+    color: var(--ink-2);
+  }
+  .cc__nshift strong { color: var(--ink); font-weight: 600; }
+
+  .cc__table { margin-top: var(--sp-4); font-size: var(--fs-1); }
+  .cc__table summary { cursor: pointer; font-family: var(--font-label); font-weight: 600; letter-spacing: 0.04em; }
+  .cc__table table {
+    display: block;
+    overflow-x: auto;
+    margin-top: var(--sp-2);
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .cc__table th, .cc__table td {
+    padding: 3px var(--sp-3) 3px 0;
+    border-bottom: var(--hairline);
+    text-align: left;
+    white-space: nowrap;
+  }
+  .cc__table thead th { font-family: var(--font-label); font-weight: 600; border-bottom-color: var(--ink); }
+  .cc__readout {
+    margin-top: var(--sp-4);
+    padding: var(--sp-2) var(--sp-3);
+    border-left: 2px solid var(--ink);
+    background: var(--paper-2);
+    font-size: var(--fs-2);
+    max-width: none;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+</style>

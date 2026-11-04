@@ -30,6 +30,9 @@ export interface StoreConfig {
 
 export const CHAMBERS: Chamber[] = ['senate', 'house'];
 
+/** The Congress elected in (or, for an odd year, sitting during) a year. */
+export const congressFor = (year: number) => Math.floor((year - 1786) / 2);
+
 /** The years the year control offers for a chamber, in order. */
 export function yearsFor(chamber: Chamber, cfg: StoreConfig): number[] {
   const ys = chamber === 'senate' ? [...cfg.years, ...cfg.senateOnlyYears] : [...cfg.years];

@@ -9,10 +9,15 @@ import ControlBar from '../components/ControlBar.astro';
 import HeaderBars from '../components/HeaderBars.astro';
 import { loadMapData, defaultYear } from '../lib/mapData';
 import { loadHeaderYears, storeConfig } from '../lib/dashboardData';
+import ControlChart from '../components/ControlChart.astro';
+import MidtermChart from '../components/MidtermChart.astro';
+import FlipsChart from '../components/FlipsChart.astro';
+import { loadControlChart, loadMidtermChart, loadFlipsChart } from '../lib/chartData';
+import { congressFor } from '../lib/store';
 import { compiledContent as sourcesHtml } from '../../data/SOURCES.md';
 import {
   loadChamberControl, loadIndependents, loadMidtermSwing, loadSenateRaces,
-  latestElection, sourceAccessedAt, formatDate, PARTY_NAME,
+  latestElection, sourceAccessedAt, formatDate,
   type ChamberControl, type Chamber,
 } from '../lib/data';
 
@@ -85,7 +90,6 @@ const runEnd = Number(best.end.yearsServed.slice(-4));
 const houseMidterms = swing.filter((s) => s.chamber === 'house' && !s.isProvisional && s.change !== null);
 const houseLosses = houseMidterms.filter((s) => (s.change ?? 0) < 0);
 const houseGains = houseMidterms.filter((s) => (s.change ?? 0) > 0);
-const worst = [...houseMidterms].sort((a, b) => (a.change ?? 0) - (b.change ?? 0))[0];
 const midFirst = Math.min(...houseMidterms.map((s) => s.year));
 const midLast = Math.max(...houseMidterms.map((s) => s.year));
 const swingHasProvisional = swing.some((s) => s.isProvisional);
@@ -95,11 +99,6 @@ const gainers = listNames(houseGains.map((s) => `${s.president} in ${s.year}`));
 
 // Senate flips since 2000 (AP convention: against the party holding the seat).
 const raceYears = [...new Set(races.filter((r) => !r.isProvisional).map((r) => r.year))];
-const flipsByYear = raceYears.map((y) => ({
-  year: y,
-  n: races.filter((r) => r.year === y && r.flippedVsHolder === true).length,
-}));
-const mostFlips = [...flipsByYear].sort((a, b) => b.n - a.n || a.year - b.year)[0];
 const flipFirst = Math.min(...raceYears);
 const senateAsOf = asOf('medsl_senate');
 
@@ -114,6 +113,13 @@ const sources = (await sourcesHtml())
 const mapData = loadMapData();
 const dashConfig = storeConfig(mapData);
 const headerYears = loadHeaderYears(mapData);
+const controlChart = loadControlChart();
+const midtermChart = loadMidtermChart();
+const flipsChart = loadFlipsChart(mapData);
+const firstClickable = congressFor(Math.min(...dashConfig.years));
+const firstClickableStart = controlChart.congresses.find((c) => c.congress === firstClickable)!.startYear;
+const ccFirst = controlChart.congresses[0];
+const ccLast = controlChart.congresses[controlChart.congresses.length - 1];
 const mapLatestYear = Math.max(...mapData.years);
 const mapHeadline = mapData.senate[defaultYear(mapData)].headline;
 const mapLatestHasResults = mapData.senate[mapLatestYear].decided > 0;
@@ -121,7 +127,6 @@ const oddSpecials = races
   .filter((r) => r.year % 2 === 1)
   .map((r) => `${mapData.stateNames[r.state]} in ${r.year}`);
 
-const fmt = (n: number) => n.toLocaleString('en-US');
 const pageAsOf = controlAsOf;
 ---
 <Base
@@ -220,32 +225,52 @@ const pageAsOf = controlAsOf;
     <section class="wrap section" aria-labelledby="control">
       <SectionHeader id="control" kicker="Who controlled Congress" title="Which party held the majority in each Congress" />
       <ChartFrame
-        title={`${best.party ? PARTY_NAME[best.party].many : 'One party'} held the House for ${runEnd - runStart} straight years, from ${runStart} to ${runEnd}`}
-        subtitle={`Seats held by each party at the opening of every Congress, House and Senate, ${ordinal(Math.min(...control.map((r) => r.congress)))} (${firstYear} election) to ${ordinal(Math.max(...control.map((r) => r.congress)))} (2026 election). One square per seat; the triangle marks the majority line.`}
+        title={controlChart.headline}
+        subtitle={`Share of seats held by each party at the opening of every Congress, from the ${ordinal(ccFirst.congress)} (elected ${ccFirst.electionYear}) to the ${ordinal(ccLast.congress)} (elected ${ccLast.electionYear}). Labels mark each change of majority that ended at least ${controlChart.minRun * 2} years of one party's control of a chamber. Select a Congress from ${firstClickableStart} on to show it across the page.`}
         source={CONTROL_SOURCE}
         dataAsOf={controlAsOf}
         provisional
-        pending="A seat bar for every Congress since 1946, built in step 04"
-        pendingHeight={420}
-      />
+      >
+        <ControlChart chart={controlChart} selectedCongress={congressFor(dashConfig.defaultYear)} clickableFrom={firstClickable} />
+        <Fragment slot="notes">
+          {controlChart.notes.map((n) => (
+            <Footnote marker={String(n.no)}>
+              Majority shown is the party in control for most of the Congress. {n.text}
+            </Footnote>
+          ))}
+          <Footnote>
+            The bars are drawn to scale rather than as one square per seat, which would be too small to see at this
+            size. The line under the chart gives the exact counts for the Congress you point at or select.
+          </Footnote>
+          {pendingYear && (
+            <Footnote>
+              The {ordinal(ccLast.congress)} Congress, elected in {pendingYear}, is shown in grey until results are entered.
+            </Footnote>
+          )}
+        </Fragment>
+      </ChartFrame>
     </section>
 
     <!-- 4. The midterm penalty -->
     <section class="wrap section" aria-labelledby="midterms">
       <SectionHeader id="midterms" kicker="The midterm penalty" title="Voters tend to punish the party in the White House" />
       <ChartFrame
-        title={`${worst.president}'s ${PARTY_NAME[worst.presidentParty].many} lost ${fmt(Math.abs(worst.change ?? 0))} House seats in ${worst.year}, the biggest midterm loss since ${midFirst}`}
-        subtitle={`Seats gained or lost by the president's party, counting independents who caucus with it, in every midterm from ${midFirst} to 2026.`}
+        title={midtermChart.headline[dashConfig.defaultChamber]}
+        subtitle={`Seats gained or lost by the president's party in each midterm from ${midFirst} to 2026, counting independents who caucus with it. The chamber follows the control bar.`}
         source={MIDTERM_SOURCE}
         dataAsOf={controlAsOf}
         provisional={swingHasProvisional}
-        pending="Bars for each midterm, House and Senate, built in step 04"
-        pendingHeight={360}
       >
+        <MidtermChart chart={midtermChart} chamber={dashConfig.defaultChamber} selectedYear={dashConfig.defaultYear} />
         <Fragment slot="notes">
           <Footnote>
             The House source records only the opening of each Congress, so House "before" counts are from the start of
-            the outgoing Congress, not election day.
+            the outgoing Congress, not election day. Some House changes therefore differ by a seat or two from the
+            figures usually quoted, which count from election day. The headline counts only whether seats were lost,
+            which is the same either way.
+          </Footnote>
+          <Footnote>
+            Senate "before" counts are from election day; "after" counts are from the opening of the new Congress.
           </Footnote>
         </Fragment>
       </ChartFrame>
@@ -255,14 +280,22 @@ const pageAsOf = controlAsOf;
     <section class="wrap section" aria-labelledby="flips">
       <SectionHeader id="flips" kicker="Seats that flipped" title="Which Senate seats changed hands" />
       <ChartFrame
-        title={`${mostFlips.n} Senate seats changed party in ${mostFlips.year}, the most of any election since ${flipFirst}`}
-        subtitle={`Senate seats won by a different party from the one holding them on election day, ${flipFirst} to 2026, with special elections included.`}
+        title={flipsChart.headline}
+        subtitle={`Senate seats won by a different caucus from the one holding them on election day, ${flipFirst} to 2026, special elections included. Select a year to list its seats; select a state to see its full record by the map.`}
         source="MIT Election Data and Science Lab, U.S. Senate statewide returns; official state results for races the dataset lacks."
         dataAsOf={senateAsOf}
         provisional
-        pending="A table of flipped seats by year, with a map toggle, built in step 04"
-        pendingHeight={300}
-      />
+      >
+        <FlipsChart chart={flipsChart} year={dashConfig.defaultYear} />
+        <Fragment slot="notes">
+          <Footnote>
+            Independents count with the party they caucus with. A seat whose party label changed but which stayed with
+            the same caucus (for example an independent who caucused with the Democrats replaced by a Democrat) is
+            listed with a note and not counted as a flip.
+          </Footnote>
+          {pendingYear && <Footnote>{pendingYear} results are not yet entered, so {pendingYear} shows no flips yet.</Footnote>}
+        </Fragment>
+      </ChartFrame>
     </section>
 
     <!-- 6. Methodology and sources -->

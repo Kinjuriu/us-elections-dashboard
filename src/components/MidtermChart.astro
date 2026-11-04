@@ -1,0 +1,367 @@
+---
+// Chart 2: the midterm penalty. One bar per midterm since 1946: seats the
+// president's party gained or lost, coloured by that party. Both chambers
+// are drawn at build time and the shared chamber control picks one; the
+// selected year is outlined when it is a midterm
+// (src/scripts/midterm-chart.ts). Bars are SVG, text is HTML over it.
+import type { MidtermChart, MidtermBar } from '../lib/chartData';
+import { signed } from '../lib/chartData';
+
+interface Props {
+  chart: MidtermChart;
+  chamber: 'house' | 'senate';
+  selectedYear: number;
+}
+const { chart, chamber, selectedYear } = Astro.props;
+
+const W = 1000;
+const PLOT_H = 300;
+const STEPS = [1, 2, 4, 5, 10, 20, 25, 50];
+
+function scale(bars: MidtermBar[]) {
+  const vals = bars.map((b) => b.change).filter((v): v is number => v !== null);
+  const rawLo = Math.min(0, ...vals);
+  const rawHi = Math.max(0, ...vals);
+  const step = STEPS.find((s) => (rawHi - rawLo) / s <= 5) ?? 50;
+  // A little room beyond the longest bar for its label.
+  const lo = Math.floor((rawLo - step * 0.3) / step) * step;
+  const hi = Math.ceil((rawHi + step * 0.3) / step) * step;
+  const ticks: number[] = [];
+  for (let t = lo; t <= hi; t += step) ticks.push(t);
+  const y = (v: number) => ((hi - v) / (hi - lo)) * PLOT_H;
+  const x = (v: number) => ((v - lo) / (hi - lo)) * 100;
+  return { lo, hi, ticks, y, x };
+}
+
+const fill = (b: MidtermBar) =>
+  b.provisional ? `url(#mt-hatch-${b.presidentParty === 'DEM' ? 'dem' : 'gop'})` : b.presidentParty === 'DEM' ? 'var(--dem)' : 'var(--gop)';
+const partyLetter = (b: MidtermBar) => (b.presidentParty === 'DEM' ? 'D' : 'R');
+
+const views = (['house', 'senate'] as const).map((ch) => {
+  const bars = chart[ch];
+  const s = scale(bars);
+  const slot = W / bars.length;
+  const bw = slot * 0.6;
+  // Annotations for the exceptions, staggered so neighbours do not overlap.
+  const notes = bars.map((b, i) => ({ b, i })).filter(({ b }) => b.note);
+  return { ch, bars, s, slot, bw, notes };
+});
+const ANN_ROW = 20;
+const annH = Math.max(...views.map((v) => v.notes.length)) * ANN_ROW + 6;
+const pct = (v: number) => +((v / W) * 100).toFixed(3);
+const readout = (b: MidtermBar, ch: string) =>
+  `${b.year}: ${b.president} (${partyLetter(b)}). ${ch === 'house' ? 'House' : 'Senate'} seats held by the president's party: ` +
+  (b.change === null ? `${b.before ?? 'n/a'} before; result not yet entered${b.provisional ? ' (provisional)' : ''}.`
+    : `${b.before} before, ${b.after} after, ${signed(b.change)}${b.provisional ? ' (provisional)' : ''}.`);
+const defaultReadoutYear = (ch: 'house' | 'senate') => {
+  const done = chart[ch].filter((b) => b.change !== null);
+  return chart.years.includes(selectedYear) ? selectedYear : done[done.length - 1].year;
+};
+---
+<div class="mt" data-mt data-chamber={chamber} data-selected={selectedYear} data-headline-house={chart.headline.house} data-headline-senate={chart.headline.senate}>
+  <ul class="mt__legend" aria-label="Key">
+    <li><span class="mt__sw" style="background:var(--dem)"></span>Democratic president</li>
+    <li><span class="mt__sw" style="background:var(--gop)"></span>Republican president</li>
+    <li><span class="mt__sw mt__sw--hatch"></span>Provisional</li>
+    <li><span class="mt__sw mt__sw--zero"></span>No change</li>
+  </ul>
+
+  {views.map((v) => (
+    <div class={`mt__ch mt__ch--${v.ch}`} data-chamber-view={v.ch}>
+      <!-- Wide: vertical bars -->
+      <div class="mt__wide" aria-hidden="true">
+        <div class="mt__yaxis" style={`margin-top:${annH}px;height:${PLOT_H}px`}>
+          {v.s.ticks.map((t) => <span style={`top:${v.s.y(t)}px`}>{t === 0 ? '0' : signed(t)}</span>)}
+        </div>
+        <div class="mt__plot">
+          <div class="mt__ann" style={`height:${annH}px`}>
+            {v.notes.map(({ b, i }, k) => {
+              const x = pct(i * v.slot + v.slot / 2);
+              // Labels hang left of their leader on the right half, right of it on the left half.
+              // Stack them so no leader crosses another label: outermost label on top.
+              const row = x > 55 ? v.notes.length - 1 - k : k;
+              const top = row * ANN_ROW;
+              const barTop = annH + v.s.y(b.change!) - 18;
+              return (
+                <>
+                  <p class={`mt__note${x > 55 ? ' mt__note--end' : ''}`} style={`left:${x}%;top:${top}px`}>{b.note}</p>
+                  <span class="mt__leader" style={`left:${x}%;top:${top + 16}px;height:${barTop - top - 16}px`}></span>
+                </>
+              );
+            })}
+          </div>
+          <svg class="mt__svg" viewBox={`0 0 ${W} ${PLOT_H}`} preserveAspectRatio="none" style={`height:${PLOT_H}px`}>
+            <defs>
+              {(['dem', 'gop'] as const).map((p) => (
+                <pattern id={`mt-hatch-${p}`} width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                  <rect width="6" height="6" fill={`var(--${p}-tint)`} />
+                  <rect width="3" height="6" fill={`var(--${p})`} />
+                </pattern>
+              ))}
+            </defs>
+            {v.s.ticks.filter((t) => t !== 0).map((t) => (
+              <line class="mt__grid" x1="0" x2={W} y1={v.s.y(t)} y2={v.s.y(t)} />
+            ))}
+            {v.bars.map((b, i) => {
+              if (b.change === null) return null;
+              const x = i * v.slot + (v.slot - v.bw) / 2;
+              const y0 = v.s.y(Math.max(0, b.change));
+              const h = Math.max(Math.abs(v.s.y(b.change) - v.s.y(0)), b.change === 0 ? 0 : 1);
+              return (
+                <>
+                  <rect x={x} y={y0} width={v.bw} height={h} fill={fill(b)} />
+                  {b.change === 0 && <rect x={x} y={v.s.y(0) - 1.5} width={v.bw} height="3" fill="var(--ink-2)" />}
+                  <rect class="mt__sel" data-year={b.year} x={x - 3} y={Math.min(y0, v.s.y(0)) - 3} width={v.bw + 6} height={Math.max(h, 3) + 6} />
+                </>
+              );
+            })}
+            <line class="mt__zero" x1="0" x2={W} y1={v.s.y(0)} y2={v.s.y(0)} />
+          </svg>
+          <div class="mt__vals" style={`top:${annH}px;height:${PLOT_H}px`}>
+            {v.bars.map((b, i) => {
+              const x = pct(i * v.slot + v.slot / 2);
+              if (b.change === null) {
+                return <span class="mt__val mt__val--pending" data-year={b.year} style={`left:${x}%;top:${v.s.y(0) + 6}px`}>Not yet entered</span>;
+              }
+              const top = b.change >= 0 ? v.s.y(b.change) - 18 : v.s.y(b.change) + 3;
+              return <span class="mt__val" data-year={b.year} style={`left:${x}%;top:${top}px`}>{b.change === 0 ? '0' : signed(b.change)}</span>;
+            })}
+          </div>
+          <div class="mt__xaxis">
+            {v.bars.map((b, i) => (
+              <span data-year={b.year} style={`left:${pct(i * v.slot + v.slot / 2)}%`}>
+                {b.year}{b.provisional && <em>Provisional</em>}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      <!-- Narrow: one row per midterm, bars left (lost) or right (gained) of zero -->
+      <div class="mt__narrow" aria-hidden="true">
+        {v.bars.map((b) => {
+          const z = v.s.x(0);
+          const e = b.change === null ? z : v.s.x(b.change);
+          return (
+            <>
+              <div class="mt__nrow" data-year={b.year}>
+                <span class="mt__nyear">{b.year}</span>
+                <div class="mt__nplot">
+                  <svg viewBox="0 0 100 10" preserveAspectRatio="none">
+                    {b.change !== null && b.change !== 0 && (
+                      <rect x={Math.min(z, e)} y="1" width={Math.abs(e - z)} height="8" fill={fill(b)} />
+                    )}
+                    {b.change === 0 && <rect x={z - 0.6} y="1" width="1.2" height="8" fill="var(--ink-2)" />}
+                    <line class="mt__zero" x1={z} x2={z} y1="-1" y2="11" />
+                  </svg>
+                  {b.change === null ? (
+                    <span class="mt__nval" style={`right:${100 - z}%;padding-right:6px`}>Not yet entered{b.provisional ? ', provisional' : ''}</span>
+                  ) : b.change < 0 ? (
+                    <span class="mt__nval" style={`right:${100 - e}%;padding-right:4px`}>{signed(b.change)}</span>
+                  ) : (
+                    <span class="mt__nval" style={`left:${e}%;padding-left:4px`}>{signed(b.change)}</span>
+                  )}
+                </div>
+              </div>
+              {b.note && <p class="mt__nnote">{b.year}: {b.note}</p>}
+            </>
+          );
+        })}
+      </div>
+
+      <p class="mt__readout" data-mt-readout aria-live="polite">{readout(v.bars.find((b) => b.year === defaultReadoutYear(v.ch))!, v.ch)}</p>
+      <script type="application/json" data-mt-data set:html={JSON.stringify(Object.fromEntries(v.bars.map((b) => [b.year, readout(b, v.ch)])))}></script>
+    </div>
+  ))}
+
+  <p class="mt__median">{chart.medianSentence}</p>
+
+  <details class="mt__table">
+    <summary>All the numbers</summary>
+    <table>
+      <caption class="visually-hidden">Seats held by the president's party before and after each midterm</caption>
+      <thead>
+        <tr><th scope="col">Year</th><th scope="col">President</th><th scope="col">House before</th><th scope="col">After</th><th scope="col">Change</th><th scope="col">Senate before</th><th scope="col">After</th><th scope="col">Change</th></tr>
+      </thead>
+      <tbody>
+        {chart.house.map((h, i) => {
+          const s = chart.senate[i];
+          const c = (v: number | null) => (v === null ? 'n/a' : signed(v));
+          return (
+            <tr>
+              <td>{h.year}{h.provisional ? ' (provisional)' : ''}</td><td>{h.president} ({partyLetter(h)})</td>
+              <td>{h.before ?? 'n/a'}</td><td>{h.after ?? 'n/a'}</td><td>{c(h.change)}</td>
+              <td>{s.before ?? 'n/a'}</td><td>{s.after ?? 'n/a'}</td><td>{c(s.change)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </details>
+</div>
+
+<script>
+  import '../scripts/midterm-chart';
+</script>
+
+<style>
+  .mt__legend {
+    list-style: none;
+    margin: 0 0 var(--sp-4);
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    font-size: var(--fs-1);
+    color: var(--ink-2);
+  }
+  .mt__legend li { display: inline-flex; align-items: center; gap: 6px; }
+  .mt__sw { display: inline-block; width: 12px; height: 12px; }
+  .mt__sw--hatch { background: repeating-linear-gradient(45deg, var(--ink-2) 0 2px, var(--paper) 2px 4px); }
+  .mt__sw--zero { height: 3px; background: var(--ink-2); }
+
+  .mt[data-chamber='house'] .mt__ch--senate,
+  .mt[data-chamber='senate'] .mt__ch--house { display: none; }
+
+  /* ---- Wide ---- */
+  .mt__wide { display: none; }
+  .mt__narrow { display: grid; }
+  @media (min-width: 1024px) {
+    .mt__wide { display: grid; grid-template-columns: 44px minmax(0, 1fr); }
+    .mt__narrow { display: none; }
+  }
+  .mt__yaxis { position: relative; }
+  .mt__yaxis span {
+    position: absolute;
+    right: var(--sp-2);
+    transform: translateY(-50%);
+    font-family: var(--font-label);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .mt__plot { position: relative; min-width: 0; }
+  .mt__ann { position: relative; }
+  .mt__note {
+    position: absolute;
+    max-width: none;
+    white-space: nowrap;
+    padding-inline: 4px;
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    line-height: 16px;
+  }
+  .mt__note--end { transform: translateX(-100%); }
+  .mt__leader { position: absolute; width: 1px; background: var(--ink-2); }
+  .mt__svg { display: block; width: 100%; overflow: visible; }
+  .mt__grid { stroke: var(--rule); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .mt__zero { stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .mt__sel { fill: none; stroke: var(--ink); stroke-width: 2; vector-effect: non-scaling-stroke; display: none; }
+  .mt__sel.is-selected { display: inline; }
+  .mt__vals { position: absolute; left: 0; right: 0; pointer-events: none; }
+  .mt__val {
+    position: absolute;
+    transform: translateX(-50%);
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    line-height: 15px;
+    font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+  }
+  .mt__val--pending {
+    width: 3.6em;
+    white-space: normal;
+    text-align: center;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+  .mt__val.is-selected { font-weight: 700; text-decoration: underline; text-underline-offset: 2px; }
+  .mt__xaxis { position: relative; height: 34px; margin-top: var(--sp-2); }
+  .mt__xaxis span {
+    position: absolute;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: var(--font-label);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .mt__xaxis em { font-style: normal; font-weight: 500; font-size: 12px; }
+  .mt__xaxis span.is-selected { color: var(--ink); text-decoration: underline 2px; text-underline-offset: 3px; }
+
+  /* ---- Narrow ---- */
+  .mt__nrow {
+    display: grid;
+    grid-template-columns: 40px minmax(0, 1fr);
+    align-items: center;
+    gap: var(--sp-2);
+    height: 24px;
+  }
+  .mt__nrow.is-selected { box-shadow: inset 0 0 0 2px var(--ink); }
+  .mt__nyear {
+    padding-left: 4px;
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .mt__nplot { position: relative; height: 100%; }
+  .mt__nplot svg { display: block; width: 100%; height: 100%; overflow: visible; }
+  .mt__nval {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+  }
+  .mt__nnote {
+    margin: 0 0 6px 48px;
+    font-size: var(--fs-1);
+    color: var(--ink-2);
+  }
+
+  .mt__readout {
+    margin-top: var(--sp-4);
+    padding: var(--sp-2) var(--sp-3);
+    border-left: 2px solid var(--ink);
+    background: var(--paper-2);
+    font-size: var(--fs-2);
+    max-width: none;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .mt__median {
+    margin-top: var(--sp-4);
+    font-size: var(--fs-3);
+  }
+  .mt__table { margin-top: var(--sp-4); font-size: var(--fs-1); }
+  .mt__table summary {
+    cursor: pointer;
+    font-family: var(--font-label);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .mt__table table {
+    display: block;
+    overflow-x: auto;
+    margin-top: var(--sp-2);
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .mt__table th, .mt__table td {
+    padding: 3px var(--sp-3) 3px 0;
+    border-bottom: var(--hairline);
+    text-align: left;
+    white-space: nowrap;
+  }
+  .mt__table th { font-family: var(--font-label); font-weight: 600; border-bottom-color: var(--ink); }
+</style>

@@ -7,6 +7,7 @@ import {
   parseCsv, loadChamberControl, loadIndependents, PARTY_NAME,
   type Party, type ChamberControl, type Independent,
 } from './data';
+import { congressFor } from './store';
 
 const ROOT = process.cwd();
 const readCsv = (rel: string) => parseCsv(readFileSync(join(ROOT, rel), 'utf8'));
@@ -120,8 +121,7 @@ export interface MapData {
 const caucusOf = (inds: Independent[], chamber: 'house' | 'senate', congress: number, state: string) =>
   inds.find((i) => i.chamber === chamber && i.congress === congress && i.state === state)?.caucusesWith ?? null;
 
-/** The Congress elected in (or, for an odd year, sitting during) a year. */
-export const congressFor = (year: number) => Math.floor((year - 1786) / 2);
+export { congressFor };
 
 function raceFills(races: SenateRace[]): SenateFill[] {
   return races.map((r): SenateFill => {
