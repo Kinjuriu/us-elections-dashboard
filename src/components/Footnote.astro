@@ -1,0 +1,26 @@
+---
+// A short note under a chart. Optional marker (e.g. "*" or "1") that
+// matches a marker used in the graphic.
+interface Props {
+  marker?: string;
+}
+const { marker } = Astro.props;
+---
+<p class="footnote">
+  {marker && <span class="footnote__marker" aria-hidden="true">{marker}</span>}
+  <slot />
+</p>
+
+<style>
+  .footnote {
+    font-size: var(--fs-1);
+    line-height: 1.45;
+    color: var(--ink-2);
+    max-width: var(--prose-max);
+  }
+  .footnote__marker {
+    font-weight: 600;
+    color: var(--ink);
+    margin-right: var(--sp-1);
+  }
+</style>

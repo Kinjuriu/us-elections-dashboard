@@ -1,0 +1,123 @@
+---
+// Squared toggle buttons for chamber or year. Native buttons with
+// aria-pressed; Left/Right/Home/End move between options. On change the
+// group fires a bubbling "segmentchange" event with { name, value }.
+interface Option {
+  value: string;
+  label: string;
+}
+interface Props {
+  /** Group name, used in the change event and as a data attribute. */
+  name: string;
+  /** Accessible name for the group, e.g. "Chamber". */
+  label: string;
+  options: Option[];
+  selected: string;
+  /** Show the label as a visible tracked caption before the buttons. */
+  showLabel?: boolean;
+}
+const { name, label, options, selected, showLabel = false } = Astro.props;
+const labelId = `seg-${name}-label`;
+---
+<div class="segmented" data-segmented={name}>
+  <span id={labelId} class:list={['label', 'segmented__label', { 'visually-hidden': !showLabel }]}>{label}</span>
+  <div class="segmented__buttons" role="group" aria-labelledby={labelId}>
+    {options.map((o) => (
+      <button
+        type="button"
+        class="segmented__button"
+        data-value={o.value}
+        aria-pressed={o.value === selected ? 'true' : 'false'}
+      >
+        {o.label}
+      </button>
+    ))}
+  </div>
+</div>
+
+<script>
+  for (const group of document.querySelectorAll<HTMLElement>('[data-segmented]')) {
+    const buttons = [...group.querySelectorAll<HTMLButtonElement>('.segmented__button')];
+
+    const select = (btn: HTMLButtonElement) => {
+      if (btn.getAttribute('aria-pressed') === 'true') return;
+      for (const b of buttons) b.setAttribute('aria-pressed', String(b === btn));
+      group.dispatchEvent(
+        new CustomEvent('segmentchange', {
+          bubbles: true,
+          detail: { name: group.dataset.segmented, value: btn.dataset.value },
+        }),
+      );
+    };
+
+    for (const btn of buttons) {
+      btn.addEventListener('click', () => select(btn));
+      btn.addEventListener('keydown', (e) => {
+        const i = buttons.indexOf(btn);
+        const next =
+          e.key === 'ArrowRight' ? buttons[Math.min(i + 1, buttons.length - 1)] :
+          e.key === 'ArrowLeft' ? buttons[Math.max(i - 1, 0)] :
+          e.key === 'Home' ? buttons[0] :
+          e.key === 'End' ? buttons[buttons.length - 1] :
+          null;
+        if (next) {
+          e.preventDefault();
+          next.focus();
+          select(next);
+        }
+      });
+    }
+  }
+</script>
+
+<style>
+  .segmented {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-3);
+  }
+  .segmented__buttons {
+    display: inline-flex;
+    flex-wrap: wrap;
+  }
+  .segmented__button {
+    appearance: none;
+    margin: 0 0 0 -1px;
+    padding: 7px var(--sp-4);
+    min-height: 36px;
+    border: 1px solid var(--ink-3);
+    border-radius: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-label);
+    font-size: var(--fs-2);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    line-height: 1.2;
+    cursor: pointer;
+  }
+  .segmented__button:first-child {
+    margin-left: 0;
+    border-radius: var(--radius-control) 0 0 var(--radius-control);
+  }
+  .segmented__button:last-child {
+    border-radius: 0 var(--radius-control) var(--radius-control) 0;
+  }
+  .segmented__button:hover {
+    background: var(--paper-2);
+  }
+  .segmented__button[aria-pressed='true'] {
+    position: relative;
+    z-index: 1;
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--paper);
+  }
+  .segmented__button:focus-visible {
+    position: relative;
+    z-index: 2;
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+</style>

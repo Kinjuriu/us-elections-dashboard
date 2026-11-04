@@ -1,0 +1,29 @@
+---
+// Section divider: tracked uppercase label sitting on a 1px black rule,
+// then the section heading in Source Serif 4 (DESIGN_RULES.md 5).
+interface Props {
+  id: string;
+  kicker: string;
+  title: string;
+}
+const { id, kicker, title } = Astro.props;
+---
+<header class="section-header">
+  <p class="label section-header__kicker">{kicker}</p>
+  <h2 id={id} class="section-header__title">{title}</h2>
+</header>
+
+<style>
+  .section-header {
+    margin-bottom: var(--sp-6);
+  }
+  .section-header__kicker {
+    padding-bottom: var(--sp-2);
+    border-bottom: 1px solid var(--ink);
+    margin-bottom: var(--sp-4);
+    max-width: none;
+  }
+  .section-header__title {
+    max-width: 32ch;
+  }
+</style>

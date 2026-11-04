@@ -1,0 +1,113 @@
+---
+// Every chart and map sits in this frame: title, subtitle, optional legend,
+// the graphic, then source line and "Data as of" date (DESIGN_RULES.md 6).
+// The build fails if any of the five parts is missing.
+import SourceLine from './SourceLine.astro';
+
+interface Props {
+  title: string;
+  subtitle: string;
+  source: string;
+  dataAsOf: string;
+  /** Shows the provisional label. Set whenever 2026 data can appear. */
+  provisional?: boolean;
+  /** For frames whose graphic is built in a later step: says what will go here. */
+  pending?: string;
+  /** Height reserved for a pending graphic, in px. */
+  pendingHeight?: number;
+}
+
+const { title, subtitle, source, dataAsOf, provisional = false, pending, pendingHeight = 320 } = Astro.props;
+
+const missing = Object.entries({ title, subtitle, source, dataAsOf })
+  .filter(([, v]) => !v || !v.trim())
+  .map(([k]) => k);
+if (!Astro.slots.has('default') && !pending) missing.push('graphic');
+if (missing.length) {
+  throw new Error(`ChartFrame "${title ?? '(untitled)'}" is missing: ${missing.join(', ')}`);
+}
+---
+<figure class="chart-frame">
+  <figcaption class="chart-frame__head">
+    <h3 class="chart-frame__title">{title}</h3>
+    <p class="chart-frame__subtitle">{subtitle}</p>
+    {provisional && (
+      <p class="chart-frame__provisional label">2026 is provisional until results are certified</p>
+    )}
+  </figcaption>
+
+  {Astro.slots.has('legend') && (
+    <div class="chart-frame__legend"><slot name="legend" /></div>
+  )}
+
+  <div class="chart-frame__graphic">
+    {Astro.slots.has('default') ? (
+      <slot />
+    ) : (
+      <div class="chart-frame__pending" style={`min-height:${pendingHeight}px`}>
+        <p>{pending}</p>
+      </div>
+    )}
+  </div>
+
+  <div class="chart-frame__foot">
+    {Astro.slots.has('notes') && <div class="chart-frame__notes"><slot name="notes" /></div>}
+    <SourceLine source={source} dataAsOf={dataAsOf} />
+  </div>
+</figure>
+
+<style>
+  .chart-frame {
+    margin: 0;
+  }
+  .chart-frame__head {
+    margin-bottom: var(--sp-4);
+  }
+  .chart-frame__title {
+    font-size: var(--fs-4);
+    max-width: var(--prose-max);
+  }
+  @media (min-width: 768px) {
+    .chart-frame__title { font-size: var(--fs-5); }
+  }
+  .chart-frame__subtitle {
+    margin-top: var(--sp-2);
+    font-size: var(--fs-2);
+    color: var(--ink-2);
+    line-height: 1.45;
+  }
+  .chart-frame__provisional {
+    margin-top: var(--sp-2);
+    color: var(--ink);
+  }
+  .chart-frame__legend {
+    margin-bottom: var(--sp-4);
+  }
+  .chart-frame__graphic {
+    min-width: 0;
+  }
+  .chart-frame__pending {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: var(--sp-5);
+    background: var(--paper-2);
+    border: 1px dashed var(--rule);
+  }
+  .chart-frame__pending p {
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+    text-align: center;
+  }
+  .chart-frame__foot {
+    margin-top: var(--sp-4);
+    padding-top: var(--sp-3);
+    border-top: var(--hairline);
+    display: grid;
+    gap: var(--sp-2);
+  }
+</style>

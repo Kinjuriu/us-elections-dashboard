@@ -1,0 +1,27 @@
+---
+// "Source: ... Data as of ..." under every chart and map.
+interface Props {
+  source: string;
+  dataAsOf: string;
+}
+const { source, dataAsOf } = Astro.props;
+if (!source.trim() || !dataAsOf.trim()) {
+  throw new Error('SourceLine needs both a source and a "Data as of" date.');
+}
+---
+<p class="source-line">
+  <span>Source: {source}</span>
+  <span class="source-line__date">Data as of <time>{dataAsOf}</time></span>
+</p>
+
+<style>
+  .source-line {
+    font-family: var(--font-text);
+    font-size: var(--fs-1);
+    line-height: 1.45;
+    color: var(--ink-2);
+    max-width: var(--prose-max);
+  }
+  .source-line span { display: block; }
+  .source-line__date { margin-top: var(--sp-1); }
+</style>
