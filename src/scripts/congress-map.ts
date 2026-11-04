@@ -222,8 +222,8 @@ function init(root: HTMLElement) {
     }
     const text = compare === null ? ''
       : view === 'senate'
-        ? `A Senate seat is held by the other caucus in ${year} than in ${compare} (${changed.size} ${changed.size === 1 ? 'state' : 'states'})`
-        : `The House delegation's majority changed between ${compare} and ${year} (${changed.size} ${changed.size === 1 ? 'state' : 'states'})`;
+        ? `A Senate seat changed caucus between ${Math.min(compare, year)} and ${Math.max(compare, year)} (${changed.size} ${changed.size === 1 ? 'state' : 'states'})`
+        : `The House delegation's majority changed between ${Math.min(compare, year)} and ${Math.max(compare, year)} (${changed.size} ${changed.size === 1 ? 'state' : 'states'})`;
     for (const li of root.querySelectorAll<HTMLElement>('[data-compare-key]')) {
       li.hidden = compare === null;
       li.querySelector('[data-compare-key-text]')!.textContent = text;
