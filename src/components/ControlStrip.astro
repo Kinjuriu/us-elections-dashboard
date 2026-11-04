@@ -1,15 +1,12 @@
 ---
-// The board's one set of controls: chamber, year and a comparison year.
-// The year control is the Congress strip: one column per election from 1946
-// to 2026, coloured by the majority of the chamber chosen. Columns before
-// 2000 show their colour but cannot be selected, because the map starts in
-// 2000. Below 900px the columns are too narrow to tap, so phones and small
-// tablets get a row of year buttons instead. Every module listens to the
-// store these controls write to (src/scripts/control-strip.ts).
+// The board's one set of controls: the railway (or, on phones, the big-year
+// stepper over a small railway), the chamber for the map, and a comparison
+// year. Every module listens to the store these controls write to
+// (src/scripts/control-strip.ts for chamber and comparison, src/scripts/railway.ts for the year).
 import SegmentedControl from './SegmentedControl.astro';
+import Railway from './Railway.astro';
 import type { StoreConfig } from '../lib/store';
 import type { StripColumn } from '../lib/dashboardData';
-import { PROVISIONAL_YEAR, FIRST_MAP_YEAR } from '../lib/mapData';
 
 interface Props {
   config: StoreConfig;
@@ -18,75 +15,35 @@ interface Props {
 const { config, columns } = Astro.props;
 const allYears = [...config.years, ...config.senateOnlyYears].sort((a, b) => a - b);
 const special = (y: number) => config.senateOnlyYears.includes(y);
-
-const yearOptions = allYears.map((y) => ({
-  value: String(y),
-  label: String(y),
-  note: y === PROVISIONAL_YEAR ? 'prov.' : undefined,
-  only: special(y) ? 'senate' : undefined,
-  ariaLabel: y === PROVISIONAL_YEAR ? `${y}, provisional` : special(y) ? `${y} special elections, Senate only` : undefined,
-}));
 const defaultChamber = config.defaultChamber;
-const lc = (p: string | null) => (p ? p.toLowerCase() : 'none');
-const first = columns[0].year;
-const last = columns[columns.length - 1].year;
 ---
 <div class="cstrip" data-cbar>
-  <div class="cstrip__main">
-    <div class="cstrip__chamber">
-      <SegmentedControl
-        name="chamber"
-        label="Chamber"
-        compact
-        options={[{ value: 'senate', label: 'Senate' }, { value: 'house', label: 'House' }]}
-        selected={defaultChamber}
-      />
-    </div>
-    <div class="cstrip__years">
-      <button type="button" class="cstrip__step" data-step="-1" aria-label="Previous election">&lsaquo;</button>
-      <div class="strip" data-strip data-chamber={defaultChamber} role="group" aria-label={`Year. One column per election, ${first} to ${last}, coloured by the majority party. Left and right arrow keys step between years.`}>
-        {columns.map((c) => (
-          <button
-            type="button"
-            class:list={['strip__col', { 'strip__col--special': c.special, 'strip__col--prov': c.provisional }]}
-            data-value={String(c.year)}
-            data-senate={lc(c.senate)}
-            data-house={lc(c.house)}
-            data-only={c.special ? 'senate' : undefined}
-            aria-pressed={c.year === config.defaultYear ? 'true' : 'false'}
-            aria-disabled={c.selectable ? undefined : 'true'}
-            aria-label={c.provisional ? `${c.year}, provisional` : c.special ? `${c.year} special elections, Senate only` : String(c.year)}
-            title={c.selectable ? undefined : `${c.year}: no map before ${FIRST_MAP_YEAR}`}
-            tabindex={c.year === config.defaultYear ? '0' : '-1'}
-          >
-            {!c.special && c.year % 10 === 0 && <span class="strip__tick" aria-hidden="true">{c.year}</span>}
-            {c.provisional && <span class="strip__tick strip__tick--prov" aria-hidden="true">prov.</span>}
-          </button>
-        ))}
-      </div>
-      <button type="button" class="cstrip__step" data-step="1" aria-label="Next election">&rsaquo;</button>
-      <output class="cstrip__year" data-year-out aria-live="polite">
-        <span data-y>{config.defaultYear}</span><span class="cstrip__prov label" data-prov hidden={config.defaultYear !== PROVISIONAL_YEAR}>provisional</span>
-      </output>
-    </div>
-    <label class="cstrip__compare">
-      <span class="label cstrip__compare-label">Compare with</span>
-      <select class="cstrip__select" data-compare aria-label="Compare with another year">
-        <option value="" data-short="Compare">None</option>
-        {allYears.map((y) => (
-          <option
-            value={String(y)}
-            data-only={special(y) ? 'senate' : undefined}
-            hidden={special(y) && defaultChamber !== 'senate'}
-            disabled={y === config.defaultYear}
-          >{y}</option>
-        ))}
-      </select>
-    </label>
+  <div class="cstrip__year">
+    <Railway config={config} columns={columns} year={config.defaultYear} trackStart={columns[0].year} />
   </div>
-  <div class="cstrip__buttons">
-    <SegmentedControl name="year" label="Year" compact scroll options={yearOptions} selected={String(config.defaultYear)} />
+  <div class="cstrip__chamber">
+    <SegmentedControl
+      name="chamber"
+      label="Chamber"
+      compact
+      options={[{ value: 'senate', label: 'Senate' }, { value: 'house', label: 'House' }]}
+      selected={defaultChamber}
+    />
   </div>
+  <label class="cstrip__compare">
+    <span class="label cstrip__compare-label">Compare with</span>
+    <select class="cstrip__select" data-compare aria-label="Compare with another year">
+      <option value="" data-short="Compare">None</option>
+      {allYears.map((y) => (
+        <option
+          value={String(y)}
+          data-only={special(y) ? 'senate' : undefined}
+          hidden={special(y) && defaultChamber !== 'senate'}
+          disabled={y === config.defaultYear}
+        >{y}</option>
+      ))}
+    </select>
+  </label>
   <noscript>
     <p class="cstrip__noscript">Showing the Senate in {config.defaultYear}. Turn on JavaScript to change the year or chamber.</p>
   </noscript>
@@ -98,65 +55,32 @@ const last = columns[columns.length - 1].year;
 
 <style>
   .cstrip {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-areas:
+      'year year'
+      'chamber compare'
+      'note note';
+    align-items: center;
+    gap: var(--sp-3) var(--sp-3);
+    padding: var(--sp-4) var(--sp-3) var(--sp-3);
     background: var(--paper-2);
     border-bottom: 1px solid var(--rule);
-  }
-  .cstrip__main {
-    display: flex;
-    align-items: center;
-    gap: var(--sp-2) var(--sp-4);
-    padding: var(--sp-2) var(--sp-4);
     min-width: 0;
   }
-  .cstrip__chamber { flex: none; }
-  .cstrip__years {
-    flex: 1 1 auto;
-    min-width: 0;
-    display: flex;
-    align-items: center;
-    gap: var(--sp-2);
-  }
-  .cstrip__step {
-    flex: none;
-    appearance: none;
-    width: 32px;
-    height: 32px;
-    padding: 0 0 3px;
-    border: 1px solid var(--ink-3);
-    border-radius: var(--radius-control);
-    background: var(--paper);
-    color: var(--ink);
-    font-family: var(--font-label);
-    font-size: var(--fs-5);
-    line-height: 1;
-    cursor: pointer;
-  }
-  .cstrip__step:hover:not(:disabled) { background: var(--paper-2); border-color: var(--ink); }
-  .cstrip__step:disabled { color: var(--ink-3); border-color: var(--rule); cursor: default; }
-  .cstrip__year {
-    flex: none;
-    min-width: 48px;
-    font-family: var(--font-label);
-    font-weight: 700;
-    font-size: var(--fs-4);
-    font-variant-numeric: tabular-nums lining-nums;
-    line-height: 1.1;
-  }
-  .cstrip__prov { display: block; font-size: 12px; font-weight: 600; color: var(--ink-2); }
-  .cstrip__prov[hidden] { display: none; }
-
-  /* ---- The Congress strip: desktop only ---- */
-  .strip { display: none; }
+  .cstrip__year { grid-area: year; min-width: 0; }
+  .cstrip__chamber { grid-area: chamber; }
   .cstrip__compare {
-    flex: none;
+    grid-area: compare;
+    justify-self: end;
     display: flex;
     align-items: center;
     gap: var(--sp-2);
-    margin-left: auto;
   }
+  .cstrip__compare-label { display: none; }
   .cstrip__select {
     appearance: none;
-    min-height: 32px;
+    min-height: 36px;
     padding: 5px 26px 5px var(--sp-2);
     border: 1px solid var(--ink-3);
     border-radius: var(--radius-control);
@@ -174,82 +98,17 @@ const last = columns[columns.length - 1].year;
   .cstrip__select:hover { background-color: var(--paper-2); }
   .cstrip__select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .cstrip__select[data-active] { border-color: var(--ink); background-color: var(--paper-2); }
-  .cstrip__noscript { padding: 0 var(--sp-4) var(--sp-2); font-size: var(--fs-1); color: var(--ink-2); }
-
-  .cstrip__buttons { padding: 0 var(--sp-4) var(--sp-2); min-width: 0; }
-  .cstrip__buttons :global(.segmented__button) { min-height: 32px; }
-  .cstrip__buttons :global(.segmented__note) { display: none; }
-
-  /* Phones: one sticky block, so the controls stay with the map. */
-  @media (max-width: 899.98px) {
-    .cstrip { position: sticky; top: 0; z-index: 20; }
-    .cstrip__compare-label { display: none; }
-    .cstrip__years { justify-content: center; }
-    .cstrip__main { padding-inline: var(--sp-3); gap: var(--sp-2); }
-  }
-  @media (max-width: 479.98px) {
-    .cstrip__main { flex-wrap: wrap; }
-    .cstrip__years { order: 3; flex: 1 0 100%; justify-content: flex-start; }
-    .cstrip__compare { margin-left: auto; }
-  }
+  .cstrip__noscript { grid-area: note; font-size: var(--fs-1); color: var(--ink-2); }
+  .cstrip :global(.segmented__button) { min-height: 36px; }
 
   @media (min-width: 900px) {
-    .cstrip { display: block; }
-    .cstrip__buttons { display: none; }
-    .cstrip__main { padding-block: 6px; min-height: 52px; }
-    .strip {
-      flex: 1 1 auto;
-      min-width: 0;
-      max-width: 700px;
-      display: flex;
-      gap: 1px;
-      align-items: stretch;
-      height: 20px;
-      margin-bottom: 14px;
+    .cstrip {
+      grid-template-areas:
+        'chamber compare'
+        'year year'
+        'note note';
+      padding: var(--sp-3) var(--sp-4) var(--sp-3);
     }
-    .strip__col {
-      position: relative;
-      flex: 1 1 0;
-      min-width: 0;
-      max-width: 16px;
-      appearance: none;
-      padding: 0;
-      border: 0;
-      border-radius: 0;
-      background: var(--no-race);
-      cursor: pointer;
-      opacity: 1;
-    }
-    .strip__col--special { flex-grow: 0.5; }
-    .strip__col[hidden] { display: none; }
-    .strip[data-chamber='senate'] .strip__col[data-senate='dem'],
-    .strip[data-chamber='house'] .strip__col[data-house='dem'] { background: var(--dem); }
-    .strip[data-chamber='senate'] .strip__col[data-senate='gop'],
-    .strip[data-chamber='house'] .strip__col[data-house='gop'] { background: var(--gop); }
-    .strip[data-chamber='house'] .strip__col[data-house='none'],
-    .strip[data-chamber='senate'] .strip__col[data-senate='none'] { background: var(--no-race); }
-    .strip__col[aria-disabled='true'] { opacity: 0.5; cursor: not-allowed; }
-    .strip__col--prov { box-shadow: inset 0 0 0 1px var(--ink); background-image: radial-gradient(var(--ink-3) 0.8px, transparent 0.9px); background-size: 4px 4px; background-color: var(--paper) !important; }
-    .strip__col:hover:not([aria-disabled='true']) { outline: 1px solid var(--ink); outline-offset: 1px; }
-    .strip__col[aria-pressed='true'] { outline: 2px solid var(--ink); outline-offset: 1px; z-index: 1; }
-    .strip__col:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; z-index: 2; }
-    .strip__tick {
-      position: absolute;
-      top: 100%;
-      left: 50%;
-      transform: translateX(-50%);
-      margin-top: 3px;
-      font-family: var(--font-label);
-      font-size: 12px;
-      font-weight: 600;
-      line-height: 1;
-      color: var(--ink-2);
-      font-variant-numeric: tabular-nums lining-nums;
-      pointer-events: none;
-    }
-    .strip__tick--prov { left: auto; right: 0; transform: none; }
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .strip__col { transition: background-color var(--dur-data) var(--ease-data); }
+    .cstrip__compare-label { display: block; }
   }
 </style>

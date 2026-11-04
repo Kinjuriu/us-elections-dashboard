@@ -26,6 +26,8 @@ export interface StoreConfig {
   states: string[];
   defaultYear: number;
   defaultChamber: Chamber;
+  /** Years with no results entered yet, mapped to the election the board shows in their place. */
+  shownYears?: Record<number, number>;
 }
 
 export const CHAMBERS: Chamber[] = ['senate', 'house'];

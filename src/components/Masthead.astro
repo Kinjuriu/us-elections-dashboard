@@ -4,14 +4,18 @@
 const base = import.meta.env.BASE_URL;
 interface Props {
   current?: 'dashboard' | 'story';
+  /** The dashboard's own page title sits under the masthead, so it leaves this one out. */
+  showTitle?: boolean;
 }
-const { current = 'dashboard' } = Astro.props;
+const { current = 'dashboard', showTitle = true } = Astro.props;
 ---
 <header class="masthead">
   <div class="wrap masthead__inner">
-    <p class="label masthead__title">
-      {current === 'story' ? <a href={base}>US Congress, 1946 to 2026</a> : 'US Congress, 1946 to 2026'}
-    </p>
+    {showTitle && (
+      <p class="label masthead__title">
+        {current === 'story' ? <a href={base}>US Congress, 1946 to 2026</a> : 'US Congress, 1946 to 2026'}
+      </p>
+    )}
     <nav aria-label="Pages" class="masthead__nav">
       {current === 'story' ? <a href={base}>Dashboard</a> : <a href={`${base}story`}>Story</a>}
       <a href={`${base}#notes`}>Sources</a>
@@ -32,6 +36,7 @@ const { current = 'dashboard' } = Astro.props;
   .masthead__title { font-weight: 700; font-size: 13px; }
   .masthead__title a { text-decoration: none; }
   .masthead__nav {
+    margin-left: auto;
     display: flex;
     gap: var(--sp-5);
     font-family: var(--font-label);

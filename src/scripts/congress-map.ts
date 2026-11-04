@@ -6,7 +6,8 @@
 import type { MapData, SenateYear, HouseYear, HouseStateYear } from '../lib/mapData';
 import type { HouseGrid } from '../lib/geo';
 import type { DashState } from '../lib/store';
-import { store, openState, closeState } from './dashboard';
+import { store, config, openState, closeState } from './dashboard';
+import { findingFor } from '../lib/finding';
 import {
   senateTitle, houseTitle, senateTone, hatchParty, detailsHtml, ariaLabel, nationalHtml,
   stateRecordHtml, senateChanged, houseChanged, type View, type NationalHeader,
@@ -189,7 +190,7 @@ function init(root: HTMLElement) {
     const t = view === 'senate' ? senateTitle(sy) : houseTitle(hy);
     root.querySelector('[data-title]')!.textContent = t.title;
     root.querySelector('[data-subtitle]')!.textContent = t.subtitle;
-    if (finding) finding.textContent = view === 'senate' ? sy.headline : hy.headline;
+    if (finding) finding.textContent = findingFor(year, view === 'senate' ? sy.headline : hy.headline, config.shownYears);
     if (provTag) provTag.hidden = !(view === 'senate' ? sy.provisional : hy.provisional);
 
     if (view === 'senate') drawSenate();

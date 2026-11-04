@@ -31,6 +31,8 @@ export interface HeaderYear {
   subtitle: string;
   house: HeaderChamber;
   senate: HeaderChamber;
+  /** The election before the one shown, for "change since" on the cards. Null when it has no counts. */
+  before: { year: number; house: Balance; senate: Balance } | null;
 }
 
 const majorityOf = (r: ChamberControl) => r.majorityMostOfCongress ?? r.majorityParty;
@@ -64,6 +66,12 @@ export function loadHeaderYears(map: MapData): Record<number, HeaderYear> {
       note = `${year} results are not yet entered, so these bars show the Congress elected in ${shownYear}. They will switch to the ${year} results, labelled provisional, once those are entered.`;
     }
 
+    const prevH = row('house', shownYear - 2);
+    const prevS = row('senate', shownYear - 2);
+    const before = prevH && prevS && hasCounts(prevH) && hasCounts(prevS)
+      ? { year: shownYear - 2, house: balanceFrom(prevH, inds, 'house'), senate: balanceFrom(prevS, inds, 'senate') }
+      : null;
+
     const chamber = (r: ChamberControl, c: 'house' | 'senate'): HeaderChamber => ({
       balance: balanceFrom(r, inds, c),
       total: r.totalSeats,
@@ -84,18 +92,27 @@ export function loadHeaderYears(map: MapData): Record<number, HeaderYear> {
       subtitle: `Seats held at the opening of the ${ordinal(h.congress)} Congress, which sits from ${h.yearsServed.replace('-', ' to ')}. One square per seat.`,
       house: chamber(h, 'house'),
       senate: chamber(s, 'senate'),
+      before,
     };
   }
   return out;
 }
 
-export function storeConfig(map: MapData): StoreConfig {
+/** Even years with no results entered, mapped to the election whose Congress the cards show instead. */
+export function noDataYears(years: Record<number, HeaderYear>): Record<number, number> {
+  const out: Record<number, number> = {};
+  for (const h of Object.values(years)) if (h.year % 2 === 0 && h.year !== h.shownYear) out[h.year] = h.shownYear;
+  return out;
+}
+
+export function storeConfig(map: MapData, years?: Record<number, HeaderYear>): StoreConfig {
   return {
     years: map.years,
     senateOnlyYears: map.senateOnlyYears,
     states: Object.keys(map.stateNames).sort(),
     defaultYear: defaultYear(map),
     defaultChamber: 'senate',
+    ...(years ? { shownYears: noDataYears(years) } : {}),
   };
 }
 

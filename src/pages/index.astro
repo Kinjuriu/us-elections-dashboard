@@ -57,8 +57,8 @@ const sources = (await sourcesHtml())
   .replace(/<(\/?)h2/g, '<$1h4');
 
 const mapData = loadMapData();
-const dashConfig = storeConfig(mapData);
 const headerYears = loadHeaderYears(mapData);
+const dashConfig = storeConfig(mapData, headerYears);
 const controlChart = loadControlChart();
 const midtermChart = loadMidtermChart();
 const flipsChart = loadFlipsChart(mapData);
@@ -77,13 +77,17 @@ const oddSpecials = races
 ---
 <Base
   title="US Congress, 1946 to 2026: who controls the House and Senate"
-  description="A map and three charts of how Democrats and Republicans have fared in the House and Senate, with a Congress strip from 1946 and a map from 2000."
+  description="A map and three charts of how Democrats and Republicans have fared in the House and Senate, with a railway of elections and a map from 2000."
 >
-  <Masthead current="dashboard" />
+  <Masthead current="dashboard" showTitle={false} />
   <script type="application/json" id="dash-config" set:html={JSON.stringify(dashConfig)}></script>
 
   <main id="main" class="wrap dash">
-    <h1 class="visually-hidden">US Congress, 1946 to 2026: who controls the House and the Senate</h1>
+    <header class="title">
+      <h1 class="title__h">US Congress, 1946 to 2026</h1>
+      <p class="title__sub">Results from {Math.min(...dashConfig.years)} to {Math.max(...dashConfig.years)}</p>
+      <p class="title__note">Earlier results may be added later.</p>
+    </header>
 
     <Board
       config={dashConfig}
@@ -131,13 +135,18 @@ const oddSpecials = races
       <div class="notes__body">
         <div class="notes__list">
           <Footnote>
-            Years before 2000 appear on the year strip, coloured by the majority at the opening of each Congress, but
-            cannot be selected, because the map starts in 2000. The charts below the map cover the whole period.
+            The railway shows one station for each election from 2000. The top half of a station and the top rail are
+            the House, the bottom half and the bottom rail are the Senate, each coloured by the party with the majority
+            for most of the Congress elected that year, with independents counted with the party they caucus with.
+            Years before 2000 are a faded track that cannot be selected, because the map starts in 2000. The charts
+            below the map cover the whole period. A dashed outline marks a result that is not final.
           </Footnote>
           <Footnote>
-            The band under the controls shows seats at the opening of the Congress elected in the year selected, with one
-            square per Senate seat and one per five House seats. The tick marks where a majority starts: 51 senators or
-            218 representatives. The House squares on the map show seats won in the November election, from the state
+            The cards under the controls show seats at the opening of the Congress elected in the year selected. The
+            Senate has one square per seat, with a mark at 50: at 50 seats each the vice president breaks ties, and 51
+            seats are a majority outright. The House blocks are drawn to scale, with a dotted line at 218 seats, the
+            majority. "Since" figures compare with the election before, or with the comparison year when one is set.
+            Pick a party on a card to outline it. The House squares on the map show seats won in the November election, from the state
             returns, one per seat, grouped by party within each state rather than by district.
           </Footnote>
           <Footnote>
@@ -176,7 +185,7 @@ const oddSpecials = races
               {pendingYear ?? 2026} is provisional until results are certified. Results are entered as states certify, and
               every {pendingYear ?? 2026} figure is marked until then.{' '}
               {!mapLatestHasResults && `States with a ${mapLatestYear} Senate race are dotted on the map, and the House squares are outlined, until results are entered from official sources.`}
-              {pendingYear && ` The ${ordinal(ccLast.congress)} Congress, elected in ${pendingYear}, is shown in grey in the history chart, and the band shows the last Congress with counts.`}
+              {pendingYear && ` The ${ordinal(ccLast.congress)} Congress, elected in ${pendingYear}, is shown in grey in the history chart, and the cards show the last Congress with counts.`}
             </Footnote>
           )}
         </div>
@@ -200,6 +209,19 @@ const oddSpecials = races
 <style>
   .dash { padding-top: var(--sp-4); }
   @media (min-width: 768px) { .dash { padding-top: var(--sp-5); } }
+
+  .title { margin-bottom: var(--sp-5); }
+  .title__h { max-width: none; }
+  .title__sub {
+    margin-top: var(--sp-2);
+    font-size: var(--fs-4);
+    font-weight: 500;
+  }
+  .title__note {
+    margin-top: var(--sp-1);
+    font-size: var(--fs-1);
+    color: var(--ink-2);
+  }
 
   .charts {
     margin-top: var(--sp-8);

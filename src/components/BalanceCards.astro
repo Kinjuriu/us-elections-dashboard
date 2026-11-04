@@ -1,0 +1,242 @@
+---
+// The two balance cards under the railway: the Senate as a semicircle of
+// seats and the House as labelled blocks, for the year selected. The
+// semicircle has one square per seat with a mark at 50; the blocks are drawn
+// to scale with a dotted line at 218. A party can be picked on either card
+// (outlined, the other fades). Drawn at build time for the default year;
+// src/scripts/cards.ts redraws them from the JSON block below.
+import { hemicycle, HEMI, cardViews, centre, blocksHtml, independentsLine, markPct, SENATE_MARK, PARTY_WORD } from '../lib/cards';
+import type { HeaderYear } from '../lib/dashboardData';
+
+interface Props {
+  years: Record<number, HeaderYear>;
+  year: number;
+}
+const { years, year } = Astro.props;
+const [house, senate] = cardViews(years[year], null);
+const seats = hemicycle(senate.total);
+const mid = centre(senate, null);
+const half = HEMI.seat / 2;
+const box = HEMI.outer + HEMI.pad;
+---
+<div class="cards" data-cards>
+  <article class="card card--house" data-card="house" aria-labelledby="card-house-h">
+    <header class="card__head">
+      <h2 class="card__title label" id="card-house-h">House</h2>
+      <p class="card__sub" data-caption>{house.caption}</p>
+    </header>
+    <div class="blocks" data-blocks>
+      <p class="mark" style={`left:${markPct(house.threshold, house.total)}%`} aria-hidden="true">
+        <span class="mark__n" data-mark-n>{house.threshold}</span><span class="mark__tri"></span>
+      </p>
+      <div class="blocks__row" role="group" aria-label="House seats by party. Pick a party to outline it." data-blocks-row set:html={blocksHtml(house, null)}></div>
+      <span class="blocks__line" style={`left:${markPct(house.threshold, house.total)}%`} aria-hidden="true"></span>
+    </div>
+    <p class="card__line" data-line>{independentsLine(house.balance)}</p>
+    <p class="card__line card__line--major" data-major>{house.threshold} seats for a majority</p>
+  </article>
+
+  <article class="card card--senate" data-card="senate" aria-labelledby="card-senate-h">
+    <header class="card__head">
+      <h2 class="card__title label" id="card-senate-h">Senate</h2>
+      <p class="card__sub" data-caption>{senate.caption}</p>
+    </header>
+    <div class="hemi">
+      <p class="mark" aria-hidden="true"><span class="mark__n">{SENATE_MARK}</span><span class="mark__tri"></span></p>
+      <svg viewBox={`${-box} ${-box} ${2 * box} ${box + HEMI.pad}`} role="img" aria-label={senate.label} data-hemi>
+        {seats.map((s, i) => (
+          <rect
+            x={-half} y={-half} width={HEMI.seat} height={HEMI.seat}
+            transform={`translate(${s.x} ${s.y}) rotate(${s.turn})`}
+            data-kind={senate.kinds[i]}
+          />
+        ))}
+        <line class="hemi__line" x1="0" x2="0" y1={-box} y2={-(HEMI.inner - HEMI.seat)} />
+      </svg>
+      <p class="hemi__centre" aria-hidden="true">
+        <span class="hemi__big" data-big>{mid.big}</span>
+        <span class="hemi__who" data-who>{mid.who}</span>
+        <span class="hemi__chg" data-chg>{mid.change}</span>
+      </p>
+    </div>
+    <div class="chips" role="group" aria-label="Senate seats by party. Pick a party to outline it.">
+      {(['dem', 'gop'] as const).map((p) => (
+        <button type="button" class="chip" data-party={p} aria-pressed="false">
+          <span class="chip__sw" data-kind={p}></span>{PARTY_WORD[p]} <span class="chip__n" data-n={p}>{senate.balance[p]}</span>
+        </button>
+      ))}
+    </div>
+    <p class="card__line" data-line>{independentsLine(senate.balance)}</p>
+    <p class="card__line card__line--major" data-major>{senate.threshold} seats for a majority. At {SENATE_MARK}, the vice president breaks ties.</p>
+  </article>
+  <script type="application/json" data-cards-data set:html={JSON.stringify(years)}></script>
+</div>
+
+<script>
+  import '../scripts/cards';
+</script>
+
+<style is:global>
+  .cards {
+    display: grid;
+    gap: var(--sp-4);
+    padding: var(--sp-4) var(--sp-3);
+  }
+  .card {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: var(--sp-2);
+  }
+  .card__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--sp-3); border-top: 1px solid var(--ink); padding-top: var(--sp-2); }
+  .card__title { font-family: var(--font-label); font-size: var(--fs-1); font-weight: 700; line-height: 1.3; }
+  .card__sub { font-family: var(--font-label); font-weight: 500; font-size: var(--fs-1); color: var(--ink-2); }
+  .card__line { font-family: var(--font-label); font-weight: 500; font-size: var(--fs-1); color: var(--ink-2); max-width: none; }
+  .card__line--major { color: var(--ink); font-weight: 600; }
+
+  /* Threshold mark: a number over a small triangle, as on AP's balance bars. */
+  .mark {
+    position: absolute;
+    top: 0;
+    margin: 0;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: var(--fs-1);
+    line-height: 1;
+    max-width: none;
+  }
+  .mark__tri {
+    width: 0;
+    height: 0;
+    margin-top: 3px;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 6px solid var(--ink);
+  }
+
+  /* ---- Senate: the semicircle ---- */
+  .hemi { position: relative; padding-top: 26px; max-width: 560px; width: 100%; margin-inline: auto; }
+  .hemi .mark { left: 50%; }
+  .hemi svg { width: 100%; height: auto; overflow: visible; }
+  .hemi__line { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; }
+  .hemi__centre {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    max-width: 40%;
+    font-family: var(--font-label);
+    line-height: 1.15;
+  }
+  .hemi__big {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-size: var(--fs-6);
+    line-height: 1;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .hemi__who { font-weight: 600; font-size: var(--fs-1); }
+  .hemi__chg { font-weight: 500; font-size: 12px; color: var(--ink-2); min-height: 14px; }
+
+  /* Seats and swatches. Squares, in party colours. */
+  .cards [data-kind='dem'] { fill: var(--dem); background: var(--dem); }
+  .cards [data-kind='gop'] { fill: var(--gop); background: var(--gop); }
+  .cards [data-kind='ind-dem'], .cards [data-kind='ind-gop'], .cards [data-kind='ind-unknown'] { fill: var(--ind); }
+  .cards [data-kind='other'] { fill: var(--ink-3); }
+  .cards [data-kind='vacant'] { fill: var(--paper); stroke: var(--ink-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .cards [data-kind='missing'] { fill: var(--no-race); stroke: var(--ink-3); stroke-width: 1; stroke-dasharray: 1 1; vector-effect: non-scaling-stroke; }
+
+  /* A party picked: its seats get a dark outline and the others fade to their tints. */
+  .cards[data-party='dem'] .hemi rect[data-kind='dem'],
+  .cards[data-party='gop'] .hemi rect[data-kind='gop'] { stroke: var(--ink); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+  .cards[data-party='dem'] .hemi rect[data-kind='gop'] { fill: var(--gop-tint); }
+  .cards[data-party='gop'] .hemi rect[data-kind='dem'] { fill: var(--dem-tint); }
+  .cards[data-party] .hemi rect[data-kind^='ind'] { fill: var(--no-race); }
+
+  .chips { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--sp-2); }
+  .chip {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    gap: var(--sp-2);
+    min-height: 36px;
+    padding: 4px var(--sp-3);
+    border: 1px solid var(--ink-3);
+    border-radius: var(--radius-control);
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: var(--fs-2);
+    cursor: pointer;
+  }
+  .chip:hover { border-color: var(--ink); background: var(--paper-2); }
+  .chip[aria-pressed='true'] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+  .chip__sw { width: 12px; height: 12px; }
+  .chip__n { font-variant-numeric: tabular-nums lining-nums; }
+
+  /* ---- House: labelled blocks ---- */
+  .blocks { position: relative; padding-top: 26px; }
+  .blocks__row { display: flex; height: 132px; gap: 0; }
+  .blocks__line {
+    position: absolute;
+    top: 26px;
+    bottom: 0;
+    border-left: 2px dotted var(--ink);
+    pointer-events: none;
+    transform: translateX(-1px);
+  }
+  .block {
+    flex: 1 1 0;
+    min-width: 2px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: flex-start;
+    gap: 2px;
+    padding: var(--sp-3);
+    border: 0;
+    border-radius: 0;
+    margin: 0;
+    font: inherit;
+    text-align: left;
+    overflow: hidden;
+    color: #fff;
+  }
+  .block--thin { padding: 0; }
+  .block[data-block='dem'] { background: var(--dem); }
+  .block[data-block='gop'] { background: var(--gop); }
+  .block[data-block='ind'] { background: var(--ind); color: var(--ink); }
+  .block[data-block='other'], .block[data-block='vacant'] { background: var(--ink-3); color: var(--ink); }
+  .block[data-block='vacant'] { background: var(--paper); box-shadow: inset 0 0 0 1px var(--ink-2); }
+  button.block { cursor: pointer; }
+  button.block:hover { filter: brightness(0.92); }
+  .block__name { font-family: var(--font-label); font-weight: 600; font-size: var(--fs-1); letter-spacing: var(--tracking-label); text-transform: uppercase; line-height: 1.2; }
+  .block__n { font-family: var(--font-label); font-weight: 700; font-size: var(--fs-6); line-height: 1; font-variant-numeric: tabular-nums lining-nums; }
+  .block__chg { font-family: var(--font-label); font-weight: 500; font-size: var(--fs-1); line-height: 1.2; }
+  .blocks .mark { z-index: 2; }
+
+  /* A party picked: dark outline on its block; the others fade to their tints with ink text. */
+  .cards[data-party='dem'] .block[data-block='dem'],
+  .cards[data-party='gop'] .block[data-block='gop'] { box-shadow: inset 0 0 0 3px var(--ink); }
+  .cards[data-party='dem'] .block[data-block='gop'] { background: var(--gop-tint); color: var(--ink); }
+  .cards[data-party='gop'] .block[data-block='dem'] { background: var(--dem-tint); color: var(--ink); }
+  .cards[data-party] .block[data-block='ind'] { background: var(--no-race); }
+
+  @media (min-width: 900px) {
+    .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-5); padding: var(--sp-4); align-items: start; }
+    .hemi__big { font-size: var(--fs-7); }
+    .hemi__who { font-size: var(--fs-2); }
+    .blocks__row { height: 168px; }
+  }
+</style>
