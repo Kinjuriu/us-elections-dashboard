@@ -1,43 +1,43 @@
-year,president,president_party,chamber,seats_before,seats_after,change,is_provisional
-1946,Harry S. Truman,DEM,house,244,188,-56,False
-1946,Harry S. Truman,DEM,senate,57,44,-13,False
-1950,Harry S. Truman,DEM,house,263,235,-28,False
-1950,Harry S. Truman,DEM,senate,54,49,-5,False
-1954,Dwight D. Eisenhower,GOP,house,221,203,-18,False
-1954,Dwight D. Eisenhower,GOP,senate,48,47,-1,False
-1958,Dwight D. Eisenhower,GOP,house,203,153,-50,False
-1958,Dwight D. Eisenhower,GOP,senate,47,34,-13,False
-1962,John F. Kennedy,DEM,house,264,258,-6,False
-1962,John F. Kennedy,DEM,senate,65,66,1,False
-1966,Lyndon B. Johnson,DEM,house,295,248,-47,False
-1966,Lyndon B. Johnson,DEM,senate,68,64,-4,False
-1970,Richard M. Nixon,GOP,house,192,180,-12,False
-1970,Richard M. Nixon,GOP,senate,43,44,1,False
-1974,Gerald R. Ford,GOP,house,192,144,-48,False
-1974,Gerald R. Ford,GOP,senate,42,37,-5,False
-1978,Jimmy Carter,DEM,house,292,278,-14,False
-1978,Jimmy Carter,DEM,senate,61,58,-3,False
-1982,Ronald Reagan,GOP,house,192,166,-26,False
-1982,Ronald Reagan,GOP,senate,53,54,1,False
-1986,Ronald Reagan,GOP,house,181,177,-4,False
-1986,Ronald Reagan,GOP,senate,53,45,-8,False
-1990,George H.W. Bush,GOP,house,175,167,-8,False
-1990,George H.W. Bush,GOP,senate,45,44,-1,False
-1994,William J. Clinton,DEM,house,258,204,-54,False
-1994,William J. Clinton,DEM,senate,57,47,-10,False
-1998,William J. Clinton,DEM,house,207,211,4,False
-1998,William J. Clinton,DEM,senate,45,45,0,False
-2002,George W. Bush,GOP,house,221,229,8,False
-2002,George W. Bush,GOP,senate,50,51,1,False
-2006,George W. Bush,GOP,house,232,202,-30,False
-2006,George W. Bush,GOP,senate,55,49,-6,False
-2010,Barack Obama,DEM,house,257,193,-64,False
-2010,Barack Obama,DEM,senate,56,51,-5,False
-2014,Barack Obama,DEM,house,201,188,-13,False
-2014,Barack Obama,DEM,senate,53,44,-9,False
-2018,Donald J. Trump,GOP,house,241,199,-42,False
-2018,Donald J. Trump,GOP,senate,52,53,1,False
-2022,Joseph R. Biden Jr.,DEM,house,222,213,-9,False
-2022,Joseph R. Biden Jr.,DEM,senate,46,48,2,False
-2026,Donald J. Trump,GOP,house,220,,,True
-2026,Donald J. Trump,GOP,senate,53,,,True
+year,president,president_party,chamber,seats_before,seats_after,change,is_provisional,before_basis,before_as_of,independents_before,independents_after,flag
+1946,Harry S. Truman,DEM,house,244,188,-56,False,opening_day,,0,0,House source gives opening-day counts only; before = opening of outgoing Congress
+1946,Harry S. Truman,DEM,senate,56,44,-12,False,election_day,1946-01-14,0,0,
+1950,Harry S. Truman,DEM,house,263,235,-28,False,opening_day,,0,1,House source gives opening-day counts only; before = opening of outgoing Congress; after: caucus unknown for 1 independent(s); not counted
+1950,Harry S. Truman,DEM,senate,54,49,-5,False,election_day,1950-01-03,0,0,
+1954,Dwight D. Eisenhower,GOP,house,221,203,-18,False,opening_day,,1,0,House source gives opening-day counts only; before = opening of outgoing Congress; before: caucus unknown for 1 independent(s); not counted
+1954,Dwight D. Eisenhower,GOP,senate,49,47,-2,False,election_day,1954-09-28,1,2,
+1958,Dwight D. Eisenhower,GOP,house,203,153,-50,False,opening_day,,0,1,House source gives opening-day counts only; before = opening of outgoing Congress; after: caucus unknown for 1 independent(s); not counted
+1958,Dwight D. Eisenhower,GOP,senate,47,34,-13,False,election_day,1958-01-27,0,0,
+1962,John F. Kennedy,DEM,house,264,258,-6,False,opening_day,,0,1,House source gives opening-day counts only; before = opening of outgoing Congress; after: caucus unknown for 1 independent(s); not counted
+1962,John F. Kennedy,DEM,senate,64,66,2,False,election_day,1962-01-10,0,0,
+1966,Lyndon B. Johnson,DEM,house,295,248,-47,False,opening_day,,0,0,House source gives opening-day counts only; before = opening of outgoing Congress
+1966,Lyndon B. Johnson,DEM,senate,67,64,-3,False,election_day,1966-05-16,0,0,
+1970,Richard M. Nixon,GOP,house,192,180,-12,False,opening_day,,0,0,House source gives opening-day counts only; before = opening of outgoing Congress
+1970,Richard M. Nixon,GOP,senate,43,44,1,False,election_day,1970-01-19,0,1,after: caucus not yet verified for Harry F. Byrd Jr.
+1974,Gerald R. Ford,GOP,house,192,144,-48,False,opening_day,,0,0,House source gives opening-day counts only; before = opening of outgoing Congress
+1974,Gerald R. Ford,GOP,senate,41,37,-4,False,election_day,1974-01-21,1,1,before: caucus not yet verified for Harry F. Byrd Jr.; after: caucus not yet verified for Harry F. Byrd Jr.
+1978,Jimmy Carter,DEM,house,292,278,-14,False,opening_day,,0,0,House source gives opening-day counts only; before = opening of outgoing Congress
+1978,Jimmy Carter,DEM,senate,62,59,-3,False,election_day,1978-01-19,1,1,before: caucus not yet verified for Harry F. Byrd Jr.; after: caucus not yet verified for Harry F. Byrd Jr.
+1982,Ronald Reagan,GOP,house,192,166,-26,False,opening_day,,0,0,House source gives opening-day counts only; before = opening of outgoing Congress
+1982,Ronald Reagan,GOP,senate,54,54,0,False,election_day,1982-04-20,1,0,before: caucus not yet verified for Harry F. Byrd Jr.
+1986,Ronald Reagan,GOP,house,181,177,-4,False,opening_day,,0,0,House source gives opening-day counts only; before = opening of outgoing Congress
+1986,Ronald Reagan,GOP,senate,53,45,-8,False,election_day,1986-01-21,0,0,
+1990,George H.W. Bush,GOP,house,175,167,-8,False,opening_day,,0,1,House source gives opening-day counts only; before = opening of outgoing Congress; after: caucus not yet verified for Bernard Sanders
+1990,George H.W. Bush,GOP,senate,45,44,-1,False,election_day,1990-01-23,0,0,
+1994,William J. Clinton,DEM,house,259,205,-54,False,opening_day,,1,1,House source gives opening-day counts only; before = opening of outgoing Congress; before: caucus not yet verified for Bernard Sanders; after: caucus not yet verified for Bernard Sanders
+1994,William J. Clinton,DEM,senate,56,47,-9,False,election_day,1994-01-25,0,0,
+1998,William J. Clinton,DEM,house,208,212,4,False,opening_day,,2,1,House source gives opening-day counts only; before = opening of outgoing Congress; before: caucus unknown for 1 independent(s); not counted; before: caucus not yet verified for Bernard Sanders; after: caucus not yet verified for Bernard Sanders
+1998,William J. Clinton,DEM,senate,45,45,0,False,election_day,1998-01-27,0,0,
+2002,George W. Bush,GOP,house,222,229,7,False,opening_day,,2,1,"House source gives opening-day counts only; before = opening of outgoing Congress; before: caucus not yet verified for Bernard Sanders, Virgil Goode; after: caucus not yet verified for Bernard Sanders"
+2002,George W. Bush,GOP,senate,49,51,2,False,election_day,2002-01-23,1,1,before: caucus not yet verified for Jim Jeffords
+2006,George W. Bush,GOP,house,232,202,-30,False,opening_day,,1,0,House source gives opening-day counts only; before = opening of outgoing Congress; before: caucus not yet verified for Bernard Sanders
+2006,George W. Bush,GOP,senate,55,49,-6,False,election_day,2006-01-03,1,2,
+2010,Barack Obama,DEM,house,257,193,-64,False,opening_day,,0,0,House source gives opening-day counts only; before = opening of outgoing Congress
+2010,Barack Obama,DEM,senate,59,53,-6,False,election_day,2010-02-04,2,2,"after: caucus not yet verified for Bernard Sanders, Joseph Lieberman"
+2014,Barack Obama,DEM,house,201,188,-13,False,opening_day,,0,0,House source gives opening-day counts only; before = opening of outgoing Congress
+2014,Barack Obama,DEM,senate,55,46,-9,False,election_day,2014-01-03,2,2,"before: caucus not yet verified for Bernard Sanders, Angus King; after: caucus not yet verified for Bernard Sanders, Angus King"
+2018,Donald J. Trump,GOP,house,241,199,-42,False,opening_day,,0,0,House source gives opening-day counts only; before = opening of outgoing Congress
+2018,Donald J. Trump,GOP,senate,51,53,2,False,election_day,2018-01-03,2,2,"before: caucus not yet verified for Bernard Sanders, Angus King; after: caucus not yet verified for Bernard Sanders, Angus King"
+2022,Joseph R. Biden Jr.,DEM,house,222,213,-9,False,opening_day,,0,0,House source gives opening-day counts only; before = opening of outgoing Congress
+2022,Joseph R. Biden Jr.,DEM,senate,50,51,1,False,election_day,2022-01-03,2,3,
+2026,Donald J. Trump,GOP,house,220,,,True,opening_day,,0,,House source gives opening-day counts only; before = opening of outgoing Congress
+2026,Donald J. Trump,GOP,senate,53,,,True,election_day,2026-01-03,2,,"before: caucus not yet verified for Bernard Sanders, Angus King"
