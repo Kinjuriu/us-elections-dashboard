@@ -1,0 +1,7 @@
+fips,state_po,county_name,dem_pct_2016,gop_pct_2016,dem_pct_2020,gop_pct_2020,dem_pct_2024,gop_pct_2024,margin_2016,margin_2020,margin_2024,shift_2016_2020,shift_2020_2024,total_votes_2024
+02000,AK,Alaska (statewide),36.575,51.3153,43.0065,53.1229,41.4061,54.5448,-14.7403,-10.1164,-13.1387,4.6239,-3.0223,338177
+51515,VA,Bedford,,,,,,,,,,,,
+KC_MO,MO,Kansas City,75.9986,19.1709,78.7881,19.315,76.9664,21.1002,56.8277,59.4731,55.8662,2.6454,-3.6069,124288
+NA_CT_STATEWIDE WRITEIN,CT,Statewide Writein,0.0,0.0,,,,,0.0,,,,,
+NA_ME_MAINE UOCAVA,ME,Maine Uocava,75.6899,16.2569,,,,,59.433,,,,,
+NA_RI_FEDERAL PRECINCT,RI,Federal Precinct,87.5,7.2802,92.8675,6.1863,,,80.2198,86.6812,,6.4614,,

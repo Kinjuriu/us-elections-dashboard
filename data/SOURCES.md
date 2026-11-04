@@ -105,9 +105,21 @@ Seats are counted by **caucus**: the president's party plus the independents who
   - Party is the party on a member's first day in that Congress. `IND` is Independent or Ind. Democrat; `OTHER` is any other label.
   - `age_at_start` is whole years on 3 January of the Congress's first year. Three members have no birthday and their age is null (80th Rohrbough, 88th Burkhalter, 96th Hutchinson).
 
-### `medsl_county_president_meta` (metadata only)
-- **Title:** County Presidential Election Returns 2000-2024, MIT Election Data and Science Lab, doi:10.7910/DVN/VOQCHQ, version 20.0 (25 February 2026), CC0 1.0
-- **Status:** the data file `countypres_2000-2024.tab` sits behind a Dataverse guestbook and has not been downloaded. No output is built from it yet.
+### `medsl_county_president`
+- **Title:** County Presidential Election Returns 2000-2024
+- **Publisher:** MIT Election Data and Science Lab, Harvard Dataverse, doi:10.7910/DVN/VOQCHQ
+- **Version:** 20.0, released 25 February 2026 (file version stamp 20260225). Codebook dated 2025-07-12. Licence: CC0 1.0.
+- **Files:** `data/raw/medsl/countypres_2000-2024.csv`, the codebook and `sources-president.csv` (per-state source URLs, certified or not, for 2020). Downloaded by hand on 4 November 2026 because of the Dataverse guestbook; `medsl_county_president_meta` in the manifest records the dataset metadata.
+- **Years used:** 2016, 2020, 2024. Output: `county_presidential_shift.csv` (joinable to `us-atlas` `counties-10m.json`) and `county_presidential_unmatched.csv`, built by `pipeline/build_county_shift.py`.
+- **Caveats:**
+  - Mode rule, from the codebook: a county with TOTAL-mode rows uses them; one with only vote modes (absentee, early, election day, provisional and so on) has the modes summed. 2020 has 849 such counties and 2024 has 376.
+  - Shares are of all votes cast (`totalvotes`), so third-party and write-in votes sit in neither column. Vermont 2024 candidate rows are 0.9% short of `totalvotes`, and DC 2024 is 0.8% over; every other state and year is within 0.5%.
+  - The 2024 New Mexico Libertarian cells are `NA` in the file and are left missing; they do not enter the Democratic or Republican shares.
+  - Alaska reports by state house district, not borough, so it cannot join to the map. One statewide row (fips 02000) is in the unmatched file.
+  - Kansas City, MO is its own unit in every year (FIPS 2938000, and 36000 in 2024) and spans four counties, so it is in the unmatched file. Jackson, Clay, Platte and Cass exclude it in every year, so their shifts are consistent but their vote totals are not whole counties.
+  - Oglala Lakota County SD is 46113 in the 2024 rows and 46102 before; recoded to 46102 to match us-atlas.
+  - Not joined: rows with no FIPS (CT statewide write-ins 2016, ME UOCAVA 2016, RI federal precinct 2016 and 2020) and Bedford city VA (51515, 2016, zero votes, merged into Bedford County in 2013). The file keeps Connecticut's old counties in every year, matching us-atlas, so the 2022 planning-region change does not appear. Virginia's independent cities are separate units in both.
+  - us-atlas counties with no data: Kalawao, HI (15005). Alaska's boroughs are not in the file by design. Territories are out of scope.
 
 ### `manual` women cross-check
 - **File:** `data/manual/women_crosscheck.csv`: published totals of women by Congress, used only by a test and the step 07 report. 1991 to 2021 come from the Congressional Research Service report R43244 (CAWP's site blocks scripts); 2025 from CAWP's 2 January 2025 press release.

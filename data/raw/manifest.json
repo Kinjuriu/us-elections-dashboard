@@ -34,6 +34,13 @@
     "sha256": "94c40dbbbb308e67ebd7736a9bb47d85a9f45aa7b74c166d459c227687016272",
     "url": "https://history.house.gov/Institution/Presidents-Coinciding/Presidents-Coinciding/"
   },
+  "medsl_county_president": {
+    "accessed_at": "2026-11-04T18:50:26+00:00",
+    "bytes": 10222208,
+    "path": "data/raw/medsl/countypres_2000-2024.csv",
+    "sha256": "9299583148f5f8264baf50b5d929c260699c46d915909b13ea3c3850918946f8",
+    "url": "manual download, see data/SOURCES.md"
+  },
   "medsl_county_president_meta": {
     "accessed_at": "2026-11-04T18:32:46+00:00",
     "bytes": 4883,

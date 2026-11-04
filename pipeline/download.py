@@ -98,6 +98,15 @@ MANUAL_RAW = [
             "data/raw/medsl/1976-2024-house.tab"
         ),
     },
+    {
+        "source_id": "medsl_county_president",
+        "path": "medsl/countypres_2000-2024.csv",
+        "how": (
+            "The MEDSL county presidential file sits behind a Dataverse guestbook. "
+            "Download 'countypres_2000-2024' (CSV) from https://doi.org/10.7910/DVN/VOQCHQ "
+            "in a browser and save it as data/raw/medsl/countypres_2000-2024.csv"
+        ),
+    },
 ]
 
 
