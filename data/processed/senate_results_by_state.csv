@@ -382,8 +382,8 @@ year,state,state_po,special,winner_name,winner_party,runner_up_party,winner_pct,
 2020,Texas,TX,False,JOHN CORNYN,GOP,DEM,53.51,43.87,9.64,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
 2020,Virginia,VA,False,MARK R. WARNER,DEM,GOP,55.99,43.91,12.08,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
 2020,West Virginia,WV,False,SHELLEY MOORE CAPITO,GOP,DEM,70.28,27.0,43.28,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
-2020,Wyoming,WY,False,CYNTHIA M. LUMMIS,GOP,,72.85,26.76,46.09,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
-2022,Alaska,AK,False,"MURKOWSKI, LISA",GOP,,43.39,42.62,0.77,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2020,Wyoming,WY,False,CYNTHIA M. LUMMIS,GOP,DEM,72.85,26.76,46.09,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
+2022,Alaska,AK,False,"MURKOWSKI, LISA",GOP,GOP,43.39,42.62,0.77,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
 2022,Alabama,AL,False,KATIE BRITT,GOP,DEM,66.62,30.88,35.74,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
 2022,Arkansas,AR,False,JOHN BOOZMAN,GOP,DEM,65.73,31.09,34.64,False,GOP,False,GOP,GOP,GOP,False,False,medsl_senate
 2022,Arizona,AZ,False,MARK KELLY,DEM,GOP,51.39,46.51,4.89,False,DEM,False,DEM,DEM,DEM,False,False,medsl_senate
