@@ -153,7 +153,8 @@ const chambers: { id: BandChamber; label: string }[] = [
       grid-template-areas: 'name dem plot gop maj';
       align-items: center;
     }
-    .band__plot { align-self: end; }
+    .band__plot, .band__maj { align-self: end; }
+    .band__maj { padding-bottom: 0; line-height: 1.2; }
     .band__shape--wide { display: block; }
     .band__shape--narrow { display: none; }
     .band__maj { flex-direction: column; gap: 0; }

@@ -26,6 +26,9 @@ try {
     for (const s of SHOTS) {
       await page.goto(srv.url + s.q);
       await page.settle(300);
+      // The Georgia view scrolls to its panel; capture from the top so the sticky controls stay in place.
+      await page.eval('scrollTo(0, 0)');
+      await page.settle(300);
       const clip = await page.eval<{ x: number; y: number; width: number; height: number }>(`(() => {
         const a = document.querySelector(${JSON.stringify(s.from)}).getBoundingClientRect();
         const b = document.querySelector(${JSON.stringify(s.to)}).getBoundingClientRect();
