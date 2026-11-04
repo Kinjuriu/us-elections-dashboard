@@ -1,0 +1,83 @@
+congress,election_year,years_served,chamber,total_seats,dem,gop,ind,other,vacant,majority_party,majority_threshold,president,president_party,is_midterm,is_provisional,source_id
+80,1946,1947-1949,house,435,188,246,0,1,0,GOP,218,Harry S. Truman,DEM,True,False,house_historian_party_divisions
+80,1946,1947-1949,senate,96,44,51,0,0,1,GOP,49,Harry S. Truman,DEM,True,False,senate_party_division
+81,1948,1949-1951,house,435,263,171,0,1,0,DEM,218,Harry S. Truman,DEM,False,False,house_historian_party_divisions
+81,1948,1949-1951,senate,96,54,42,0,0,0,DEM,49,Harry S. Truman,DEM,False,False,senate_party_division
+82,1950,1951-1953,house,435,235,199,1,0,0,DEM,218,Harry S. Truman,DEM,True,False,house_historian_party_divisions
+82,1950,1951-1953,senate,96,49,47,0,0,0,DEM,49,Harry S. Truman,DEM,True,False,senate_party_division
+83,1952,1953-1955,house,435,213,221,1,0,0,GOP,218,Dwight D. Eisenhower,GOP,False,False,house_historian_party_divisions
+83,1952,1953-1955,senate,96,47,48,1,0,0,GOP,49,Dwight D. Eisenhower,GOP,False,False,senate_party_division
+84,1954,1955-1957,house,435,232,203,0,0,0,DEM,218,Dwight D. Eisenhower,GOP,True,False,house_historian_party_divisions
+84,1954,1955-1957,senate,96,47,47,2,0,0,DEM,49,Dwight D. Eisenhower,GOP,True,False,senate_party_division
+85,1956,1957-1959,house,435,232,203,0,0,0,DEM,218,Dwight D. Eisenhower,GOP,False,False,house_historian_party_divisions
+85,1956,1957-1959,senate,96,49,47,0,0,0,DEM,49,Dwight D. Eisenhower,GOP,False,False,senate_party_division
+86,1958,1959-1961,house,436,282,153,1,0,0,DEM,219,Dwight D. Eisenhower,GOP,True,False,house_historian_party_divisions
+86,1958,1959-1961,senate,98,64,34,0,0,0,DEM,50,Dwight D. Eisenhower,GOP,True,False,senate_party_division
+87,1960,1961-1963,house,437,264,173,0,0,0,DEM,219,John F. Kennedy,DEM,False,False,house_historian_party_divisions
+87,1960,1961-1963,senate,100,65,35,0,0,0,DEM,51,John F. Kennedy,DEM,False,False,senate_party_division
+88,1962,1963-1965,house,435,258,176,1,0,0,DEM,218,John F. Kennedy,DEM,True,False,house_historian_party_divisions
+88,1962,1963-1965,senate,100,66,34,0,0,0,DEM,51,John F. Kennedy,DEM,True,False,senate_party_division
+89,1964,1965-1967,house,435,295,140,0,0,0,DEM,218,Lyndon B. Johnson,DEM,False,False,house_historian_party_divisions
+89,1964,1965-1967,senate,100,68,32,0,0,0,DEM,51,Lyndon B. Johnson,DEM,False,False,senate_party_division
+90,1966,1967-1969,house,435,248,187,0,0,0,DEM,218,Lyndon B. Johnson,DEM,True,False,house_historian_party_divisions
+90,1966,1967-1969,senate,100,64,36,0,0,0,DEM,51,Lyndon B. Johnson,DEM,True,False,senate_party_division
+91,1968,1969-1971,house,435,243,192,0,0,0,DEM,218,Richard M. Nixon,GOP,False,False,house_historian_party_divisions
+91,1968,1969-1971,senate,100,57,43,0,0,0,DEM,51,Richard M. Nixon,GOP,False,False,senate_party_division
+92,1970,1971-1973,house,435,255,180,0,0,0,DEM,218,Richard M. Nixon,GOP,True,False,house_historian_party_divisions
+92,1970,1971-1973,senate,100,54,44,1,1,0,DEM,51,Richard M. Nixon,GOP,True,False,senate_party_division
+93,1972,1973-1975,house,435,243,192,0,0,0,DEM,218,Richard M. Nixon,GOP,False,False,house_historian_party_divisions
+93,1972,1973-1975,senate,100,56,42,1,1,0,DEM,51,Richard M. Nixon,GOP,False,False,senate_party_division
+94,1974,1975-1977,house,435,291,144,0,0,0,DEM,218,Gerald R. Ford,GOP,True,False,house_historian_party_divisions
+94,1974,1975-1977,senate,100,60,37,1,1,1,DEM,51,Gerald R. Ford,GOP,True,False,senate_party_division
+95,1976,1977-1979,house,435,292,143,0,0,0,DEM,218,Jimmy Carter,DEM,False,False,house_historian_party_divisions
+95,1976,1977-1979,senate,100,61,38,1,0,0,DEM,51,Jimmy Carter,DEM,False,False,senate_party_division
+96,1978,1979-1981,house,435,278,157,0,0,0,DEM,218,Jimmy Carter,DEM,True,False,house_historian_party_divisions
+96,1978,1979-1981,senate,100,58,41,1,0,0,DEM,51,Jimmy Carter,DEM,True,False,senate_party_division
+97,1980,1981-1983,house,435,243,192,0,0,0,DEM,218,Ronald Reagan,GOP,False,False,house_historian_party_divisions
+97,1980,1981-1983,senate,100,46,53,1,0,0,GOP,51,Ronald Reagan,GOP,False,False,senate_party_division
+98,1982,1983-1985,house,435,269,166,0,0,0,DEM,218,Ronald Reagan,GOP,True,False,house_historian_party_divisions
+98,1982,1983-1985,senate,100,46,54,0,0,0,GOP,51,Ronald Reagan,GOP,True,False,senate_party_division
+99,1984,1985-1987,house,435,253,181,0,0,1,DEM,218,Ronald Reagan,GOP,False,False,house_historian_party_divisions
+99,1984,1985-1987,senate,100,47,53,0,0,0,GOP,51,Ronald Reagan,GOP,False,False,senate_party_division
+100,1986,1987-1989,house,435,258,177,0,0,0,DEM,218,Ronald Reagan,GOP,True,False,house_historian_party_divisions
+100,1986,1987-1989,senate,100,55,45,0,0,0,DEM,51,Ronald Reagan,GOP,True,False,senate_party_division
+101,1988,1989-1991,house,435,260,175,0,0,0,DEM,218,George H.W. Bush,GOP,False,False,house_historian_party_divisions
+101,1988,1989-1991,senate,100,55,45,0,0,0,DEM,51,George H.W. Bush,GOP,False,False,senate_party_division
+102,1990,1991-1993,house,435,267,167,1,0,0,DEM,218,George H.W. Bush,GOP,True,False,house_historian_party_divisions
+102,1990,1991-1993,senate,100,56,44,0,0,0,DEM,51,George H.W. Bush,GOP,True,False,senate_party_division
+103,1992,1993-1995,house,435,258,176,1,0,0,DEM,218,William J. Clinton,DEM,False,False,house_historian_party_divisions
+103,1992,1993-1995,senate,100,57,43,0,0,0,DEM,51,William J. Clinton,DEM,False,False,senate_party_division
+104,1994,1995-1997,house,435,204,230,1,0,0,GOP,218,William J. Clinton,DEM,True,False,house_historian_party_divisions
+104,1994,1995-1997,senate,100,47,53,0,0,0,GOP,51,William J. Clinton,DEM,True,False,senate_party_division
+105,1996,1997-1999,house,435,207,226,2,0,0,GOP,218,William J. Clinton,DEM,False,False,house_historian_party_divisions
+105,1996,1997-1999,senate,100,45,55,0,0,0,GOP,51,William J. Clinton,DEM,False,False,senate_party_division
+106,1998,1999-2001,house,435,211,223,1,0,0,GOP,218,William J. Clinton,DEM,True,False,house_historian_party_divisions
+106,1998,1999-2001,senate,100,45,55,0,0,0,GOP,51,William J. Clinton,DEM,True,False,senate_party_division
+107,2000,2001-2003,house,435,212,221,2,0,0,GOP,218,George W. Bush,GOP,False,False,house_historian_party_divisions
+107,2000,2001-2003,senate,100,50,50,0,0,0,DEM,51,George W. Bush,GOP,False,False,senate_party_division
+108,2002,2003-2005,house,435,205,229,1,0,0,GOP,218,George W. Bush,GOP,True,False,house_historian_party_divisions
+108,2002,2003-2005,senate,100,48,51,1,0,0,GOP,51,George W. Bush,GOP,True,False,senate_party_division
+109,2004,2005-2007,house,435,202,232,1,0,0,GOP,218,George W. Bush,GOP,False,False,house_historian_party_divisions
+109,2004,2005-2007,senate,100,44,55,1,0,0,GOP,51,George W. Bush,GOP,False,False,senate_party_division
+110,2006,2007-2009,house,435,233,202,0,0,0,DEM,218,George W. Bush,GOP,True,False,house_historian_party_divisions
+110,2006,2007-2009,senate,100,49,49,2,0,0,DEM,51,George W. Bush,GOP,True,False,senate_party_division
+111,2008,2009-2011,house,435,257,178,0,0,0,DEM,218,Barack Obama,DEM,False,False,house_historian_party_divisions
+111,2008,2009-2011,senate,100,56,41,2,0,1,DEM,51,Barack Obama,DEM,False,False,senate_party_division
+112,2010,2011-2013,house,435,193,242,0,0,0,GOP,218,Barack Obama,DEM,True,False,house_historian_party_divisions
+112,2010,2011-2013,senate,100,51,47,2,0,0,DEM,51,Barack Obama,DEM,True,False,senate_party_division
+113,2012,2013-2015,house,435,201,234,0,0,0,GOP,218,Barack Obama,DEM,False,False,house_historian_party_divisions
+113,2012,2013-2015,senate,100,53,45,2,0,0,DEM,51,Barack Obama,DEM,False,False,senate_party_division
+114,2014,2015-2017,house,435,188,247,0,0,0,GOP,218,Barack Obama,DEM,True,False,house_historian_party_divisions
+114,2014,2015-2017,senate,100,44,54,2,0,0,GOP,51,Barack Obama,DEM,True,False,senate_party_division
+115,2016,2017-2019,house,435,194,241,0,0,0,GOP,218,Donald J. Trump,GOP,False,False,house_historian_party_divisions
+115,2016,2017-2019,senate,100,46,52,2,0,0,GOP,51,Donald J. Trump,GOP,False,False,senate_party_division
+116,2018,2019-2021,house,435,235,199,0,0,1,DEM,218,Donald J. Trump,GOP,True,False,house_historian_party_divisions
+116,2018,2019-2021,senate,100,45,53,2,0,0,GOP,51,Donald J. Trump,GOP,True,False,senate_party_division
+117,2020,2021-2023,house,435,222,212,0,0,1,DEM,218,Joseph R. Biden Jr.,DEM,False,False,house_historian_party_divisions
+117,2020,2021-2023,senate,100,46,51,2,0,1,GOP,51,Joseph R. Biden Jr.,DEM,False,False,senate_party_division
+118,2022,2023-2025,house,435,213,222,0,0,0,GOP,218,Joseph R. Biden Jr.,DEM,True,False,house_historian_party_divisions
+118,2022,2023-2025,senate,100,48,49,3,0,0,DEM,51,Joseph R. Biden Jr.,DEM,True,False,senate_party_division
+119,2024,2025-2027,house,435,215,220,0,0,0,GOP,218,Donald J. Trump,GOP,False,False,house_historian_party_divisions
+119,2024,2025-2027,senate,100,45,53,2,0,0,GOP,51,Donald J. Trump,GOP,False,False,senate_party_division
+120,2026,2027-2029,house,435,,,,,,,218,Donald J. Trump,GOP,True,True,manual_2026_provisional
+120,2026,2027-2029,senate,100,,,,,,,51,Donald J. Trump,GOP,True,True,manual_2026_provisional
