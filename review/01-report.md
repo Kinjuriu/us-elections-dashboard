@@ -79,7 +79,7 @@ I checked each against the raw source text, and they're also written into `test_
 
 ## Open questions
 
-1. **AZ 2024 counts as a flip under `flipped_vs_holder`.** Sinema held the seat as an independent and Gallego won it as a Democrat. Because Sinema caucused with the Democrats, AP may treat it as a hold. Should the holder rule compare caucuses instead of parties? WV 2024 (Manchin, an independent caucusing with Democrats, then Justice R) is a flip either way.
+1. **VT 2006 shows `party_changed = false`.** You listed it as a party-change case, but under the holder rule it isn't one. Jeffords had already become an independent in 2001, so on election day the seat went from one independent (caucusing D) to another (Sanders, caucusing D). It is a label change only against the previous election (Jeffords won as a Republican in 2000), where `flipped_vs_last_election` is true. If you want the map's note there too, `party_changed` could be measured against the last election instead; tell me which. CT 2006 (Lieberman, D to I) does come out `party_changed = true`.
 2. **Name style is mixed.** The 8 manual races use title case ("Doug Jones"), while MEDSL rows are upper case ("TOMMY TUBERVILLE"). The site needs a display-name step either way; I have not changed either source.
 3. **`senate_seat_changes.csv` coverage for 2025 and 2026.** My own knowledge stops in mid-2026, and the archived Senate page shows no party-changing appointment or switch in the 119th Congress up to 2 November 2026. Please confirm nothing is missing for 2026.
 4. **Sinema's switch date (9 December 2022)** comes from general knowledge, not the source. It falls after the 2022 election, so it only affects AZ 2024's holder, which doesn't depend on the exact date.
@@ -93,6 +93,7 @@ I checked each against the raw source text, and they're also written into `test_
 4. **Independents** in `data/manual/independents.csv`: unverified rows, plus five House rows with no name.
 5. **Party overrides** in `data/manual/candidate_party_overrides.csv`: confirm Murkowski and Lummis; add Ben David and Tshibaka.
 6. **Senate seat changes** in `data/manual/senate_seat_changes.csv`: all 7 rows `verified = false`, as you asked.
+7. **Caucus entries behind the holder rule.** Caucus flips involving independents now depend on `independents.csv` and `senate_seat_changes.csv`. The 110th Congress rows for Sanders and Lieberman (VT and CT 2006) are verified in the source. The rows for Sanders and King after 2012, and every seat-change row (Sinema, Manchin, Jeffords), are not yet verified.
 
 ## Effects and animations
 
@@ -140,3 +141,14 @@ None. This step is data only.
 
   Both races still needed manual values, so the outputs are the same either way. The `issue` column in your file keeps my original wording; you may want to correct it.
 - **Something to check:** every note in the file says "Filled by Claude from the official source". I did not fill these values in this session, and I have not fetched those source URLs. If another session filled them, the spot-check the notes ask for is still worth doing, particularly the PDF sources.
+
+## Revision 3 (caucus-based holder rule)
+
+- **`flipped_vs_holder` compares caucuses:** a seat counts as flipped only when it moves from one caucus to the other.
+  - New columns: `holder_caucus` and `winner_caucus`, from `independents.csv` for elected independents and `senate_seat_changes.csv` for switches and appointments. The build stops if an elected independent has no single caucus entry.
+  - **No longer flips:** AZ 2024, CT 2006 and CT 2012. All three have `party_changed = true`.
+  - **Still flips:** ME 2012 (King) and WV 2024 (Justice).
+- **New column `party_changed`:** the winner's party label differs from the holder's. True for AZ 2024, CT 2006 and CT 2012, so the map can note them without hatching. VT 2006 is false; see open question 1.
+- **`flipped_vs_last_election` is unchanged** (party labels against the previous election).
+- **`senate_results_manual.csv`:** the `issue` column now reads `medsl_rounds_mixed` for LA 2016 and `medsl_runoff_labelled_gen` for MS 2018. I edited only those two cells. The `note` cells in those rows still carry the old "Previous issue" wording.
+- **Tests:** the flip test now pins AZ 2024, CT 2006 and CT 2012 as party changes without a caucus flip, VT 2006, ME 2012 and WV 2024. It also checks that every caucus flip is a party change. 25 of 25 tests pass, and two runs give identical outputs.

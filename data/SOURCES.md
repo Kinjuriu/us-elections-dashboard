@@ -110,18 +110,24 @@ Seats are counted by **caucus**: the president's party plus the independents who
 
 ## Flip definitions (Senate)
 
-Both are kept. The site displays `flipped_vs_holder`.
+The site displays `flipped_vs_holder`, with hatching, and uses `party_changed` for a note without hatching.
 
-- **`flipped_vs_last_election`:** compares the winner's party with `previous_party`, the party that won the last election for the same seat (same state and Senate class, earlier year).
-- **`flipped_vs_holder`:** AP's convention. It compares the winner's party with `holder_party`, the party holding the seat on election day. That is `previous_party`, updated by any change in `senate_seat_changes.csv` dated between 3 January after the last election and this election day. Starting on 3 January means an interim appointment made after an election and ended when the elected senator was sworn in (Barkley, MN 2002) does not carry over.
+- **`flipped_vs_last_election`:** compares the winner's party with `previous_party`, the party that won the last election for the same seat (same state and Senate class, earlier year). Party labels, not caucuses.
+- **`flipped_vs_holder`:** true only when the seat moves from one **caucus** to the other.
+  - `holder_party` is the party holding the seat on election day. That is `previous_party`, updated by any change in `senate_seat_changes.csv` dated between 3 January after the last election and this election day. Starting on 3 January means an interim appointment made after an election and ended when the elected senator was sworn in (Barkley, MN 2002) does not carry over.
+  - `holder_caucus` and `winner_caucus` are DEM or GOP. Democrats and Republicans take their own party. An elected independent takes the caucus listed in `data/manual/independents.csv` for the Congress they joined. An independent created by a switch or appointment takes the caucus in `senate_seat_changes.csv`.
+- **`party_changed`:** the winner's party label differs from `holder_party`, whether or not the caucus changed. Every caucus flip is also a party change.
 - **Off-cycle specials** missing from MEDSL (MA 2010 and 2013, NJ 2013, AL 2017) are dated to their year's November election day for this purpose. No listed seat change falls between their real date and that one.
 
-The two definitions differ in these races (2000 to 2024, where both are known):
+Races involving independents, or where the definitions differ (2000 to 2024):
 
-| Race | `previous_party` | `holder_party` | Winner | vs last election | vs holder |
+| Race | Holder (party, caucus) | Winner (party, caucus) | vs holder (caucus) | party_changed | vs last election |
 |---|---|---|---|---|---|
-| GA 2000 special | GOP | DEM | DEM | flip | no flip |
-| VT 2006 | GOP | IND | IND | flip | no flip |
-| PA 2010 | GOP | DEM | GOP | no flip | flip |
-| AZ 2024 | DEM | IND | DEM | no flip | flip |
-| WV 2024 | DEM | IND | GOP | flip | flip |
+| CT 2006 | DEM, DEM (Lieberman) | IND, DEM (Lieberman) | no | yes | yes |
+| VT 2006 | IND, DEM (Jeffords) | IND, DEM (Sanders) | no | no | yes |
+| CT 2012 | IND, DEM (Lieberman) | DEM, DEM (Murphy) | no | yes | yes |
+| ME 2012 | GOP, GOP (Snowe) | IND, DEM (King) | yes | yes | yes |
+| AZ 2024 | IND, DEM (Sinema) | DEM, DEM (Gallego) | no | yes | no |
+| WV 2024 | IND, DEM (Manchin) | GOP, GOP (Justice) | yes | yes | yes |
+| GA 2000 special | DEM (Miller, appointed) | DEM | no | no | yes |
+| PA 2010 | DEM (Specter, switched) | GOP | yes | yes | no |
