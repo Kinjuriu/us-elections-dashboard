@@ -1,0 +1,41 @@
+---
+// One line: the site name on the left, the other page and the sources on the
+// right. There is nothing to jump to, because the whole dashboard is in view.
+const base = import.meta.env.BASE_URL;
+interface Props {
+  current?: 'dashboard' | 'story';
+}
+const { current = 'dashboard' } = Astro.props;
+---
+<header class="masthead">
+  <div class="wrap masthead__inner">
+    <p class="label masthead__title">
+      {current === 'story' ? <a href={base}>US Congress, 1946 to 2026</a> : 'US Congress, 1946 to 2026'}
+    </p>
+    <nav aria-label="Pages" class="masthead__nav">
+      {current === 'story' ? <a href={base}>Dashboard</a> : <a href={`${base}story`}>Story</a>}
+      <a href={`${base}#notes`}>Sources</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .masthead { border-bottom: 1px solid var(--ink); }
+  .masthead__inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    min-height: 44px;
+  }
+  @media (min-width: 768px) { .masthead__inner { min-height: 48px; } }
+  .masthead__title { font-weight: 700; font-size: 13px; }
+  .masthead__title a { text-decoration: none; }
+  .masthead__nav {
+    display: flex;
+    gap: var(--sp-5);
+    font-family: var(--font-label);
+    font-size: var(--fs-2);
+    font-weight: 500;
+  }
+</style>

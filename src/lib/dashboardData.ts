@@ -5,6 +5,7 @@ import { loadChamberControl, loadIndependents, hasCounts, PARTY_NAME, type Chamb
 import { balanceFrom, defaultYear, type Balance, type MapData } from './mapData';
 import { ordinal } from './mapText';
 import type { StoreConfig } from './store';
+import type { ControlChart } from './chartData';
 
 export interface HeaderChamber {
   balance: Balance;
@@ -96,4 +97,41 @@ export function storeConfig(map: MapData): StoreConfig {
     defaultYear: defaultYear(map),
     defaultChamber: 'senate',
   };
+}
+
+export interface StripColumn {
+  year: number;
+  senate: Party | null;
+  house: Party | null;
+  /** An odd-year Senate special election: half width, Senate view only. */
+  special: boolean;
+  /** The map and the rest of the page can show this year. */
+  selectable: boolean;
+  provisional: boolean;
+}
+
+/**
+ * One column per election from the first Congress in the history chart to the
+ * last, in order, with the Senate's odd-year special elections between them.
+ * Each column carries both chambers' majority; the chamber chosen picks which
+ * one is drawn.
+ */
+export function stripColumns(chart: ControlChart, cfg: StoreConfig): StripColumn[] {
+  const out: StripColumn[] = [];
+  for (const c of chart.congresses) {
+    out.push({
+      year: c.electionYear,
+      senate: c.senate.majority,
+      house: c.house.majority,
+      special: false,
+      selectable: cfg.years.includes(c.electionYear),
+      provisional: c.senate.provisional || c.house.provisional,
+    });
+    for (const y of cfg.senateOnlyYears) {
+      if (y === c.electionYear + 1) {
+        out.push({ year: y, senate: c.senate.majority, house: null, special: true, selectable: true, provisional: false });
+      }
+    }
+  }
+  return out;
 }

@@ -58,7 +58,7 @@ const defaultReadoutYear = (ch: 'house' | 'senate') => {
   return chart.years.includes(selectedYear) ? selectedYear : done[done.length - 1].year;
 };
 ---
-<div class="mt" data-mt data-chamber={chamber} data-selected={selectedYear} data-headline-house={chart.headline.house} data-headline-senate={chart.headline.senate}>
+<div class="mt" data-mt data-chamber={chamber} data-selected={selectedYear}>
   <ul class="mt__legend" aria-label="Key">
     <li><span class="mt__sw" style="background:var(--dem)"></span>Democratic president</li>
     <li><span class="mt__sw" style="background:var(--gop)"></span>Republican president</li>
@@ -226,7 +226,7 @@ const defaultReadoutYear = (ch: 'house' | 'senate') => {
   /* ---- Wide ---- */
   .mt__wide { display: none; }
   .mt__narrow { display: grid; }
-  @media (min-width: 1024px) {
+  @container chart (min-width: 700px) {
     .mt__wide { display: grid; grid-template-columns: 44px minmax(0, 1fr); }
     .mt__narrow { display: none; }
   }

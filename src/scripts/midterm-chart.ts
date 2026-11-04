@@ -23,11 +23,8 @@ function init(root: HTMLElement) {
     }
   }
 
-  const title = root.closest('figure')?.querySelector<HTMLElement>('.chart-frame__title') ?? null;
-
   function draw(s: DashState) {
     root.dataset.chamber = s.chamber;
-    if (title) title.textContent = s.chamber === 'house' ? root.dataset.headlineHouse! : root.dataset.headlineSenate!;
     selected = s.year;
     for (const el of root.querySelectorAll<Element>('[data-year]')) {
       el.classList.toggle('is-selected', Number((el as HTMLElement).dataset.year) === s.year);

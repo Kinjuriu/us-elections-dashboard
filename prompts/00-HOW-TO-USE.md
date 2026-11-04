@@ -11,7 +11,8 @@
 | 02 | `02-scaffold-and-design-system.md` | Astro site, tokens, fonts, layout, empty sections |
 | 03 | `03-the-map.md` | The centrepiece map with year control |
 | 04 | `04-charts.md` | Dashboard layer (shared year and chamber controls, state view, compare) plus the history charts |
-| 05 | `05-polish-review-deploy.md` | Audit against the rules, accessibility, GitHub Pages deploy |
+| 05 | `05-dashboard-board.md` | Redesign as a dashboard: map board first, story on its own page (Sonnet 5.5) |
+| 06 | `06-polish-review-deploy.md` | Audit against the rules, accessibility, GitHub Pages deploy |
 
 ## Page outline (what we are building)
 
