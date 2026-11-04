@@ -61,13 +61,20 @@ export function houseTitle(h: HouseYear): { title: string; subtitle: string } {
 
 // ---------- Fills and label tone ----------
 
+const DARK: SenateFill[] = ['dem', 'gop', 'ind', 'other'];
+
 /** White labels on full party fills and hatching, ink on tints and greys. */
-export function senateTone(fill: SenateFill, flipped: boolean): 'dark' | 'light' {
+export function senateTone(fill: SenateFill, flipped: boolean, split: [SenateFill, SenateFill] | null = null): 'dark' | 'light' {
+  if (split) return DARK.includes(split[0]) && DARK.includes(split[1]) ? 'dark' : 'light';
   if (flipped) return 'dark';
-  return fill === 'dem' || fill === 'gop' || fill === 'ind' || fill === 'other' ? 'dark' : 'light';
+  return DARK.includes(fill) ? 'dark' : 'light';
 }
 
+/** Fills a split state can have on each half. */
+export const SPLIT_FILLS: SenateFill[] = ['dem', 'gop', 'ind', 'other', 'dem-lead', 'gop-lead', 'ind-lead', 'pending'];
+
 /** The party colour used for a state's hatching when its seat flipped. */
+/** Split states are not hatched; the panel says which race flipped. */
 export function hatchParty(fill: SenateFill): 'dem' | 'gop' | 'ind' | '' {
   if (fill.startsWith('dem')) return 'dem';
   if (fill.startsWith('gop')) return 'gop';

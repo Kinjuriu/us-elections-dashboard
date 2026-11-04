@@ -6,7 +6,7 @@ import SeatBar from '../components/SeatBar.astro';
 import SegmentedControl from '../components/SegmentedControl.astro';
 import Footnote from '../components/Footnote.astro';
 import CongressMap from '../components/CongressMap.astro';
-import { loadMapData } from '../lib/mapData';
+import { loadMapData, defaultYear } from '../lib/mapData';
 import { compiledContent as sourcesHtml } from '../../data/SOURCES.md';
 import {
   loadChamberControl, loadIndependents, loadMidtermSwing, loadSenateRaces,
@@ -119,7 +119,7 @@ const sources = (await sourcesHtml())
 // The map: its headline follows the year shown; this is the default view.
 const mapData = loadMapData();
 const mapLatestYear = Math.max(...mapData.years);
-const mapHeadline = mapData.senate[mapLatestYear].headline;
+const mapHeadline = mapData.senate[defaultYear(mapData)].headline;
 const mapLatestHasResults = mapData.senate[mapLatestYear].decided > 0;
 const oddSpecials = races
   .filter((r) => r.year % 2 === 1)
@@ -245,7 +245,10 @@ const pageAsOf = controlAsOf;
             The Senate bar shows seats at the opening of the new Congress. The House bar and squares show seats won in
             the November election, from the state returns, grouped by party within each state rather than by district.
           </Footnote>
-          <Footnote>Winners' names are printed as the source spells them.</Footnote>
+          <Footnote>
+            Winners' names are title-cased from the source for display, with hand-checked exceptions such as McConnell
+            and DeWine. The data keeps the source's spelling.
+          </Footnote>
           {!mapLatestHasResults && (
             <Footnote>
               {mapLatestYear} results are not yet entered. States with a {mapLatestYear} Senate race are dotted, and the

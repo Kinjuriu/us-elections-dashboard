@@ -18,11 +18,11 @@ export const FIRST_MAP_YEAR = 2000;
 export const PROVISIONAL_YEAR = 2026;
 
 /** Fill class of a state in the Senate view. */
-export type SenateFill = 'dem' | 'gop' | 'ind' | 'other' | 'dem-lead' | 'gop-lead' | 'ind-lead' | 'pending' | 'no-race';
+export type SenateFill = 'dem' | 'gop' | 'ind' | 'other' | 'dem-lead' | 'gop-lead' | 'ind-lead' | 'pending' | 'no-race' | 'split';
 
 export interface SenateRace {
   special: boolean;
-  /** As printed by the source, with "LAST, FIRST" turned round. */
+  /** Title-cased for display by the pipeline (winner_display_name); the data keeps the source spelling. */
   winnerName: string | null;
   winnerParty: Party | null;
   winnerCaucus: Party | null;
@@ -37,13 +37,16 @@ export interface SenateRace {
   /** Party label changed but the caucus did not (e.g. Sinema to Gallego). */
   labelOnly: boolean;
   provisional: boolean;
-  /** Only meaningful for provisional rows; null when the data has no call. */
-  called: boolean | null;
+  /** Race called. Always true for certified years. */
+  called: boolean;
 }
 
 export interface SenateStateYear {
   races: SenateRace[];
+  /** 'split' when the regular and special races went to different sides. */
   fill: SenateFill;
+  /** For a split state: the regular race's fill, then the special's. */
+  split: [SenateFill, SenateFill] | null;
   flipped: boolean;
 }
 
@@ -85,6 +88,7 @@ export interface HouseStateYear {
   gopShare: number | null;
   note: string;
   provisional: boolean;
+  called: boolean;
   /** Seats won two years earlier, when the state had the same number of seats. */
   prev: { year: number; dem: number; gop: number } | null;
 }
@@ -108,33 +112,19 @@ export interface MapData {
   stateNames: Record<string, string>;
 }
 
-const SUFFIX = /^(JR\.?|SR\.?|II|III|IV)$/i;
-/** "MURKOWSKI, LISA" -> "LISA MURKOWSKI"; "ROBERT P. CASEY, JR." is left alone. */
-export function displayName(raw: string): string {
-  const m = raw.match(/^([^,]+),\s*(.+)$/);
-  if (!m || SUFFIX.test(m[2].trim())) return raw.trim();
-  return `${m[2].trim()} ${m[1].trim()}`;
-}
-
 const caucusOf = (inds: Independent[], chamber: 'house' | 'senate', congress: number, state: string) =>
   inds.find((i) => i.chamber === chamber && i.congress === congress && i.state === state)?.caucusesWith ?? null;
 
 const congressFor = (year: number) => (year - 1786) / 2;
 
-function senateFill(races: SenateRace[]): SenateFill {
-  const fills = races.map((r): SenateFill => {
+function raceFills(races: SenateRace[]): SenateFill[] {
+  return races.map((r): SenateFill => {
     if (!r.winnerParty) return 'pending';
     const p = r.winnerParty === 'DEM' ? 'dem' : r.winnerParty === 'GOP' ? 'gop' : r.winnerParty === 'IND' ? 'ind' : 'other';
     // Provisional and not called: the tint for "leading".
-    if (r.provisional && r.called !== true && p !== 'other') return `${p}-lead` as SenateFill;
+    if (r.provisional && !r.called && p !== 'other') return `${p}-lead` as SenateFill;
     return p;
   });
-  const unique = [...new Set(fills)];
-  if (unique.length > 1) {
-    // Never happens through 2026. If it does, the map needs a split fill.
-    throw new Error(`Two Senate races in one state with different results: ${JSON.stringify(races)}`);
-  }
-  return unique[0];
 }
 
 function balanceFrom(row: ChamberControl | undefined, inds: Independent[], chamber: 'house' | 'senate'): Balance {
@@ -179,20 +169,27 @@ function senateHeadline(year: number, after: ChamberControl | undefined, before:
     : `${many(aMaj)} kept the Senate in ${year} despite losing ${seatsWord(lost - won)}`;
 }
 
+/**
+ * "Republicans took the House in 2010, winning 242 seats". Only the seats won
+ * that year: a gain would depend on which earlier count it is measured from
+ * (the previous election's results or the opening of the previous Congress),
+ * and readers know the election-day figures.
+ */
 function houseHeadline(year: number, t: HouseYear['totals'], prev: HouseYear['totals'] | null): string {
   if (t.dem === null || t.gop === null) return `The ${year} House results are not yet entered`;
-  const demSide = t.dem + t.indDem;
-  const gopSide = t.gop + t.indGop;
-  const maj: Party | null = demSide >= 218 ? 'DEM' : gopSide >= 218 ? 'GOP' : null;
+  const side = (x: HouseYear['totals']): Party | null =>
+    x.dem === null || x.gop === null ? null : x.dem + x.indDem >= 218 ? 'DEM' : x.gop + x.indGop >= 218 ? 'GOP' : null;
+  const maj = side(t);
   if (!maj) return `No party won a House majority in ${year}`;
-  if (!prev || prev.dem === null || prev.gop === null) return `${many(maj)} won the House in ${year}`;
-  const prevMaj: Party | null = prev.dem + prev.indDem >= 218 ? 'DEM' : prev.gop + prev.indGop >= 218 ? 'GOP' : null;
-  const change = maj === 'DEM' ? t.dem - prev.dem : t.gop - prev.gop;
-  if (maj !== prevMaj) return `${many(maj)} gained ${seatsWord(change)} and took the House in ${year}`;
-  if (change === 0) return `${many(maj)} kept the House in ${year} with the same number of seats`;
-  return change > 0
-    ? `${many(maj)} kept the House in ${year} and gained ${seatsWord(change)}`
-    : `${many(maj)} kept the House in ${year} despite losing ${seatsWord(-change)}`;
+  const won = maj === 'DEM' ? t.dem : t.gop;
+  const verb = prev && side(prev) === maj ? 'kept' : prev ? 'took' : 'won';
+  return `${many(maj)} ${verb} the House in ${year}, winning ${won} seats`;
+}
+
+/** The year the map opens on: the latest with results entered. */
+export function defaultYear(data: MapData): number {
+  const withResults = data.years.filter((y) => data.senate[y].decided > 0);
+  return Math.max(...(withResults.length ? withResults : data.years));
 }
 
 export function loadMapData(): MapData {
@@ -218,7 +215,7 @@ export function loadMapData(): MapData {
       const flipped = r.flipped_vs_holder === '' ? null : bool(r.flipped_vs_holder);
       (byState[r.state_po] ??= []).push({
         special: bool(r.special),
-        winnerName: r.winner_name ? displayName(r.winner_name) : null,
+        winnerName: r.winner_display_name || null,
         winnerParty: party(r.winner_party),
         winnerCaucus: party(r.winner_caucus),
         runnerUpParty: party(r.runner_up_party),
@@ -230,13 +227,17 @@ export function loadMapData(): MapData {
         holderCaucus: party(r.holder_caucus),
         labelOnly: bool(r.party_changed) && flipped === false,
         provisional: bool(r.is_provisional),
-        called: 'called' in r && r.called !== '' ? bool(r.called) : null,
+        called: bool(r.called),
       });
     }
     const states: Record<string, SenateStateYear> = {};
     for (const [st, races] of Object.entries(byState)) {
       races.sort((a, b) => Number(a.special) - Number(b.special));
-      states[st] = { races, fill: senateFill(races), flipped: races.some((r) => r.flipped === true) };
+      // Regular and special won by different sides: the state is split
+      // diagonally, regular race top-left (see CongressMap.astro).
+      const fills = raceFills(races);
+      const split = new Set(fills).size > 1 ? [fills[0], fills[1]] as [SenateFill, SenateFill] : null;
+      states[st] = { races, fill: split ? 'split' : fills[0], split, flipped: races.some((r) => r.flipped === true) };
     }
     const all = Object.values(states).flatMap((s) => s.races);
     const after = row('senate', year);
@@ -277,6 +278,7 @@ export function loadMapData(): MapData {
         gopShare: num(r.gop_vote_share),
         note: r.note,
         provisional: bool(r.is_provisional),
+        called: bool(r.called),
         prev: null,
       };
     }

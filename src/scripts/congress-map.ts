@@ -43,7 +43,7 @@ function init(root: HTMLElement) {
   const params = new URLSearchParams(location.search);
   const state = {
     view: (params.get('chamber') === 'house' ? 'house' : 'senate') as View,
-    year: years.includes(Number(params.get('year'))) ? Number(params.get('year')) : Math.max(...years),
+    year: years.includes(Number(params.get('year'))) ? Number(params.get('year')) : Number(root.dataset.year),
     pinned: null as string | null,
     focused: null as string | null,
     hovered: null as string | null,
@@ -65,14 +65,18 @@ function init(root: HTMLElement) {
     for (const el of root.querySelectorAll<SVGUseElement>('.cmap__state')) {
       const st = el.dataset.state!;
       el.dataset.fill = sy.states[st]?.fill ?? 'no-race';
+      const split = sy.states[st]?.split;
+      if (split) el.dataset.split = split.join('|');
+      else delete el.dataset.split;
     }
+    root.querySelector<HTMLElement>('[data-split-key]')!.hidden = !Object.values(sy.states).some((s) => s.split);
     for (const el of root.querySelectorAll<SVGUseElement>('.cmap__hatch')) {
       const s = sy.states[el.dataset.state!];
       el.dataset.hatch = s?.flipped ? hatchParty(s.fill) : '';
     }
     for (const el of root.querySelectorAll<HTMLElement>('.cmap__labels--senate .cmap__label')) {
       const s = sy.states[el.dataset.state!];
-      if (!('callout' in el.dataset)) el.dataset.tone = senateTone(s?.fill ?? 'no-race', s?.flipped ?? false);
+      if (!('callout' in el.dataset)) el.dataset.tone = senateTone(s?.fill ?? 'no-race', s?.flipped ?? false, s?.split ?? null);
       el.querySelector<HTMLElement>('.cmap__races')!.hidden = (s?.races.length ?? 0) < 2;
     }
     const b = sy.balance;
@@ -85,7 +89,7 @@ function init(root: HTMLElement) {
   /** Square kinds for one state, in the same order as the seat bar. */
   function squareKinds(s: HouseStateYear): string[] {
     if (s.dem === null || s.gop === null) return Array(s.seats).fill('missing');
-    const lead = s.provisional;
+    const lead = s.provisional && !s.called;
     const out: string[] = [];
     const push = (k: string, n: number) => { for (let i = 0; i < n; i++) out.push(k); };
     push(lead ? 'dem-lead' : 'dem', s.dem);

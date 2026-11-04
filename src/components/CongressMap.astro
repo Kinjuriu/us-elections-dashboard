@@ -10,15 +10,16 @@
 // data (01, 02, 10).
 import SegmentedControl from './SegmentedControl.astro';
 import SeatBar from './SeatBar.astro';
-import { loadMapData, PROVISIONAL_YEAR } from '../lib/mapData';
+import { loadMapData, defaultYear, PROVISIONAL_YEAR } from '../lib/mapData';
 import { buildGeo, LAYOUTS } from '../lib/geo';
-import { senateTitle, senateTone, hatchParty, ariaLabel, senateBarCaption } from '../lib/mapText';
+import { senateTitle, senateTone, hatchParty, ariaLabel, senateBarCaption, SPLIT_FILLS } from '../lib/mapText';
 
 
 const data = loadMapData();
 const geo = buildGeo(data.apportionments);
 
-const year = Math.max(...data.years);
+// The latest year with results; 2026 once its results are entered.
+const year = defaultYear(data);
 const senate = data.senate[year];
 const house = data.house[year];
 const title = senateTitle(senate);
@@ -30,6 +31,7 @@ const statesIn = (r: string) => Object.keys(geo.states).filter((st) => geo.state
 
 // Default (no-JS) state of each shape and label.
 const fillOf = (st: string) => senate.states[st]?.fill ?? 'no-race';
+const splitOf = (st: string) => senate.states[st]?.split ?? null;
 const flippedOf = (st: string) => senate.states[st]?.flipped ?? false;
 const hatchOf = (st: string) => (flippedOf(st) ? hatchParty(fillOf(st)) : '');
 const name = (st: string) => data.stateNames[st];
@@ -42,7 +44,15 @@ const patternCss = LAYOUTS.flatMap((spec) => regions.flatMap((r) => {
     `${g} .cmap__state[data-fill="pending"]{fill:url(#cm-${spec.id}-${r}-pending)}`,
     ...(['dem', 'gop', 'ind'] as const).map((p) => `${g} .cmap__hatch[data-hatch="${p}"]{fill:url(#cm-${spec.id}-${r}-hatch-${p})}`),
   ];
-})).join('\n');
+})).join('\n') + '\n' +
+  // Split states: one half each colour, on a hard diagonal (regular race top-left).
+  SPLIT_FILLS.flatMap((a) => SPLIT_FILLS.filter((b) => b !== a).map((b) =>
+    `.cmap__state[data-fill="split"][data-split="${a}|${b}"]{fill:url(#cm-split-${a}-${b})}`)).join('\n');
+
+const SPLIT_COLOUR: Record<string, string> = {
+  dem: 'var(--dem)', gop: 'var(--gop)', ind: 'var(--ind)', other: 'var(--ink-3)',
+  'dem-lead': 'var(--dem-tint)', 'gop-lead': 'var(--gop-tint)', 'ind-lead': 'var(--ind)', pending: 'var(--paper)',
+};
 
 const yearOptions = data.years.map((y) => ({ value: String(y), label: y === PROVISIONAL_YEAR ? `${y} (provisional)` : String(y) }));
 
@@ -90,6 +100,7 @@ const senateBalance = senate.balance;
     <li><span class="cmap__sw" data-fill="no-race"></span>No race</li>
     <li><span class="cmap__sw" data-fill="pending"></span>Result not yet entered</li>
     <li><span class="cmap__races cmap__races--key">2</span>Two races: regular and special election</li>
+    <li data-split-key hidden={!Object.values(senate.states).some((s) => s.split)}><span class="cmap__sw cmap__sw--split"></span>Split: the two races went different ways (regular top left)</li>
   </ul>
   <ul class="cmap__legend cmap__legend--house" aria-label="Key">
     <li><span class="cmap__sq" data-kind="dem"></span>Democrat</li>
@@ -150,6 +161,12 @@ const senateBalance = senate.balance;
       <!-- Shared geometry, placed by each layout below. -->
       <svg class="cmap__defs" width="0" height="0" aria-hidden="true" focusable="false">
         <defs>
+          {SPLIT_FILLS.flatMap((a) => SPLIT_FILLS.filter((b) => b !== a).map((b) => (
+            <linearGradient id={`cm-split-${a}-${b}`} x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0.5" style={`stop-color:${SPLIT_COLOUR[a]}`} />
+              <stop offset="0.5" style={`stop-color:${SPLIT_COLOUR[b]}`} />
+            </linearGradient>
+          )))}
           {Object.entries(geo.states).map(([st, s]) => (
             <path id={`cm-st-${st}`} d={s.d} vector-effect="non-scaling-stroke" />
           ))}
@@ -218,6 +235,7 @@ const senateBalance = senate.balance;
                           class="cmap__state"
                           data-state={st}
                           data-fill={fillOf(st)}
+                          data-split={splitOf(st)?.join('|')}
                           role="button"
                           tabindex="-1"
                           aria-label={ariaLabel('senate', st, name(st), senate, house)}
@@ -251,7 +269,7 @@ const senateBalance = senate.balance;
                   class={`cmap__label cmap__label--${s.align}${s.badgeBelow ? ' cmap__label--stack' : ''}`}
                   data-state={s.state}
                   data-callout={s.callout ? '' : undefined}
-                  data-tone={s.callout ? (s.onLand ? 'land' : 'water') : senateTone(fillOf(s.state), flippedOf(s.state))}
+                  data-tone={s.callout ? (s.onLand ? 'land' : 'water') : senateTone(fillOf(s.state), flippedOf(s.state), splitOf(s.state))}
                   style={`left:${s.x}%;top:${s.y}%`}
                 >
                   <span class="cmap__code">{s.state}</span>
@@ -333,6 +351,10 @@ const senateBalance = senate.balance;
   }
   .cmap__sw--flip {
     background: repeating-linear-gradient(45deg, var(--ink-2) 0 1.4px, var(--paper) 1.4px 2.8px);
+  }
+  .cmap__legend li[hidden] { display: none; }
+  .cmap__sw--split {
+    background: linear-gradient(135deg, var(--dem) 50%, var(--gop) 50%);
   }
   .cmap__sw--lead {
     background: linear-gradient(90deg, var(--dem-tint) 50%, var(--gop-tint) 50%);
