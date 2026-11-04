@@ -1,0 +1,62 @@
+---
+// The map board: the one framed block that holds the controls, the summary
+// band, the finding line, the map and the side panel. It is the first thing
+// on the page. Everything inside follows the shared store.
+import ControlStrip from './ControlStrip.astro';
+import Band from './Band.astro';
+import CongressMap from './CongressMap.astro';
+import type { StoreConfig } from '../lib/store';
+import type { HeaderYear, StripColumn } from '../lib/dashboardData';
+
+interface Props {
+  config: StoreConfig;
+  columns: StripColumn[];
+  headerYears: Record<number, HeaderYear>;
+  finding: string;
+  provisional: boolean;
+}
+const { config, columns, headerYears, finding, provisional } = Astro.props;
+---
+<section class="board" aria-label="Map board">
+  <ControlStrip config={config} columns={columns} />
+  <Band years={headerYears} year={config.defaultYear} />
+  <div class="board__finding">
+    <p class="board__sentence" data-finding aria-live="polite">{finding}</p>
+    <p class="board__prov label" data-prov-tag hidden={!provisional}>Provisional</p>
+  </div>
+  <CongressMap />
+</section>
+
+<style>
+  .board {
+    border: 1px solid var(--ink);
+    background: var(--paper);
+  }
+  .board__finding {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    padding: var(--sp-2) var(--sp-4) var(--sp-4);
+  }
+  .board__sentence {
+    max-width: none;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: var(--fs-3);
+    line-height: 1.25;
+  }
+  @media (min-width: 768px) {
+    .board__sentence { font-size: var(--fs-4); }
+  }
+  .board__prov {
+    flex: none;
+    margin: 0;
+    padding: 2px var(--sp-2);
+    border: 1px solid var(--ink);
+    border-radius: var(--radius-control);
+    font-size: 12px;
+  }
+  .board__prov[hidden] { display: none; }
+</style>

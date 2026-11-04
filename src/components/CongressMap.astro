@@ -2,17 +2,17 @@
 // The map: Senate results or House delegations by state, for every even
 // year from 2000. Everything is drawn here at build time for the default
 // view (latest Senate year), so it reads correctly with JavaScript off.
-// src/scripts/congress-map.ts then wires up the controls, tooltip and
-// details panel and redraws for other years.
+// src/scripts/congress-map.ts then follows the shared store (year, chamber,
+// selected state, comparison year; the controls are in ControlBar.astro)
+// and runs the tooltip and the state view beside the map.
 //
 // Style reference: reference/screenshots/11 and 12 (dark carved water,
 // tracked title block bottom-left), with AP and NYT conventions for the
 // data (01, 02, 10).
-import SegmentedControl from './SegmentedControl.astro';
-import SeatBar from './SeatBar.astro';
-import { loadMapData, defaultYear, PROVISIONAL_YEAR } from '../lib/mapData';
+import { loadMapData, defaultYear } from '../lib/mapData';
+import { loadHeaderYears } from '../lib/dashboardData';
 import { buildGeo, LAYOUTS } from '../lib/geo';
-import { senateTitle, senateTone, hatchParty, ariaLabel, senateBarCaption, SPLIT_FILLS } from '../lib/mapText';
+import { senateTitle, senateTone, hatchParty, ariaLabel, nationalHtml, SPLIT_FILLS, type NationalHeader } from '../lib/mapText';
 
 
 const data = loadMapData();
@@ -54,10 +54,8 @@ const SPLIT_COLOUR: Record<string, string> = {
   'dem-lead': 'var(--dem-tint)', 'gop-lead': 'var(--gop-tint)', 'ind-lead': 'var(--ind)', pending: 'var(--paper)',
 };
 
-const yearOptions = data.years.map((y) => ({ value: String(y), label: y === PROVISIONAL_YEAR ? `${y} (provisional)` : String(y) }));
-
 // What the island needs, and nothing it does not.
-const clientData = {
+const clientData: Record<string, unknown> = {
   ...data,
   stateOrder: geo.stateOrder,
   regions: Object.fromEntries(Object.entries(geo.states).map(([st, s]) => [st, s.region])),
@@ -72,84 +70,21 @@ const clientData = {
     house: l.house,
   })),
 };
-const senateBalance = senate.balance;
+// What the national panel says about each year's Congress.
+const headerYears = loadHeaderYears(data);
+const header: Record<number, NationalHeader> = Object.fromEntries(Object.entries(headerYears).map(([y, h]) => [y, {
+  congress: h.congress,
+  yearsServed: h.yearsServed,
+  note: h.note,
+  senateNote: h.senate.majorityNote,
+  unverifiedInd: h.senate.unverifiedInd || h.house.unverifiedInd,
+}]));
+clientData.header = header;
+const nationalDefault = nationalHtml('senate', year, data, header[year], null);
 ---
 <div class="cmap" data-cmap data-view="senate" data-year={year}>
   <style set:html={patternCss}></style>
 
-  <div class="cmap__controls">
-    <SegmentedControl
-      name="chamber"
-      label="Chamber"
-      showLabel
-      options={[{ value: 'senate', label: 'Senate' }, { value: 'house', label: 'House' }]}
-      selected="senate"
-    />
-    <SegmentedControl name="year" label="Year" showLabel scroll options={yearOptions} selected={String(year)} />
-    <noscript>
-      <p class="cmap__noscript">Turn on JavaScript to change the year or switch to the House.</p>
-    </noscript>
-  </div>
-
-  <ul class="cmap__legend cmap__legend--senate" aria-label="Key">
-    <li><span class="cmap__sw" data-fill="dem"></span>Democrat</li>
-    <li><span class="cmap__sw" data-fill="gop"></span>Republican</li>
-    <li><span class="cmap__sw" data-fill="ind"></span>Independent</li>
-    <li><span class="cmap__sw cmap__sw--flip"></span>Flipped seat</li>
-    <li><span class="cmap__sw cmap__sw--lead"></span>Leading, not called</li>
-    <li><span class="cmap__sw" data-fill="no-race"></span>No race</li>
-    <li><span class="cmap__sw" data-fill="pending"></span>Result not yet entered</li>
-    <li><span class="cmap__races cmap__races--key">2</span>Two races: regular and special election</li>
-    <li data-split-key hidden={!Object.values(senate.states).some((s) => s.split)}><span class="cmap__sw cmap__sw--split"></span>Split: the two races went different ways (regular top left)</li>
-  </ul>
-  <ul class="cmap__legend cmap__legend--house" aria-label="Key">
-    <li><span class="cmap__sq" data-kind="dem"></span>Democrat</li>
-    <li><span class="cmap__sq" data-kind="gop"></span>Republican</li>
-    <li><span class="cmap__sq" data-kind="ind-dem"></span>Independent</li>
-    <li><span class="cmap__sq" data-kind="vacant"></span>Vacant</li>
-    <li><span class="cmap__sq" data-kind="missing"></span>Not yet entered</li>
-    <li>One square per seat, grouped by party</li>
-  </ul>
-
-  <div class="cmap__bar cmap__bar--senate">
-    <SeatBar
-      label="Senate"
-      caption={senateBarCaption(senate.congress)}
-      total={100}
-      threshold={51}
-      dem={senateBalance.dem}
-      gop={senateBalance.gop}
-      indDem={senateBalance.indDem}
-      indGop={senateBalance.indGop}
-      indUnknown={senateBalance.indUnknown}
-      other={senateBalance.other}
-      vacant={senateBalance.vacant}
-      rowsWide={2}
-      rowsNarrow={4}
-      provisional={senate.provisional}
-      dynamic
-    />
-    <p class="cmap__control-note" data-control-note hidden={!senate.controlNote}>{senate.controlNote}</p>
-  </div>
-  <div class="cmap__bar cmap__bar--house">
-    <SeatBar
-      label="House"
-      caption="Seats won in the November election"
-      total={435}
-      threshold={218}
-      dem={house.totals.dem}
-      gop={house.totals.gop}
-      indDem={house.totals.indDem}
-      indGop={house.totals.indGop}
-      indUnknown={house.totals.indUnknown}
-      other={house.totals.other}
-      vacant={house.totals.vacant}
-      rowsWide={5}
-      rowsNarrow={10}
-      provisional={house.provisional}
-      dynamic
-    />
-  </div>
 
   <div class="cmap__body">
     <div class="cmap__map">
@@ -274,6 +209,7 @@ const senateBalance = senate.balance;
                 >
                   <span class="cmap__code">{s.state}</span>
                   <span class="cmap__races" hidden={(senate.states[s.state]?.races.length ?? 0) < 2}>2</span>
+                  <span class="cmap__changed" hidden></span>
                 </span>
               ))}
             </div>
@@ -285,15 +221,37 @@ const senateBalance = senate.balance;
       <div class="cmap__tooltip" role="tooltip" hidden></div>
     </div>
 
-    <aside class="cmap__panel" aria-label="State details">
-      <div class="cmap__panel-body" data-panel aria-live="polite">
-        <p class="cmap__panel-empty">
-          Select a state to see its result here: tap or click it, or press Tab to reach the map and use the arrow keys,
-          then Enter.
-        </p>
+    <aside class="cmap__panel" aria-label="State record" tabindex="-1" data-panel-root>
+      <div class="cmap__panel-scroll">
+        <button type="button" class="cmap__clear" data-clear hidden>Close</button>
+        <div class="cmap__panel-body" data-panel aria-live="polite" set:html={nationalDefault}></div>
       </div>
-      <button type="button" class="cmap__clear" data-clear hidden>Clear selection</button>
     </aside>
+  </div>
+
+  <div class="cmap__legendrow">
+  <ul class="cmap__legend cmap__legend--senate" aria-label="Key">
+    <li><span class="cmap__sw" data-fill="dem"></span>Democrat</li>
+    <li><span class="cmap__sw" data-fill="gop"></span>Republican</li>
+    <li><span class="cmap__sw" data-fill="ind"></span>Independent</li>
+    <li><span class="cmap__sw cmap__sw--flip"></span>Flipped seat</li>
+    <li><span class="cmap__sw cmap__sw--lead"></span>Leading, not called</li>
+    <li><span class="cmap__sw" data-fill="no-race"></span>No race</li>
+    <li><span class="cmap__sw" data-fill="pending"></span>Result not yet entered</li>
+    <li><span class="cmap__races cmap__races--key">2</span>Two races: regular and special election</li>
+    <li data-split-key hidden={!Object.values(senate.states).some((s) => s.split)}><span class="cmap__sw cmap__sw--split"></span>Split: the two races went different ways (regular top left)</li>
+    <li data-compare-key hidden><span class="cmap__changed cmap__changed--key"></span><span data-compare-key-text></span></li>
+  </ul>
+    <ul class="cmap__legend cmap__legend--house" aria-label="Key">
+    <li><span class="cmap__sq" data-kind="dem"></span>Democrat</li>
+    <li><span class="cmap__sq" data-kind="gop"></span>Republican</li>
+    <li><span class="cmap__sq" data-kind="ind-dem"></span>Independent</li>
+    <li><span class="cmap__sq" data-kind="vacant"></span>Vacant</li>
+    <li><span class="cmap__sq" data-kind="missing"></span>Not yet entered</li>
+    <li>One square per seat, grouped by party</li>
+    <li data-compare-key hidden><span class="cmap__changed cmap__changed--key"></span><span data-compare-key-text></span></li>
+  </ul>
+    <p class="cmap__floor">Years before 2000 show on the year strip but have no map.</p>
   </div>
 
   <script type="application/json" data-cmap-data set:html={JSON.stringify(clientData)}></script>
@@ -308,21 +266,10 @@ const senateBalance = senate.balance;
     --cm-title: clamp(20px, 3.2cqi, 34px);
   }
 
-  .cmap__controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-3) var(--sp-6);
-    align-items: center;
-  }
-  .cmap__noscript {
-    font-size: var(--fs-1);
-    color: var(--ink-2);
-  }
-
   /* Legends: inline, small, above the map. */
   .cmap__legend {
     list-style: none;
-    margin: var(--sp-4) 0 0;
+    margin: 0;
     padding: 0;
     display: flex;
     flex-wrap: wrap;
@@ -371,27 +318,16 @@ const senateBalance = senate.balance;
   .cmap__sq[data-kind='vacant'] { background: var(--paper); box-shadow: inset 0 0 0 1px var(--ink-3); }
   .cmap__sq[data-kind='missing'] { background: var(--no-race); box-shadow: inset 0 0 0 1px var(--ink-3); }
 
-  .cmap__bar { margin-top: var(--sp-5); }
-  .cmap[data-view='senate'] .cmap__bar--house,
-  .cmap[data-view='house'] .cmap__bar--senate { display: none; }
-  .cmap__control-note {
-    margin-top: var(--sp-2);
-    max-width: var(--prose-max);
-    font-size: var(--fs-1);
-    color: var(--ink-2);
-  }
-  .cmap__control-note[hidden] { display: none; }
 
-  /* ---- Map and details panel ---- */
+  /* ---- Map and side panel: the panel sits under the map, then beside it ---- */
   .cmap__body {
-    margin-top: var(--sp-5);
     display: grid;
-    gap: var(--sp-5);
+    min-width: 0;
   }
-  @media (min-width: 1024px) {
+  @media (min-width: 1100px) {
     .cmap__body {
-      grid-template-columns: minmax(0, 1fr) 260px;
-      align-items: start;
+      grid-template-columns: minmax(0, 1fr) 320px;
+      align-items: stretch;
     }
   }
   .cmap__map {
@@ -522,6 +458,21 @@ const senateBalance = senate.balance;
     text-align: center;
   }
   .cmap__races--key { color: var(--ink); }
+  /* Compare: a small diamond on states that changed between the two years. */
+  .cmap__changed,
+  .cmap__labels :global(.cmap__changed) {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    margin-left: 2px;
+    flex: none;
+    transform: rotate(45deg);
+    background: var(--paper);
+    border: 2px solid var(--ink);
+  }
+  .cmap__changed[hidden],
+  .cmap__labels :global(.cmap__changed[hidden]) { display: none; }
+  .cmap__changed--key { margin: 0 3px; }
   .cmap__races[hidden] { display: none; }
   /* House labels: a white chip, so they read on land, water and squares
      alike. The anchor is the chip's edge that faces the grid. */
@@ -589,16 +540,25 @@ const senateBalance = senate.balance;
   }
   .cmap__tooltip[hidden] { display: none; }
 
-  /* The panel only works with the island running. */
-  .cmap:not(.is-ready) .cmap__panel { display: none; }
   .cmap__panel {
-    border-top: 1px solid var(--ink);
-    padding-top: var(--sp-3);
+    position: relative;
+    background: var(--paper-2);
+    border-top: 1px solid var(--rule);
     font-size: var(--fs-2);
+    min-width: 0;
   }
+  .cmap__panel-scroll { padding: var(--sp-4); }
+  @media (min-width: 1100px) {
+    .cmap__panel { border-top: 0; border-left: 1px solid var(--rule); }
+    /* Same height as the map; a state's long record scrolls inside. */
+    .cmap__panel-scroll { position: absolute; inset: 0; overflow-y: auto; }
+  }
+  .cmap__panel:focus { outline: none; }
+  .cmap__panel:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; }
   .cmap__panel-empty { color: var(--ink-2); }
   .cmap__clear {
-    margin-top: var(--sp-4);
+    float: right;
+    margin: 0 0 var(--sp-2) var(--sp-3);
     appearance: none;
     padding: 6px var(--sp-3);
     border: 1px solid var(--ink-3);
@@ -613,6 +573,54 @@ const senateBalance = senate.balance;
   .cmap__clear:hover { background: var(--paper-2); }
   .cmap__clear:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
   .cmap__clear[hidden] { display: none; }
+
+  .cmap__legendrow {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-5);
+    padding: var(--sp-3) var(--sp-4);
+    border-top: 1px solid var(--rule);
+  }
+  .cmap__floor { margin: 0; max-width: none; font-size: var(--fs-1); color: var(--ink-2); }
+
+  /* National mode of the panel. */
+  .cmap :global(.cmn__title) {
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: var(--fs-4);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    line-height: 1.1;
+  }
+  .cmap :global(.cmn__sub) { margin-top: var(--sp-1); color: var(--ink-2); font-size: var(--fs-1); }
+  .cmap :global(.cmn__nums) { margin: var(--sp-4) 0 0; display: grid; }
+  .cmap :global(.cmn__nums div) {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    padding-block: var(--sp-1);
+    border-bottom: var(--hairline);
+  }
+  .cmap :global(.cmn__nums dt) { color: var(--ink-2); }
+  .cmap :global(.cmn__nums dd) {
+    margin: 0;
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .cmap :global(.cmn__states) { margin-top: var(--sp-2); font-size: var(--fs-1); }
+  .cmap :global(.cmn__head) {
+    margin-top: var(--sp-4);
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+  .cmap :global(.cmn__note) { margin-top: var(--sp-2); font-size: var(--fs-1); color: var(--ink-2); }
+  .cmap :global(.cmn__hint) { margin-top: var(--sp-4); font-size: var(--fs-1); color: var(--ink-2); }
 
   /* Details content, shared by tooltip and panel (built as HTML strings). */
   .cmap :global(.cmd__state) {
@@ -673,4 +681,58 @@ const senateBalance = senate.balance;
   .cmap :global(.cmd__status--flip) { font-weight: 600; }
   .cmap :global(.cmd__counts) { margin-top: var(--sp-2); }
   .cmap :global(.cmd__note) { margin-top: var(--sp-2); font-size: var(--fs-1); color: var(--ink-2); }
+
+  /* State view: the full record under the selected year's result. */
+  .cmap :global(.cmr__head) {
+    margin-top: var(--sp-5);
+    padding-bottom: var(--sp-1);
+    border-bottom: 1px solid var(--ink);
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: var(--fs-1);
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+  .cmap :global(.cmr__table) {
+    width: 100%;
+    margin-top: var(--sp-1);
+    border-collapse: collapse;
+    font-size: var(--fs-1);
+  }
+  .cmap :global(.cmr__table th) {
+    padding: var(--sp-1) var(--sp-1) var(--sp-1) 0;
+    border-bottom: var(--hairline);
+    font-family: var(--font-label);
+    font-weight: 600;
+    text-align: left;
+    color: var(--ink-2);
+  }
+  .cmap :global(.cmr__table td) {
+    padding: 3px var(--sp-1) 3px 0;
+    border-bottom: var(--hairline);
+    vertical-align: top;
+  }
+  .cmap :global(.cmr__table .cmd__swatch) { display: inline-block; margin-right: 3px; vertical-align: -1px; }
+  .cmap :global(.cmr__num) { font-variant-numeric: tabular-nums lining-nums; white-space: nowrap; }
+  .cmap :global(th.cmr__num), .cmap :global(td.cmr__num + td) { text-align: left; }
+  .cmap :global(.cmr__sub) { display: block; font-size: 12px; color: var(--ink-2); }
+  .cmap :global(.cmr__pending) { color: var(--ink-2); }
+  .cmap :global(.is-current) { background: var(--paper-2); font-weight: 600; }
+  .cmap :global(.cmr__rows) { list-style: none; margin: 0; padding: 0; }
+  .cmap :global(.cmr__row) {
+    display: grid;
+    grid-template-columns: 38px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: var(--sp-2);
+    padding-block: 2px;
+    font-size: var(--fs-1);
+  }
+  .cmap :global(.cmr__bar) { max-width: 100%; height: auto; }
+  .cmap :global(.cmr__counts) { color: var(--ink-2); white-space: nowrap; font-variant-numeric: tabular-nums lining-nums; }
+  .cmap :global(.cmr__bar [data-kind='dem']) { fill: var(--dem); }
+  .cmap :global(.cmr__bar [data-kind='gop']) { fill: var(--gop); }
+  .cmap :global(.cmr__bar [data-kind='ind']) { fill: var(--ind); }
+  .cmap :global(.cmr__bar [data-kind='other']) { fill: var(--ink-3); }
+  .cmap :global(.cmr__bar [data-kind='vacant']) { fill: var(--paper); stroke: var(--ink-2); stroke-width: 1; }
+  .cmap :global(.cmr__bar [data-kind='missing']) { fill: var(--no-race); stroke: var(--ink-3); stroke-width: 1; }
 </style>

@@ -1,30 +1,29 @@
 ---
 import Base from '../layouts/Base.astro';
-import SectionHeader from '../components/SectionHeader.astro';
 import ChartFrame from '../components/ChartFrame.astro';
-import SeatBar from '../components/SeatBar.astro';
-import SegmentedControl from '../components/SegmentedControl.astro';
 import Footnote from '../components/Footnote.astro';
-import CongressMap from '../components/CongressMap.astro';
+import Masthead from '../components/Masthead.astro';
+import Footer from '../components/Footer.astro';
+import Board from '../components/Board.astro';
+import ControlChart from '../components/ControlChart.astro';
+import MidtermChart from '../components/MidtermChart.astro';
+import FlipsChart from '../components/FlipsChart.astro';
 import { loadMapData, defaultYear } from '../lib/mapData';
+import { loadHeaderYears, storeConfig, stripColumns } from '../lib/dashboardData';
+import { loadControlChart, loadMidtermChart, loadFlipsChart } from '../lib/chartData';
+import { congressFor } from '../lib/store';
+import { ordinal } from '../lib/mapText';
 import { compiledContent as sourcesHtml } from '../../data/SOURCES.md';
 import {
-  loadChamberControl, loadIndependents, loadMidtermSwing, loadSenateRaces,
-  latestElection, sourceAccessedAt, formatDate, PARTY_NAME,
-  type ChamberControl, type Chamber,
+  loadChamberControl, loadMidtermSwing, loadSenateRaces,
+  latestElection, sourceAccessedAt, formatDate,
 } from '../lib/data';
 
 // ---------- Data, all read at build time from data/processed/ ----------
 const control = loadChamberControl();
-const independents = loadIndependents();
 const swing = loadMidtermSwing();
 const races = loadSenateRaces();
 
-const ordinal = (n: number) => {
-  const s = ['th', 'st', 'nd', 'rd'];
-  const v = n % 100;
-  return `${n}${s[(v - 20) % 10] ?? s[v] ?? s[0]}`;
-};
 const asOf = (...ids: string[]) => {
   const dates = ids.map(sourceAccessedAt).filter((d): d is Date => d !== null);
   if (!dates.length) throw new Error(`No access date in manifest for ${ids.join(', ')}`);
@@ -35,367 +34,213 @@ const CONTROL_SOURCE =
 const MIDTERM_SOURCE =
   'US House of Representatives, Office of the Historian; US Senate Historical Office. Senate counts before each midterm are from election day; counts after are from the opening of the new Congress.';
 const controlAsOf = asOf('house_historian_party_divisions', 'senate_party_division');
-
-// Header bars: the latest election with counts, and a note if a newer one
-// (2026) has none entered yet.
-const latest = (['house', 'senate'] as Chamber[]).map((chamber) => {
-  const { newest, withCounts } = latestElection(control, chamber);
-  if (!withCounts) throw new Error(`No ${chamber} row with seat counts`);
-  const inds = independents.filter((i) => i.chamber === chamber && i.congress === withCounts.congress);
-  const indDem = inds.filter((i) => i.caucusesWith === 'DEM').length;
-  const indGop = inds.filter((i) => i.caucusesWith === 'GOP').length;
-  const indTotal = withCounts.ind ?? 0;
-  return {
-    chamber,
-    row: withCounts,
-    pending: newest.electionYear !== withCounts.electionYear ? newest : null,
-    indDem,
-    indGop,
-    indUnknown: Math.max(indTotal - indDem - indGop, 0),
-    unverifiedInd: inds.some((i) => !i.verified),
-  };
-});
-const [houseNow, senateNow] = latest;
-const shownYear = houseNow.row.electionYear;
-const pendingYear = houseNow.pending?.electionYear ?? senateNow.pending?.electionYear ?? null;
-const shownProvisional = houseNow.row.isProvisional || senateNow.row.isProvisional;
-
-const majorityOf = (r: ChamberControl) => r.majorityMostOfCongress ?? r.majorityParty;
-const houseMaj = majorityOf(houseNow.row);
-const senateMaj = majorityOf(senateNow.row);
-const headerBarTitle =
-  houseMaj && houseMaj === senateMaj
-    ? `${PARTY_NAME[houseMaj].many} control both the House and the Senate after the ${shownYear} election`
-    : `${houseMaj ? PARTY_NAME[houseMaj].many : 'No party'} hold the House and ${senateMaj ? PARTY_NAME[senateMaj].many : 'no party'} the Senate after the ${shownYear} election`;
-
-// Control since 1946: Congresses with counts.
-const certified = control.filter((r) => !r.isProvisional && r.dem !== null);
-const firstYear = Math.min(...certified.map((r) => r.electionYear));
-const lastCertifiedYear = Math.max(...certified.map((r) => r.electionYear));
-const nCongresses = new Set(certified.map((r) => r.congress)).size;
-const demHeld = (chamber: Chamber) =>
-  certified.filter((r) => r.chamber === chamber && majorityOf(r) === 'DEM').length;
-
-// Longest unbroken run of one party in the House majority.
-const houseRows = certified.filter((r) => r.chamber === 'house').sort((a, b) => a.congress - b.congress);
-let best = { party: houseRows[0].majorityMostOfCongress, start: houseRows[0], end: houseRows[0], n: 1 };
-let cur = { ...best };
-for (const r of houseRows.slice(1)) {
-  cur = majorityOf(r) === cur.party ? { ...cur, end: r, n: cur.n + 1 } : { party: majorityOf(r), start: r, end: r, n: 1 };
-  if (cur.n > best.n) best = { ...cur };
-}
-const runStart = Number(best.start.yearsServed.slice(0, 4));
-const runEnd = Number(best.end.yearsServed.slice(-4));
-
-// Midterms: president's party in the House.
-const houseMidterms = swing.filter((s) => s.chamber === 'house' && !s.isProvisional && s.change !== null);
-const houseLosses = houseMidterms.filter((s) => (s.change ?? 0) < 0);
-const houseGains = houseMidterms.filter((s) => (s.change ?? 0) > 0);
-const worst = [...houseMidterms].sort((a, b) => (a.change ?? 0) - (b.change ?? 0))[0];
-const midFirst = Math.min(...houseMidterms.map((s) => s.year));
-const midLast = Math.max(...houseMidterms.map((s) => s.year));
-const swingHasProvisional = swing.some((s) => s.isProvisional);
-const listNames = (xs: string[]) =>
-  xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`;
-const gainers = listNames(houseGains.map((s) => `${s.president} in ${s.year}`));
-
-// Senate flips since 2000 (AP convention: against the party holding the seat).
-const raceYears = [...new Set(races.filter((r) => !r.isProvisional).map((r) => r.year))];
-const flipsByYear = raceYears.map((y) => ({
-  year: y,
-  n: races.filter((r) => r.year === y && r.flippedVsHolder === true).length,
-}));
-const mostFlips = [...flipsByYear].sort((a, b) => b.n - a.n || a.year - b.year)[0];
-const flipFirst = Math.min(...raceYears);
 const senateAsOf = asOf('medsl_senate');
 
-// Methodology: SOURCES.md, with its own h1 dropped and headings shifted
-// under this section's h2.
+// The newest election with no seat counts yet (2026), if there is one.
+const pendingYear = (() => {
+  const { newest, withCounts } = latestElection(control, 'house');
+  return withCounts && newest.electionYear !== withCounts.electionYear ? newest.electionYear : null;
+})();
+
+const houseMidterms = swing.filter((s) => s.chamber === 'house' && !s.isProvisional && s.change !== null);
+const midFirst = Math.min(...houseMidterms.map((s) => s.year));
+const swingHasProvisional = swing.some((s) => s.isProvisional);
+const raceYears = [...new Set(races.filter((r) => !r.isProvisional).map((r) => r.year))];
+const flipFirst = Math.min(...raceYears);
+const listNames = (xs: string[]) =>
+  xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`;
+
+// Methodology: SOURCES.md, with its own h1 dropped and headings shifted down.
 const sources = (await sourcesHtml())
   .replace(/<h1[^>]*>[\s\S]*?<\/h1>/, '')
-  .replace(/<(\/?)h3/g, '<$1h4')
-  .replace(/<(\/?)h2/g, '<$1h3');
+  .replace(/<(\/?)h3/g, '<$1h5')
+  .replace(/<(\/?)h2/g, '<$1h4');
 
-// The map: its headline follows the year shown; this is the default view.
 const mapData = loadMapData();
+const dashConfig = storeConfig(mapData);
+const headerYears = loadHeaderYears(mapData);
+const controlChart = loadControlChart();
+const midtermChart = loadMidtermChart();
+const flipsChart = loadFlipsChart(mapData);
+const columns = stripColumns(controlChart, dashConfig);
+const firstClickable = congressFor(Math.min(...dashConfig.years));
+const firstClickableStart = controlChart.congresses.find((c) => c.congress === firstClickable)!.startYear;
+const ccFirst = controlChart.congresses[0];
+const ccLast = controlChart.congresses[controlChart.congresses.length - 1];
 const mapLatestYear = Math.max(...mapData.years);
-const mapHeadline = mapData.senate[defaultYear(mapData)].headline;
+const startYear = defaultYear(mapData);
+const defaultSenate = mapData.senate[startYear];
 const mapLatestHasResults = mapData.senate[mapLatestYear].decided > 0;
 const oddSpecials = races
   .filter((r) => r.year % 2 === 1)
   .map((r) => `${mapData.stateNames[r.state]} in ${r.year}`);
-
-const fmt = (n: number) => n.toLocaleString('en-US');
-const pageAsOf = controlAsOf;
 ---
 <Base
-  title="US Congress, 1946 to 2026: who controlled the House and Senate"
-  description={`Who has controlled the House and Senate since ${firstYear}, and how the president's party fares in midterm elections.`}
+  title="US Congress, 1946 to 2026: who controls the House and Senate"
+  description="A map and three charts of how Democrats and Republicans have fared in the House and Senate, with a Congress strip from 1946 and a map from 2000."
 >
-  <header class="masthead">
-    <div class="wrap masthead__inner">
-      <p class="label masthead__title">US Congress, 1946 to 2026</p>
-      <nav aria-label="Sections" class="masthead__nav">
-        <a href="#map">Map</a>
-        <a href="#control">Control</a>
-        <a href="#midterms">Midterms</a>
-        <a href="#flips">Flips</a>
-        <a href="#method">Sources</a>
-      </nav>
-    </div>
-  </header>
+  <Masthead current="dashboard" />
+  <script type="application/json" id="dash-config" set:html={JSON.stringify(dashConfig)}></script>
 
-  <main id="main">
-    <!-- 1. Header and standfirst -->
-    <section class="wrap intro" aria-labelledby="page-title">
-      <p class="label intro__kicker">Congress since {firstYear}</p>
-      <h1 id="page-title" class="intro__title">
-        The president's party lost House seats in {houseLosses.length} of the {houseMidterms.length} midterms since {midFirst}
-      </h1>
-      <div class="intro__standfirst">
-        <p>
-          Congress is two chambers: the House of Representatives, whose 435 voting seats are all elected every two
-          years, and the Senate, whose 100 seats are elected a third at a time. A midterm is the election held halfway
-          through a president's term.
-        </p>
-        <p>
-          Democrats held the House for {demHeld('house')} and the Senate for {demHeld('senate')} of the
-          {' '}{nCongresses} Congresses elected from {firstYear} to {lastCertifiedYear}, including an unbroken
-          {' '}{runEnd - runStart}-year run in the House from {runStart} to {runEnd}.
-          In midterms, the president's party gained House seats only {houseGains.length === 2 ? 'twice' : `${houseGains.length} times`}: {gainers}.
-        </p>
-        {pendingYear && (
-          <p>
-            Results of the {pendingYear} midterm are not yet entered. Every {pendingYear} figure on this page will be
-            marked provisional until results are certified.
-          </p>
-        )}
-      </div>
-      <p class="intro__dateline">Data as of <time>{pageAsOf}</time></p>
+  <main id="main" class="wrap dash">
+    <h1 class="visually-hidden">US Congress, 1946 to 2026: who controls the House and the Senate</h1>
 
-      <div class="intro__bars">
+    <Board
+      config={dashConfig}
+      columns={columns}
+      headerYears={headerYears}
+      finding={defaultSenate.headline}
+      provisional={defaultSenate.provisional}
+    />
+
+    <section class="charts" aria-label="History charts">
+      <div class="charts__cell">
         <ChartFrame
-          title={headerBarTitle}
-          subtitle={`Seats held at the opening of the ${ordinal(houseNow.row.congress)} Congress, which sits from ${houseNow.row.yearsServed.replace('-', ' to ')}. One square per seat.`}
+          title="Who held the majority"
+          subtitle={`Seats by party at the opening of each Congress, ${ordinal(ccFirst.congress)} to ${ordinal(ccLast.congress)}. Select one from ${firstClickableStart}.`}
           source={CONTROL_SOURCE}
           dataAsOf={controlAsOf}
-          provisional={shownProvisional}
         >
-          <div class="intro__bar-grid">
-            {latest.map((c) => (
-              <SeatBar
-                label={c.chamber === 'house' ? 'House' : 'Senate'}
-                caption={`${ordinal(c.row.congress)} Congress, elected ${c.row.electionYear}`}
-                total={c.row.totalSeats}
-                threshold={c.row.majorityThreshold}
-                dem={c.row.dem}
-                gop={c.row.gop}
-                indDem={c.indDem}
-                indGop={c.indGop}
-                indUnknown={c.indUnknown}
-                other={c.row.other ?? 0}
-                vacant={c.row.vacant ?? 0}
-                rowsWide={c.chamber === 'house' ? 5 : 2}
-                rowsNarrow={c.chamber === 'house' ? 10 : 4}
-                provisional={c.row.isProvisional}
-              />
-            ))}
-          </div>
-          <Fragment slot="notes">
-            {pendingYear && (
-              <Footnote>
-                {pendingYear} results are not yet entered in the data, so these bars show the Congress elected in
-                {' '}{shownYear}. They will switch to the {pendingYear} results, labelled provisional, once those are
-                entered.
-              </Footnote>
-            )}
-            {senateNow.unverifiedInd && (
-              <Footnote>
-                The Senate source gives the number of independents but not their caucus for this Congress; the caucus
-                shown is still to be confirmed.
-              </Footnote>
-            )}
-          </Fragment>
+          <ControlChart chart={controlChart} selectedCongress={congressFor(dashConfig.defaultYear)} clickableFrom={firstClickable} />
+        </ChartFrame>
+      </div>
+      <div class="charts__cell">
+        <ChartFrame
+          title="The midterm penalty"
+          subtitle={`Seats gained or lost by the president's party in each midterm, ${midFirst} to 2026.`}
+          source={MIDTERM_SOURCE}
+          dataAsOf={controlAsOf}
+        >
+          <MidtermChart chart={midtermChart} chamber={dashConfig.defaultChamber} selectedYear={dashConfig.defaultYear} />
+        </ChartFrame>
+      </div>
+      <div class="charts__cell">
+        <ChartFrame
+          title="Seats that flipped"
+          subtitle={`Senate seats won by a different caucus from the one holding them, ${flipFirst} to 2026.`}
+          source="MIT Election Data and Science Lab, U.S. Senate statewide returns; official state results for races the dataset lacks."
+          dataAsOf={senateAsOf}
+        >
+          <FlipsChart chart={flipsChart} year={dashConfig.defaultYear} />
         </ChartFrame>
       </div>
     </section>
 
-    <!-- 2. The map -->
-    <section class="wrap section" aria-labelledby="map">
-      <SectionHeader id="map" kicker="The map" title="Where each party won, state by state" />
-      <ChartFrame
-        title={mapHeadline}
-        subtitle="The party that won each state's Senate race, or each state's House delegation with one square per seat, for every election from 2000. Hatching marks a Senate seat that changed party."
-        source="MIT Election Data and Science Lab, U.S. Senate and U.S. House statewide returns; US Senate Historical Office and House Office of the Historian for seats at the opening of each Congress. Map: US Census Bureau state boundaries (us-atlas); water and neighbouring land from Natural Earth."
-        dataAsOf={senateAsOf}
-        provisional
-      >
-        <CongressMap />
-        <Fragment slot="notes">
+    <details class="notes" id="notes">
+      <summary>Notes and sources</summary>
+      <div class="notes__body">
+        <div class="notes__list">
+          <Footnote>
+            Years before 2000 appear on the year strip, coloured by the majority at the opening of each Congress, but
+            cannot be selected, because the map starts in 2000. The charts below the map cover the whole period.
+          </Footnote>
+          <Footnote>
+            The band under the controls shows seats at the opening of the Congress elected in the year selected, with one
+            square per Senate seat and one per five House seats. The tick marks where a majority starts: 51 senators or
+            218 representatives. The House squares on the map show seats won in the November election, from the state
+            returns, one per seat, grouped by party within each state rather than by district.
+          </Footnote>
           <Footnote>
             A Senate seat counts as flipped when it passes from one party's caucus to the other's, compared with whoever
-            held it on election day. Independents count with the party they caucus with.
+            held it on election day. Independents count with the party they caucus with. A seat whose party label changed
+            but which stayed with the same caucus (for example an independent who caucused with the Democrats replaced by
+            a Democrat) is listed with a note and not counted as a flip.
           </Footnote>
           {oddSpecials.length > 0 && (
             <Footnote>
-              Special elections held in odd years are not on the map: {listNames(oddSpecials)}.
+              Special elections held in odd years ({listNames(oddSpecials)}) have their own Senate maps, chosen from the
+              year control. They are not in the House view, which has no odd-year elections.
             </Footnote>
           )}
           <Footnote>
-            The Senate bar shows seats at the opening of the new Congress. The House bar and squares show seats won in
-            the November election, from the state returns, grouped by party within each state rather than by district.
+            Winners' names are title-cased from the source for display, with hand-checked exceptions such as McConnell and
+            DeWine. The data keeps the source's spelling.
+          </Footnote>
+          {controlChart.notes.map((n) => (
+            <Footnote marker={String(n.no)}>
+              Majority shown is the party in control for most of the Congress. {n.text}
+            </Footnote>
+          ))}
+          <Footnote>
+            In the history chart the bars are drawn to scale rather than as one square per seat, which would be too small
+            to see at this size. The line under the chart gives the exact counts for the Congress you point at or select.
           </Footnote>
           <Footnote>
-            Winners' names are title-cased from the source for display, with hand-checked exceptions such as McConnell
-            and DeWine. The data keeps the source's spelling.
+            The House source records only the opening of each Congress, so House "before" counts in the midterm chart are
+            from the start of the outgoing Congress, not election day. Some House changes therefore differ by a seat or two
+            from the figures usually quoted, which count from election day. Senate "before" counts are from election day;
+            "after" counts are from the opening of the new Congress.
           </Footnote>
-          {!mapLatestHasResults && (
+          {(pendingYear || swingHasProvisional) && (
             <Footnote>
-              {mapLatestYear} results are not yet entered. States with a {mapLatestYear} Senate race are dotted, and the
-              House squares are outlined, until results are entered from official sources.
+              {pendingYear ?? 2026} is provisional until results are certified. Results are entered as states certify, and
+              every {pendingYear ?? 2026} figure is marked until then.{' '}
+              {!mapLatestHasResults && `States with a ${mapLatestYear} Senate race are dotted on the map, and the House squares are outlined, until results are entered from official sources.`}
+              {pendingYear && ` The ${ordinal(ccLast.congress)} Congress, elected in ${pendingYear}, is shown in grey in the history chart, and the band shows the last Congress with counts.`}
             </Footnote>
           )}
-        </Fragment>
-      </ChartFrame>
-    </section>
-
-    <!-- 3. Who controlled Congress -->
-    <section class="wrap section" aria-labelledby="control">
-      <SectionHeader id="control" kicker="Who controlled Congress" title="Which party held the majority in each Congress" />
-      <ChartFrame
-        title={`${best.party ? PARTY_NAME[best.party].many : 'One party'} held the House for ${runEnd - runStart} straight years, from ${runStart} to ${runEnd}`}
-        subtitle={`Seats held by each party at the opening of every Congress, House and Senate, ${ordinal(Math.min(...control.map((r) => r.congress)))} (${firstYear} election) to ${ordinal(Math.max(...control.map((r) => r.congress)))} (2026 election). One square per seat; the triangle marks the majority line.`}
-        source={CONTROL_SOURCE}
-        dataAsOf={controlAsOf}
-        provisional
-        pending="A seat bar for every Congress since 1946, built in step 04"
-        pendingHeight={420}
-      />
-    </section>
-
-    <!-- 4. The midterm penalty -->
-    <section class="wrap section" aria-labelledby="midterms">
-      <SectionHeader id="midterms" kicker="The midterm penalty" title="Voters tend to punish the party in the White House" />
-      <ChartFrame
-        title={`${worst.president}'s ${PARTY_NAME[worst.presidentParty].many} lost ${fmt(Math.abs(worst.change ?? 0))} House seats in ${worst.year}, the biggest midterm loss since ${midFirst}`}
-        subtitle={`Seats gained or lost by the president's party, counting independents who caucus with it, in every midterm from ${midFirst} to 2026.`}
-        source={MIDTERM_SOURCE}
-        dataAsOf={controlAsOf}
-        provisional={swingHasProvisional}
-        pending="Bars for each midterm, House and Senate, built in step 04"
-        pendingHeight={360}
-      >
-        <Fragment slot="notes">
-          <Footnote>
-            The House source records only the opening of each Congress, so House "before" counts are from the start of
-            the outgoing Congress, not election day.
-          </Footnote>
-        </Fragment>
-      </ChartFrame>
-    </section>
-
-    <!-- 5. Seats that flipped -->
-    <section class="wrap section" aria-labelledby="flips">
-      <SectionHeader id="flips" kicker="Seats that flipped" title="Which Senate seats changed hands" />
-      <ChartFrame
-        title={`${mostFlips.n} Senate seats changed party in ${mostFlips.year}, the most of any election since ${flipFirst}`}
-        subtitle={`Senate seats won by a different party from the one holding them on election day, ${flipFirst} to 2026, with special elections included.`}
-        source="MIT Election Data and Science Lab, U.S. Senate statewide returns; official state results for races the dataset lacks."
-        dataAsOf={senateAsOf}
-        provisional
-        pending="A table of flipped seats by year, with a map toggle, built in step 04"
-        pendingHeight={300}
-      />
-    </section>
-
-    <!-- 6. Methodology and sources -->
-    <section class="wrap section" aria-labelledby="method">
-      <SectionHeader id="method" kicker="Methodology and sources" title="Where the numbers come from" />
-      <div class="sources" set:html={sources} />
-    </section>
+        </div>
+        <div class="sources" set:html={sources} />
+      </div>
+    </details>
   </main>
 
-  <footer class="wrap site-footer">
-    <p>
-      Every number on this page is read from the files in <code>data/processed/</code>, built by the scripts in
-      {' '}<code>pipeline/</code>. Data as of <time>{pageAsOf}</time>.
-    </p>
-  </footer>
+  <Footer asOf={controlAsOf} />
 </Base>
 
-<style>
-  .masthead {
-    border-bottom: 1px solid var(--ink);
-  }
-  .masthead__inner {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: var(--sp-2) var(--sp-5);
-    padding-block: var(--sp-3);
-  }
-  .masthead__title { font-weight: 700; }
-  .masthead__nav {
-    display: flex;
-    flex-wrap: wrap;
-    gap: var(--sp-1) var(--sp-4);
-    font-family: var(--font-label);
-    font-size: var(--fs-2);
-    font-weight: 500;
-  }
-  .masthead__nav a { text-decoration: none; }
-  .masthead__nav a:hover { text-decoration: underline; }
+<script>
+  // A link to #notes (from the masthead or footer) opens the disclosure.
+  const open = () => {
+    if (location.hash === '#notes') document.querySelector<HTMLDetailsElement>('#notes')!.open = true;
+  };
+  open();
+  addEventListener('hashchange', open);
+</script>
 
-  .intro {
-    padding-top: var(--sp-7);
-  }
-  .intro__kicker { margin-bottom: var(--sp-3); }
-  .intro__title { max-width: 26ch; }
-  .intro__standfirst {
-    margin-top: var(--sp-5);
+<style>
+  .dash { padding-top: var(--sp-4); }
+  @media (min-width: 768px) { .dash { padding-top: var(--sp-5); } }
+
+  .charts {
+    margin-top: var(--sp-8);
     display: grid;
-    gap: var(--sp-4);
-    font-size: var(--fs-3);
-  }
-  @media (min-width: 768px) {
-    .intro__standfirst { font-size: var(--fs-4); line-height: 1.45; }
-  }
-  .intro__dateline {
-    margin-top: var(--sp-4);
-    font-size: var(--fs-1);
-    color: var(--ink-2);
-  }
-  .intro__bars {
-    margin-top: var(--sp-7);
-    padding-top: var(--sp-5);
-    border-top: var(--hairline);
-  }
-  .intro__bar-grid {
-    display: grid;
-    gap: var(--sp-7);
+    gap: var(--sp-8) var(--sp-5);
   }
   @media (min-width: 1024px) {
-    .intro__bar-grid {
-      grid-template-columns: 3fr 2fr;
-      gap: var(--sp-7);
-      align-items: start;
-    }
+    .charts { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
+  }
+  /* The charts pick their narrow or wide drawing from the width of this cell. */
+  .charts__cell {
+    container: chart / inline-size;
+    min-width: 0;
   }
 
-  .section {
-    padding-top: var(--sp-9);
+  .notes {
+    margin-top: var(--sp-8);
+    border-top: 1px solid var(--ink);
   }
+  .notes > summary {
+    padding-block: var(--sp-3);
+    font-family: var(--font-label);
+    font-size: var(--fs-2);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .notes > summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .notes__body { padding-bottom: var(--sp-5); }
+  .notes__list { display: grid; gap: var(--sp-3); }
 
   .sources {
     max-width: var(--prose-max);
     font-size: var(--fs-2);
   }
-  .sources :global(h3) {
+  .sources :global(h4) {
     margin-top: var(--sp-7);
     font-size: var(--fs-4);
   }
-  .sources :global(h4) {
+  .sources :global(h5) {
     margin-top: var(--sp-5);
     font-family: var(--font-label);
     font-size: var(--fs-2);
@@ -437,11 +282,4 @@ const pageAsOf = controlAsOf;
     vertical-align: top;
   }
 
-  .site-footer {
-    margin-top: var(--sp-9);
-    padding-block: var(--sp-5) var(--sp-7);
-    border-top: 1px solid var(--ink);
-    font-size: var(--fs-1);
-    color: var(--ink-2);
-  }
 </style>

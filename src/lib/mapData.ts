@@ -7,6 +7,7 @@ import {
   parseCsv, loadChamberControl, loadIndependents, PARTY_NAME,
   type Party, type ChamberControl, type Independent,
 } from './data';
+import { congressFor } from './store';
 
 const ROOT = process.cwd();
 const readCsv = (rel: string) => parseCsv(readFileSync(join(ROOT, rel), 'utf8'));
@@ -22,6 +23,8 @@ export type SenateFill = 'dem' | 'gop' | 'ind' | 'other' | 'dem-lead' | 'gop-lea
 
 export interface SenateRace {
   special: boolean;
+  /** Senate class of the seat (1, 2 or 3), from senate_results_detail.csv. */
+  seatClass: number | null;
   /** Title-cased for display by the pipeline (winner_display_name); the data keeps the source spelling. */
   winnerName: string | null;
   winnerParty: Party | null;
@@ -104,7 +107,10 @@ export interface HouseYear {
 }
 
 export interface MapData {
+  /** Even years: both chambers. */
   years: number[];
+  /** Odd years with a Senate special election: Senate only. */
+  senateOnlyYears: number[];
   senate: Record<number, SenateYear>;
   house: Record<number, HouseYear>;
   /** Seats per state for each apportionment key. */
@@ -115,7 +121,7 @@ export interface MapData {
 const caucusOf = (inds: Independent[], chamber: 'house' | 'senate', congress: number, state: string) =>
   inds.find((i) => i.chamber === chamber && i.congress === congress && i.state === state)?.caucusesWith ?? null;
 
-const congressFor = (year: number) => (year - 1786) / 2;
+export { congressFor };
 
 function raceFills(races: SenateRace[]): SenateFill[] {
   return races.map((r): SenateFill => {
@@ -127,7 +133,7 @@ function raceFills(races: SenateRace[]): SenateFill[] {
   });
 }
 
-function balanceFrom(row: ChamberControl | undefined, inds: Independent[], chamber: 'house' | 'senate'): Balance {
+export function balanceFrom(row: ChamberControl | undefined, inds: Independent[], chamber: 'house' | 'senate'): Balance {
   if (!row || row.dem === null || row.gop === null) {
     return { dem: null, gop: null, indDem: 0, indGop: 0, indUnknown: 0, other: 0, vacant: 0 };
   }
@@ -186,6 +192,20 @@ function houseHeadline(year: number, t: HouseYear['totals'], prev: HouseYear['to
   return `${many(maj)} ${verb} the House in ${year}, winning ${won} seats`;
 }
 
+/** Special elections held in an odd year, during a Congress already sitting. */
+function specialHeadline(year: number, states: Record<string, SenateStateYear>): string {
+  const all = Object.values(states).flatMap((s) => s.races);
+  const n = all.length;
+  const what = n === 1 ? 'the Senate special election' : n === 2 ? 'both Senate special elections' : `all ${n} Senate special elections`;
+  const winners = new Set(all.map((r) => r.winnerCaucus ?? r.winnerParty));
+  const flips = all.filter((r) => r.flipped === true).length;
+  const flipText = flips ? `, flipping ${seatsWord(flips)}` : '';
+  if (winners.size === 1 && all[0].winnerParty) {
+    return `${many(all[0].winnerCaucus ?? all[0].winnerParty)} won ${what} in ${year}${flipText}`;
+  }
+  return `${n} Senate special elections in ${year}${flips ? `, ${seatsWord(flips)} changed party` : ''}`;
+}
+
 /** The year the map opens on: the latest with results entered. */
 export function defaultYear(data: MapData): number {
   const withResults = data.years.filter((y) => data.senate[y].decided > 0);
@@ -196,6 +216,8 @@ export function loadMapData(): MapData {
   const control = loadChamberControl();
   const inds = loadIndependents();
   const senateRows = readCsv('data/processed/senate_results_by_state.csv');
+  const classOf = new Map(readCsv('data/processed/senate_results_detail.csv')
+    .map((r) => [`${r.year}|${r.state_po}|${r.special}`, num(r.senate_class)]));
   const houseRows = readCsv('data/processed/house_delegations_by_state.csv');
 
   const stateNames: Record<string, string> = {};
@@ -203,18 +225,22 @@ export function loadMapData(): MapData {
 
   const years: number[] = [];
   for (let y = FIRST_MAP_YEAR; y <= PROVISIONAL_YEAR; y += 2) years.push(y);
+  const senateOnlyYears = [...new Set(senateRows.map((r) => Number(r.year)))]
+    .filter((y) => y % 2 === 1 && y >= FIRST_MAP_YEAR)
+    .sort((a, b) => a - b);
 
   const row = (chamber: 'house' | 'senate', y: number) =>
     control.find((c) => c.chamber === chamber && c.electionYear === y);
 
   // ---- Senate ----
   const senate: Record<number, SenateYear> = {};
-  for (const year of years) {
+  for (const year of [...years, ...senateOnlyYears]) {
     const byState: Record<string, SenateRace[]> = {};
     for (const r of senateRows.filter((r) => Number(r.year) === year)) {
       const flipped = r.flipped_vs_holder === '' ? null : bool(r.flipped_vs_holder);
       (byState[r.state_po] ??= []).push({
         special: bool(r.special),
+        seatClass: classOf.get(`${r.year}|${r.state_po}|${r.special}`) ?? null,
         winnerName: r.winner_display_name || null,
         winnerParty: party(r.winner_party),
         winnerCaucus: party(r.winner_caucus),
@@ -240,7 +266,9 @@ export function loadMapData(): MapData {
       states[st] = { races, fill: split ? 'split' : fills[0], split, flipped: races.some((r) => r.flipped === true) };
     }
     const all = Object.values(states).flatMap((s) => s.races);
-    const after = row('senate', year);
+    const odd = year % 2 === 1;
+    // An odd year's specials happen during the Congress elected the year before.
+    const after = row('senate', odd ? year - 1 : year);
     senate[year] = {
       year,
       provisional: all.some((r) => r.provisional),
@@ -250,10 +278,10 @@ export function loadMapData(): MapData {
       states,
       balance: balanceFrom(after, inds, 'senate'),
       congress: congressFor(year),
-      controlNote: after?.majorityNote ?? '',
-      headline: senateHeadline(year, after, row('senate', year - 2), states),
+      controlNote: odd ? '' : after?.majorityNote ?? '',
+      headline: odd ? specialHeadline(year, states) : senateHeadline(year, after, row('senate', year - 2), states),
     };
-    if (all.length < 32 || all.length > 38) throw new Error(`Senate ${year}: ${all.length} races, expected 33 to 37`);
+    if (!odd && (all.length < 32 || all.length > 38)) throw new Error(`Senate ${year}: ${all.length} races, expected 33 to 37`);
   }
 
   // ---- House ----
@@ -325,5 +353,5 @@ export function loadMapData(): MapData {
     }
   }
 
-  return { years, senate, house, apportionments, stateNames };
+  return { years, senateOnlyYears, senate, house, apportionments, stateNames };
 }
