@@ -1,6 +1,6 @@
 # Step 07 report: data for the next round of visuals
 
-**A (county shift), B (members, women, age) and E (governors) are built. C is dropped to the backlog.** `run_all.py` runs end to end: exit 0, 36 tests pass, and the existing processed files are unchanged. Nothing was estimated or typed from memory.
+**A (county shift), B (members, women, age) and E (governors) are built. C is dropped to the backlog.** `run_all.py` runs end to end: exit 0, 42 tests pass, and the existing processed files are unchanged. Nothing was estimated or typed from memory.
 
 ## B. Who serves in Congress: built
 
