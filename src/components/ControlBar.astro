@@ -1,0 +1,140 @@
+---
+// The dashboard's one set of controls: chamber, year and a comparison
+// year. It sits under the masthead and sticks to the top of the window
+// once the masthead has scrolled away (position: sticky), so there is only
+// ever one header on screen. Every module listens to the store these
+// controls write to (src/scripts/control-bar.ts).
+import SegmentedControl from './SegmentedControl.astro';
+import type { StoreConfig } from '../lib/store';
+import { PROVISIONAL_YEAR } from '../lib/mapData';
+
+interface Props {
+  config: StoreConfig;
+}
+const { config } = Astro.props;
+const allYears = [...config.years, ...config.senateOnlyYears].sort((a, b) => a - b);
+const special = (y: number) => config.senateOnlyYears.includes(y);
+
+const yearOptions = allYears.map((y) => ({
+  value: String(y),
+  label: String(y),
+  note: y === PROVISIONAL_YEAR ? 'provisional' : undefined,
+  only: special(y) ? 'senate' : undefined,
+  ariaLabel: y === PROVISIONAL_YEAR ? `${y}, provisional` : special(y) ? `${y} special elections, Senate only` : undefined,
+}));
+const defaultChamber = config.defaultChamber;
+---
+<div class="cbar" data-cbar>
+  <div class="wrap cbar__inner">
+    <div class="cbar__chamber">
+      <SegmentedControl
+        name="chamber"
+        label="Chamber"
+        compact
+        options={[{ value: 'senate', label: 'Senate' }, { value: 'house', label: 'House' }]}
+        selected={defaultChamber}
+      />
+    </div>
+    <div class="cbar__years">
+      <SegmentedControl name="year" label="Year" compact scroll options={yearOptions} selected={String(config.defaultYear)} />
+    </div>
+    <label class="cbar__compare">
+      <span class="label cbar__compare-label">Compare with</span>
+      <select class="cbar__select" data-compare aria-label="Compare with another year">
+        <option value="" data-short="Compare">None</option>
+        {allYears.map((y) => (
+          <option
+            value={String(y)}
+            data-only={special(y) ? 'senate' : undefined}
+            hidden={special(y) && defaultChamber !== 'senate'}
+            disabled={y === config.defaultYear}
+          >{y}</option>
+        ))}
+      </select>
+    </label>
+    <noscript>
+      <p class="cbar__noscript">Showing the Senate in {config.defaultYear}. Turn on JavaScript to change the year or chamber.</p>
+    </noscript>
+  </div>
+</div>
+
+<script>
+  import '../scripts/control-bar';
+</script>
+
+<style>
+  .cbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: var(--paper);
+    border-bottom: 1px solid var(--ink);
+  }
+  .cbar__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2) var(--sp-4);
+    padding-block: var(--sp-2);
+    min-width: 0;
+  }
+  .cbar__chamber { flex: none; }
+  /* The years take the room that is left and scroll sideways if it is not enough. */
+  .cbar__years {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  .cbar__years :global(.segmented) { flex-wrap: nowrap; }
+  .cbar__years :global(.segmented__buttons) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    /* Room for the focus outline inside the scroller. */
+    padding: 4px;
+    margin: -4px;
+    max-width: calc(100% + 8px);
+  }
+  .cbar__years :global(.segmented__buttons::-webkit-scrollbar) { display: none; }
+  .cbar__years :global(.segmented__button) { flex: none; }
+  .cbar__compare {
+    flex: none;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+  .cbar__select {
+    appearance: none;
+    min-height: 32px;
+    padding: 5px 26px 5px var(--sp-2);
+    border: 1px solid var(--ink-3);
+    border-radius: var(--radius-control);
+    background:
+      linear-gradient(45deg, transparent 50%, var(--ink) 50%) calc(100% - 13px) 50% / 5px 5px no-repeat,
+      linear-gradient(135deg, var(--ink) 50%, transparent 50%) calc(100% - 8px) 50% / 5px 5px no-repeat,
+      var(--paper);
+    color: var(--ink);
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+  .cbar__select:hover { background-color: var(--paper-2); }
+  .cbar__select:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .cbar__select[data-active] { border-color: var(--ink); background-color: var(--paper-2); }
+  .cbar__noscript {
+    font-size: var(--fs-1);
+    color: var(--ink-2);
+  }
+  @media (min-width: 640px) {
+    .cbar__select { font-size: var(--fs-2); }
+  }
+  /* Phones: one row. Labels go; the year buttons scroll sideways. */
+  @media (max-width: 639.98px) {
+    .cbar__inner { gap: var(--sp-2); }
+    .cbar__compare-label { display: none; }
+    .cbar__years :global(.segmented__note) { display: none; }
+  }
+  @media (min-width: 640px) and (max-width: 1279.98px) {
+    .cbar__compare-label { display: none; }
+  }
+</style>

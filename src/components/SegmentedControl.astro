@@ -5,6 +5,12 @@
 interface Option {
   value: string;
   label: string;
+  /** A short second line in the button, e.g. "provisional". */
+  note?: string;
+  /** Only shown in one view (written as data-only, read by the page script). */
+  only?: string;
+  /** Accessible name when the visible label is not enough. */
+  ariaLabel?: string;
 }
 interface Props {
   /** Group name, used in the change event and as a data attribute. */
@@ -17,11 +23,13 @@ interface Props {
   showLabel?: boolean;
   /** Under 640px, keep the buttons on one line that scrolls sideways. */
   scroll?: boolean;
+  /** Smaller buttons, for the control bar. */
+  compact?: boolean;
 }
-const { name, label, options, selected, showLabel = false, scroll = false } = Astro.props;
+const { name, label, options, selected, showLabel = false, scroll = false, compact = false } = Astro.props;
 const labelId = `seg-${name}-label`;
 ---
-<div class:list={['segmented', { 'segmented--scroll': scroll }]} data-segmented={name}>
+<div class:list={['segmented', { 'segmented--scroll': scroll, 'segmented--compact': compact }]} data-segmented={name}>
   <span id={labelId} class:list={['label', 'segmented__label', { 'visually-hidden': !showLabel }]}>{label}</span>
   <div class="segmented__buttons" role="group" aria-labelledby={labelId}>
     {options.map((o) => (
@@ -29,9 +37,11 @@ const labelId = `seg-${name}-label`;
         type="button"
         class="segmented__button"
         data-value={o.value}
+        data-only={o.only}
+        aria-label={o.ariaLabel}
         aria-pressed={o.value === selected ? 'true' : 'false'}
       >
-        {o.label}
+        {o.label}{o.note && <span class="segmented__note">{o.note}</span>}
       </button>
     ))}
   </div>
@@ -55,12 +65,14 @@ const labelId = `seg-${name}-label`;
     for (const btn of buttons) {
       btn.addEventListener('click', () => select(btn));
       btn.addEventListener('keydown', (e) => {
-        const i = buttons.indexOf(btn);
+        // Buttons hidden in the current view are skipped.
+        const shown = buttons.filter((b) => !b.hidden);
+        const i = shown.indexOf(btn);
         const next =
-          e.key === 'ArrowRight' ? buttons[Math.min(i + 1, buttons.length - 1)] :
-          e.key === 'ArrowLeft' ? buttons[Math.max(i - 1, 0)] :
-          e.key === 'Home' ? buttons[0] :
-          e.key === 'End' ? buttons[buttons.length - 1] :
+          e.key === 'ArrowRight' ? shown[Math.min(i + 1, shown.length - 1)] :
+          e.key === 'ArrowLeft' ? shown[Math.max(i - 1, 0)] :
+          e.key === 'Home' ? shown[0] :
+          e.key === 'End' ? shown[shown.length - 1] :
           null;
         if (next) {
           e.preventDefault();
@@ -117,6 +129,22 @@ const labelId = `seg-${name}-label`;
       scrollbar-width: thin;
     }
     .segmented--scroll .segmented__button { flex: none; }
+  }
+  .segmented__button[hidden] { display: none; }
+  .segmented__note {
+    margin-left: 4px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+  }
+  .segmented--compact .segmented__button {
+    padding: 5px var(--sp-2);
+    min-height: 32px;
+    font-size: var(--fs-1);
+  }
+  @media (min-width: 640px) {
+    .segmented--compact .segmented__button { padding-inline: var(--sp-2); font-size: var(--fs-2); }
   }
   .segmented__button:first-child {
     margin-left: 0;

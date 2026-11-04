@@ -1,11 +1,17 @@
 // The map island. The page arrives fully drawn for the latest Senate year;
-// this script switches chamber and year, draws the House squares, and runs
-// the tooltip (hover), details panel (tap, click, Enter) and keyboard
-// navigation. All data comes from the JSON block the build wrote.
+// this script follows the shared store (year, chamber, selected state,
+// comparison year), draws the House squares, and runs the tooltip (hover),
+// the state view (tap, click, Enter) and keyboard navigation. All data
+// comes from the JSON block the build wrote.
 import type { MapData, SenateYear, HouseYear, HouseStateYear } from '../lib/mapData';
 import type { HouseGrid } from '../lib/geo';
+import type { DashState } from '../lib/store';
 import { setSeatBar } from '../lib/seatbar-client';
-import { senateTitle, houseTitle, senateTone, hatchParty, detailsHtml, ariaLabel, senateBarCaption, type View } from '../lib/mapText';
+import { store, openState, closeState } from './dashboard';
+import {
+  senateTitle, houseTitle, senateTone, hatchParty, detailsHtml, ariaLabel, senateBarCaption,
+  stateRecordHtml, senateChanged, houseChanged, type View,
+} from '../lib/mapText';
 
 type Pt = [number, number];
 interface LayoutData {
@@ -29,6 +35,7 @@ function init(root: HTMLElement) {
   const map = root.querySelector<HTMLElement>('.cmap__map')!;
   const tooltip = root.querySelector<HTMLElement>('.cmap__tooltip')!;
   const panel = root.querySelector<HTMLElement>('[data-panel]')!;
+  const panelRoot = root.querySelector<HTMLElement>('[data-panel-root]')!;
   const clearBtn = root.querySelector<HTMLButtonElement>('[data-clear]')!;
   const panelEmpty = panel.innerHTML;
   const headline = root.closest('figure')?.querySelector<HTMLElement>('.chart-frame__title') ?? null;
@@ -39,11 +46,11 @@ function init(root: HTMLElement) {
     [...root.querySelectorAll<HTMLElement>('[data-layout]')].map((el) => [el.dataset.layout!, el]),
   );
 
-  const years = data.years;
-  const params = new URLSearchParams(location.search);
+  const shared = store.get();
   const state = {
-    view: (params.get('chamber') === 'house' ? 'house' : 'senate') as View,
-    year: years.includes(Number(params.get('year'))) ? Number(params.get('year')) : Number(root.dataset.year),
+    view: shared.chamber as View,
+    year: shared.year,
+    compare: shared.compare,
     pinned: null as string | null,
     focused: null as string | null,
     hovered: null as string | null,
@@ -51,7 +58,8 @@ function init(root: HTMLElement) {
   };
 
   const senateYear = (): SenateYear => data.senate[state.year];
-  const houseYear = (): HouseYear => data.house[state.year];
+  // Odd (special-election) years are Senate only; the House stays on the election before.
+  const houseYear = (): HouseYear => data.house[state.year] ?? data.house[state.year - 1];
   const name = (st: string) => data.stateNames[st];
 
   /** The layout on screen now (each has its own media query). */
@@ -152,6 +160,10 @@ function init(root: HTMLElement) {
         label.style.left = `${g.label.x}%`;
         label.style.top = `${g.label.y}%`;
         label.textContent = g.state;
+        const mark = document.createElement('span');
+        mark.className = 'cmap__changed';
+        mark.hidden = true;
+        label.append(mark);
         labels.append(label);
       }
     }
@@ -194,11 +206,28 @@ function init(root: HTMLElement) {
     if (state.pinned) showPanel(state.pinned);
     hideTooltip();
     updateRings();
+    drawCompare();
+  }
 
-    const url = new URL(location.href);
-    url.searchParams.set('chamber', view);
-    url.searchParams.set('year', String(year));
-    history.replaceState(null, '', url);
+  // ---------- Compare: mark states that changed between the two years ----------
+
+  function drawCompare() {
+    const { compare, year, view } = state;
+    const changed = compare === null ? new Set<string>()
+      : view === 'senate' ? senateChanged(data, Math.min(compare, year), Math.max(compare, year))
+      : houseChanged(data, Math.min(compare, year), Math.max(compare, year));
+    for (const m of root.querySelectorAll<HTMLElement>('.cmap__changed:not(.cmap__changed--key)')) {
+      const st = (m.parentElement as HTMLElement).dataset.state!;
+      m.hidden = !changed.has(st);
+    }
+    const text = compare === null ? ''
+      : view === 'senate'
+        ? `A Senate seat is held by the other caucus in ${year} than in ${compare} (${changed.size} ${changed.size === 1 ? 'state' : 'states'})`
+        : `The House delegation's majority changed between ${compare} and ${year} (${changed.size} ${changed.size === 1 ? 'state' : 'states'})`;
+    for (const li of root.querySelectorAll<HTMLElement>('[data-compare-key]')) {
+      li.hidden = compare === null;
+      li.querySelector('[data-compare-key-text]')!.textContent = text;
+    }
   }
 
   // ---------- Selection rings ----------
@@ -250,9 +279,10 @@ function init(root: HTMLElement) {
   }
 
   function showPanel(st: string) {
-    panel.innerHTML = details(st);
+    panel.innerHTML = stateRecordHtml(state.view, st, name(st), data, state.year);
     clearBtn.hidden = false;
   }
+  /** Show a state's record (called when the store's selected state changes). */
   function pin(st: string) {
     state.pinned = st;
     showPanel(st);
@@ -325,7 +355,7 @@ function init(root: HTMLElement) {
   });
   map.addEventListener('click', (e) => {
     const st = stateFrom(e.target);
-    if (st) pin(st);
+    if (st) openState(st);
   });
   map.addEventListener('focusin', (e) => {
     const st = stateFrom(e.target);
@@ -352,55 +382,41 @@ function init(root: HTMLElement) {
       focusState(e.key === 'Home' ? data.stateOrder[0] : data.stateOrder[data.stateOrder.length - 1]);
     } else if (e.key === 'Enter' || e.key === ' ') {
       e.preventDefault();
-      pin(st);
+      openState(st);
     } else if (e.key === 'Escape') {
+      e.preventDefault();
       hideTooltip();
-      unpin();
+      closeState();
     }
   });
   clearBtn.addEventListener('click', () => {
     const st = state.pinned;
-    unpin();
-    if (st) focusState(st);
+    const back = closeState();
+    if (back) back.focus();
+    else if (st) focusState(st);
   });
+  // A request from further down the page (the flips table): bring the panel into view.
+  document.addEventListener('dash:focus-panel', () => panelRoot.focus());
 
-  root.addEventListener('segmentchange', (e) => {
-    const { name: group, value } = (e as CustomEvent<{ name: string; value: string }>).detail;
-    if (group === 'chamber') state.view = value as View;
-    if (group === 'year') state.year = Number(value);
-    draw();
-    centreYear();
-  });
+  for (const l of data.layouts) matchMedia(l.media).addEventListener('change', hideTooltip);
 
-  // ---------- Year row on phones: keep the current year in the middle ----------
+  // ---------- Follow the store ----------
 
-  const yearRow = root.querySelector<HTMLElement>('[data-segmented="year"] .segmented__buttons')!;
-  function centreYear() {
-    const btn = yearRow.querySelector<HTMLElement>('[aria-pressed="true"]');
-    if (!btn || yearRow.scrollWidth <= yearRow.clientWidth) return;
-    const row = yearRow.getBoundingClientRect();
-    const b = btn.getBoundingClientRect();
-    yearRow.scrollLeft += b.left + b.width / 2 - (row.left + row.width / 2);
-  }
-
-  /** Match the buttons to a state read from the URL. */
-  function syncButtons() {
-    for (const [group, value] of [['chamber', state.view], ['year', String(state.year)]]) {
-      for (const b of root.querySelectorAll<HTMLButtonElement>(`[data-segmented="${group}"] .segmented__button`)) {
-        b.setAttribute('aria-pressed', String(b.dataset.value === value));
-      }
+  function follow(s: DashState, prev: DashState | null) {
+    const viewChanged = !prev || s.year !== prev.year || s.chamber !== prev.chamber;
+    state.view = s.chamber;
+    state.year = s.year;
+    state.compare = s.compare;
+    if (viewChanged) draw();
+    else if (!prev || s.compare !== prev.compare) drawCompare();
+    if (!prev || s.state !== prev.state) {
+      if (s.state) pin(s.state);
+      else if (state.pinned) unpin();
     }
   }
-
-  for (const l of data.layouts) matchMedia(l.media).addEventListener('change', () => { hideTooltip(); centreYear(); });
-
-  const fromUrl = params.has('chamber') || params.has('year');
-  if (fromUrl) {
-    syncButtons();
-    draw();
-  }
-  centreYear();
-  // Button widths change once the web fonts arrive.
-  document.fonts?.ready.then(centreYear);
+  // The build drew the default Senate year; draw only if the URL asked for something else.
+  const built = { year: Number(root.dataset.year), chamber: 'senate' as const, state: null, compare: null };
+  follow(shared, built);
+  store.subscribe(follow);
   root.classList.add('is-ready');
 }

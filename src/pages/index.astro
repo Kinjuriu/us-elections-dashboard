@@ -2,11 +2,13 @@
 import Base from '../layouts/Base.astro';
 import SectionHeader from '../components/SectionHeader.astro';
 import ChartFrame from '../components/ChartFrame.astro';
-import SeatBar from '../components/SeatBar.astro';
 import SegmentedControl from '../components/SegmentedControl.astro';
 import Footnote from '../components/Footnote.astro';
 import CongressMap from '../components/CongressMap.astro';
+import ControlBar from '../components/ControlBar.astro';
+import HeaderBars from '../components/HeaderBars.astro';
 import { loadMapData, defaultYear } from '../lib/mapData';
+import { loadHeaderYears, storeConfig } from '../lib/dashboardData';
 import { compiledContent as sourcesHtml } from '../../data/SOURCES.md';
 import {
   loadChamberControl, loadIndependents, loadMidtermSwing, loadSenateRaces,
@@ -56,17 +58,9 @@ const latest = (['house', 'senate'] as Chamber[]).map((chamber) => {
   };
 });
 const [houseNow, senateNow] = latest;
-const shownYear = houseNow.row.electionYear;
 const pendingYear = houseNow.pending?.electionYear ?? senateNow.pending?.electionYear ?? null;
-const shownProvisional = houseNow.row.isProvisional || senateNow.row.isProvisional;
 
 const majorityOf = (r: ChamberControl) => r.majorityMostOfCongress ?? r.majorityParty;
-const houseMaj = majorityOf(houseNow.row);
-const senateMaj = majorityOf(senateNow.row);
-const headerBarTitle =
-  houseMaj && houseMaj === senateMaj
-    ? `${PARTY_NAME[houseMaj].many} control both the House and the Senate after the ${shownYear} election`
-    : `${houseMaj ? PARTY_NAME[houseMaj].many : 'No party'} hold the House and ${senateMaj ? PARTY_NAME[senateMaj].many : 'no party'} the Senate after the ${shownYear} election`;
 
 // Control since 1946: Congresses with counts.
 const certified = control.filter((r) => !r.isProvisional && r.dem !== null);
@@ -118,6 +112,8 @@ const sources = (await sourcesHtml())
 
 // The map: its headline follows the year shown; this is the default view.
 const mapData = loadMapData();
+const dashConfig = storeConfig(mapData);
+const headerYears = loadHeaderYears(mapData);
 const mapLatestYear = Math.max(...mapData.years);
 const mapHeadline = mapData.senate[defaultYear(mapData)].headline;
 const mapLatestHasResults = mapData.senate[mapLatestYear].decided > 0;
@@ -144,6 +140,8 @@ const pageAsOf = controlAsOf;
       </nav>
     </div>
   </header>
+  <ControlBar config={dashConfig} />
+  <script type="application/json" id="dash-config" set:html={JSON.stringify(dashConfig)}></script>
 
   <main id="main">
     <!-- 1. Header and standfirst -->
@@ -174,49 +172,7 @@ const pageAsOf = controlAsOf;
       <p class="intro__dateline">Data as of <time>{pageAsOf}</time></p>
 
       <div class="intro__bars">
-        <ChartFrame
-          title={headerBarTitle}
-          subtitle={`Seats held at the opening of the ${ordinal(houseNow.row.congress)} Congress, which sits from ${houseNow.row.yearsServed.replace('-', ' to ')}. One square per seat.`}
-          source={CONTROL_SOURCE}
-          dataAsOf={controlAsOf}
-          provisional={shownProvisional}
-        >
-          <div class="intro__bar-grid">
-            {latest.map((c) => (
-              <SeatBar
-                label={c.chamber === 'house' ? 'House' : 'Senate'}
-                caption={`${ordinal(c.row.congress)} Congress, elected ${c.row.electionYear}`}
-                total={c.row.totalSeats}
-                threshold={c.row.majorityThreshold}
-                dem={c.row.dem}
-                gop={c.row.gop}
-                indDem={c.indDem}
-                indGop={c.indGop}
-                indUnknown={c.indUnknown}
-                other={c.row.other ?? 0}
-                vacant={c.row.vacant ?? 0}
-                rowsWide={c.chamber === 'house' ? 5 : 2}
-                rowsNarrow={c.chamber === 'house' ? 10 : 4}
-                provisional={c.row.isProvisional}
-              />
-            ))}
-          </div>
-          <Fragment slot="notes">
-            {pendingYear && (
-              <Footnote>
-                {pendingYear} results are not yet entered in the data, so these bars show the Congress elected in
-                {' '}{shownYear}. They will switch to the {pendingYear} results, labelled provisional, once those are
-                entered.
-              </Footnote>
-            )}
-            {senateNow.unverifiedInd && (
-              <Footnote>
-                The Senate source gives the number of independents but not their caucus for this Congress; the caucus
-                shown is still to be confirmed.
-              </Footnote>
-            )}
-          </Fragment>
-        </ChartFrame>
+        <HeaderBars years={headerYears} year={dashConfig.defaultYear} source={CONTROL_SOURCE} dataAsOf={controlAsOf} />
       </div>
     </section>
 
@@ -238,7 +194,8 @@ const pageAsOf = controlAsOf;
           </Footnote>
           {oddSpecials.length > 0 && (
             <Footnote>
-              Special elections held in odd years are not on the map: {listNames(oddSpecials)}.
+              Special elections held in odd years ({listNames(oddSpecials)}) have their own Senate maps, chosen from
+              the year control. They are not in the House view, which has no odd-year elections.
             </Footnote>
           )}
           <Footnote>
@@ -370,17 +327,6 @@ const pageAsOf = controlAsOf;
     margin-top: var(--sp-7);
     padding-top: var(--sp-5);
     border-top: var(--hairline);
-  }
-  .intro__bar-grid {
-    display: grid;
-    gap: var(--sp-7);
-  }
-  @media (min-width: 1024px) {
-    .intro__bar-grid {
-      grid-template-columns: 3fr 2fr;
-      gap: var(--sp-7);
-      align-items: start;
-    }
   }
 
   .section {
