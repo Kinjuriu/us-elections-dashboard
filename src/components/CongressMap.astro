@@ -1,0 +1,654 @@
+---
+// The map: Senate results or House delegations by state, for every even
+// year from 2000. Everything is drawn here at build time for the default
+// view (latest Senate year), so it reads correctly with JavaScript off.
+// src/scripts/congress-map.ts then wires up the controls, tooltip and
+// details panel and redraws for other years.
+//
+// Style reference: reference/screenshots/11 and 12 (dark carved water,
+// tracked title block bottom-left), with AP and NYT conventions for the
+// data (01, 02, 10).
+import SegmentedControl from './SegmentedControl.astro';
+import SeatBar from './SeatBar.astro';
+import { loadMapData, PROVISIONAL_YEAR } from '../lib/mapData';
+import { buildGeo, LAYOUTS } from '../lib/geo';
+import { senateTitle, senateTone, hatchParty, ariaLabel, senateBarCaption } from '../lib/mapText';
+
+
+const data = loadMapData();
+const geo = buildGeo(data.apportionments);
+
+const year = Math.max(...data.years);
+const senate = data.senate[year];
+const house = data.house[year];
+const title = senateTitle(senate);
+
+const regions = ['l48', 'ak', 'hi'] as const;
+const matrix = (t: { s: number; tx: number; ty: number }) =>
+  `matrix(${+t.s.toFixed(5)} 0 0 ${+t.s.toFixed(5)} ${+t.tx.toFixed(2)} ${+t.ty.toFixed(2)})`;
+const statesIn = (r: string) => Object.keys(geo.states).filter((st) => geo.states[st].region === r).sort();
+
+// Default (no-JS) state of each shape and label.
+const fillOf = (st: string) => senate.states[st]?.fill ?? 'no-race';
+const flippedOf = (st: string) => senate.states[st]?.flipped ?? false;
+const hatchOf = (st: string) => (flippedOf(st) ? hatchParty(fillOf(st)) : '');
+const name = (st: string) => data.stateNames[st];
+
+// Patterns live in each region's own coordinates, which the layout scales;
+// sizes are divided by that scale so stripes are 2px wide on screen.
+const patternCss = LAYOUTS.flatMap((spec) => regions.flatMap((r) => {
+  const g = `.cm-${spec.id}-${r}`;
+  return [
+    `${g} .cmap__state[data-fill="pending"]{fill:url(#cm-${spec.id}-${r}-pending)}`,
+    ...(['dem', 'gop', 'ind'] as const).map((p) => `${g} .cmap__hatch[data-hatch="${p}"]{fill:url(#cm-${spec.id}-${r}-hatch-${p})}`),
+  ];
+})).join('\n');
+
+const yearOptions = data.years.map((y) => ({ value: String(y), label: y === PROVISIONAL_YEAR ? `${y} (provisional)` : String(y) }));
+
+// What the island needs, and nothing it does not.
+const clientData = {
+  ...data,
+  stateOrder: geo.stateOrder,
+  regions: Object.fromEntries(Object.entries(geo.states).map(([st, s]) => [st, s.region])),
+  layouts: geo.layouts.map((l) => ({
+    id: l.spec.id,
+    media: l.spec.media,
+    width: l.spec.width,
+    height: l.spec.height,
+    cell: l.spec.cell,
+    gap: l.spec.gap,
+    anchors: Object.fromEntries(Object.entries(l.anchors).map(([st, [x, y]]) => [st, [+x.toFixed(1), +y.toFixed(1)]])),
+    house: l.house,
+  })),
+};
+const senateBalance = senate.balance;
+---
+<div class="cmap" data-cmap data-view="senate" data-year={year}>
+  <style set:html={patternCss}></style>
+
+  <div class="cmap__controls">
+    <SegmentedControl
+      name="chamber"
+      label="Chamber"
+      showLabel
+      options={[{ value: 'senate', label: 'Senate' }, { value: 'house', label: 'House' }]}
+      selected="senate"
+    />
+    <SegmentedControl name="year" label="Year" showLabel scroll options={yearOptions} selected={String(year)} />
+    <noscript>
+      <p class="cmap__noscript">Turn on JavaScript to change the year or switch to the House.</p>
+    </noscript>
+  </div>
+
+  <ul class="cmap__legend cmap__legend--senate" aria-label="Key">
+    <li><span class="cmap__sw" data-fill="dem"></span>Democrat</li>
+    <li><span class="cmap__sw" data-fill="gop"></span>Republican</li>
+    <li><span class="cmap__sw" data-fill="ind"></span>Independent</li>
+    <li><span class="cmap__sw cmap__sw--flip"></span>Flipped seat</li>
+    <li><span class="cmap__sw cmap__sw--lead"></span>Leading, not called</li>
+    <li><span class="cmap__sw" data-fill="no-race"></span>No race</li>
+    <li><span class="cmap__sw" data-fill="pending"></span>Result not yet entered</li>
+    <li><span class="cmap__races cmap__races--key">2</span>Two races: regular and special election</li>
+  </ul>
+  <ul class="cmap__legend cmap__legend--house" aria-label="Key">
+    <li><span class="cmap__sq" data-kind="dem"></span>Democrat</li>
+    <li><span class="cmap__sq" data-kind="gop"></span>Republican</li>
+    <li><span class="cmap__sq" data-kind="ind-dem"></span>Independent</li>
+    <li><span class="cmap__sq" data-kind="vacant"></span>Vacant</li>
+    <li><span class="cmap__sq" data-kind="missing"></span>Not yet entered</li>
+    <li>One square per seat, grouped by party</li>
+  </ul>
+
+  <div class="cmap__bar cmap__bar--senate">
+    <SeatBar
+      label="Senate"
+      caption={senateBarCaption(senate.congress)}
+      total={100}
+      threshold={51}
+      dem={senateBalance.dem}
+      gop={senateBalance.gop}
+      indDem={senateBalance.indDem}
+      indGop={senateBalance.indGop}
+      indUnknown={senateBalance.indUnknown}
+      other={senateBalance.other}
+      vacant={senateBalance.vacant}
+      rowsWide={2}
+      rowsNarrow={4}
+      provisional={senate.provisional}
+      dynamic
+    />
+    <p class="cmap__control-note" data-control-note hidden={!senate.controlNote}>{senate.controlNote}</p>
+  </div>
+  <div class="cmap__bar cmap__bar--house">
+    <SeatBar
+      label="House"
+      caption="Seats won in the November election"
+      total={435}
+      threshold={218}
+      dem={house.totals.dem}
+      gop={house.totals.gop}
+      indDem={house.totals.indDem}
+      indGop={house.totals.indGop}
+      indUnknown={house.totals.indUnknown}
+      other={house.totals.other}
+      vacant={house.totals.vacant}
+      rowsWide={5}
+      rowsNarrow={10}
+      provisional={house.provisional}
+      dynamic
+    />
+  </div>
+
+  <div class="cmap__body">
+    <div class="cmap__map">
+      <div class="cmap__titleblock">
+        <p class="cmap__title" data-title>{title.title}</p>
+        <p class="cmap__subtitle" data-subtitle>{title.subtitle}</p>
+      </div>
+
+      <!-- Shared geometry, placed by each layout below. -->
+      <svg class="cmap__defs" width="0" height="0" aria-hidden="true" focusable="false">
+        <defs>
+          {Object.entries(geo.states).map(([st, s]) => (
+            <path id={`cm-st-${st}`} d={s.d} vector-effect="non-scaling-stroke" />
+          ))}
+          {regions.map((r) => (
+            <>
+              <path id={`cm-land-${r}`} d={geo.layers[r].land} vector-effect="non-scaling-stroke" />
+              <path id={`cm-lakes-${r}`} d={geo.layers[r].lakes} />
+              <g id={`cm-bathy-${r}`}>
+                {geo.layers[r].bathymetry.map((b) => (
+                  <path d={b.d} data-depth={b.depth} vector-effect="non-scaling-stroke" />
+                ))}
+              </g>
+            </>
+          ))}
+        </defs>
+      </svg>
+
+      {geo.layouts.map((l) => {
+        const { spec } = l;
+        const id = spec.id;
+        return (
+          <div class={`cmap__layout cmap__layout--${id}`} data-layout={id} style={`aspect-ratio:${spec.width}/${spec.height}`}>
+            <svg
+              class="cmap__svg"
+              viewBox={`0 0 ${spec.width} ${spec.height}`}
+              role="group"
+              aria-label={`Map of the United States. Select a state for its result. Arrow keys move between states.`}
+            >
+              <defs>
+                {regions.map((r) => {
+                  const s = l.transforms[r].s;
+                  const w = +(4 / s).toFixed(3);
+                  return (
+                    <>
+                      {(['dem', 'gop', 'ind'] as const).map((p) => (
+                        <pattern id={`cm-${id}-${r}-hatch-${p}`} width={w} height={w} patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                          <rect width={w} height={w} fill={p === 'ind' ? 'var(--paper)' : `var(--${p}-tint)`} />
+                          <rect width={w / 2} height={w} fill={`var(--${p})`} />
+                        </pattern>
+                      ))}
+                      <pattern id={`cm-${id}-${r}-pending`} width={w} height={w} patternUnits="userSpaceOnUse">
+                        <rect width={w} height={w} fill="var(--paper)" />
+                        <circle cx={w / 2} cy={w / 2} r={+(0.7 / s).toFixed(3)} fill="var(--ink-3)" />
+                      </pattern>
+                    </>
+                  );
+                })}
+                <clipPath id={`cm-${id}-clip-ak`}><rect x={spec.ak[0]} y={spec.ak[1]} width={spec.ak[2]} height={spec.ak[3]} /></clipPath>
+                <clipPath id={`cm-${id}-clip-hi`}><rect x={spec.hi[0]} y={spec.hi[1]} width={spec.hi[2]} height={spec.hi[3]} /></clipPath>
+              </defs>
+
+              <rect class="cmap__ocean" width={spec.width} height={spec.height} />
+
+              {regions.map((r) => {
+                const box = r === 'l48' ? null : spec[r];
+                return (
+                  <g clip-path={box ? `url(#cm-${id}-clip-${r})` : undefined}>
+                    {box && <rect class="cmap__ocean" x={box[0]} y={box[1]} width={box[2]} height={box[3]} />}
+                    <g class={`cmap__region cm-${id}-${r}`} data-region={r} transform={matrix(l.transforms[r])}>
+                      <use href={`#cm-bathy-${r}`} class="cmap__contours" />
+                      <use href={`#cm-land-${r}`} class="cmap__land" />
+                      <use href={`#cm-lakes-${r}`} class="cmap__lakes" />
+                      {statesIn(r).map((st) => (
+                        <use
+                          href={`#cm-st-${st}`}
+                          class="cmap__state"
+                          data-state={st}
+                          data-fill={fillOf(st)}
+                          role="button"
+                          tabindex="-1"
+                          aria-label={ariaLabel('senate', st, name(st), senate, house)}
+                        />
+                      ))}
+                      {statesIn(r).map((st) => (
+                        <use href={`#cm-st-${st}`} class="cmap__hatch" data-state={st} data-hatch={hatchOf(st)} aria-hidden="true" />
+                      ))}
+                      <use class="cmap__ring cmap__ring--hover" aria-hidden="true" />
+                      <use class="cmap__ring cmap__ring--outer" aria-hidden="true" />
+                      <use class="cmap__ring cmap__ring--inner" aria-hidden="true" />
+                    </g>
+                  </g>
+                );
+              })}
+              <rect class="cmap__inset-rule" x={spec.ak[0] + 0.5} y={spec.ak[1] + 0.5} width={spec.ak[2] - 1} height={spec.ak[3] - 1} />
+              <rect class="cmap__inset-rule" x={spec.hi[0] + 0.5} y={spec.hi[1] + 0.5} width={spec.hi[2] - 1} height={spec.hi[3] - 1} />
+
+              <g class="cmap__leaders cmap__leaders--senate" aria-hidden="true">
+                {l.senateLabels.filter((s) => s.leader).map((s) => (
+                  <line class={s.onLand ? 'cmap__leader--land' : undefined} x1={s.leader![0][0]} y1={s.leader![0][1]} x2={s.leader![1][0]} y2={s.leader![1][1]} />
+                ))}
+              </g>
+              <g class="cmap__leaders cmap__leaders--house" aria-hidden="true"></g>
+              <g class="cmap__squares" aria-hidden="true"></g>
+            </svg>
+
+            <div class="cmap__labels cmap__labels--senate" aria-hidden="true">
+              {l.senateLabels.map((s) => (
+                <span
+                  class={`cmap__label cmap__label--${s.align}${s.badgeBelow ? ' cmap__label--stack' : ''}`}
+                  data-state={s.state}
+                  data-callout={s.callout ? '' : undefined}
+                  data-tone={s.callout ? (s.onLand ? 'land' : 'water') : senateTone(fillOf(s.state), flippedOf(s.state))}
+                  style={`left:${s.x}%;top:${s.y}%`}
+                >
+                  <span class="cmap__code">{s.state}</span>
+                  <span class="cmap__races" hidden={(senate.states[s.state]?.races.length ?? 0) < 2}>2</span>
+                </span>
+              ))}
+            </div>
+            <div class="cmap__labels cmap__labels--house" aria-hidden="true"></div>
+          </div>
+        );
+      })}
+
+      <div class="cmap__tooltip" role="tooltip" hidden></div>
+    </div>
+
+    <aside class="cmap__panel" aria-label="State details">
+      <div class="cmap__panel-body" data-panel aria-live="polite">
+        <p class="cmap__panel-empty">
+          Select a state to see its result here: tap or click it, or press Tab to reach the map and use the arrow keys,
+          then Enter.
+        </p>
+      </div>
+      <button type="button" class="cmap__clear" data-clear hidden>Clear selection</button>
+    </aside>
+  </div>
+
+  <script type="application/json" data-cmap-data set:html={JSON.stringify(clientData)}></script>
+</div>
+
+<script>
+  import '../scripts/congress-map';
+</script>
+
+<style>
+  .cmap {
+    --cm-title: clamp(20px, 3.2cqi, 34px);
+  }
+
+  .cmap__controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-3) var(--sp-6);
+    align-items: center;
+  }
+  .cmap__noscript {
+    font-size: var(--fs-1);
+    color: var(--ink-2);
+  }
+
+  /* Legends: inline, small, above the map. */
+  .cmap__legend {
+    list-style: none;
+    margin: var(--sp-4) 0 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    font-size: var(--fs-1);
+    color: var(--ink-2);
+  }
+  .cmap__legend li { display: inline-flex; align-items: center; gap: 6px; }
+  .cmap[data-view='senate'] .cmap__legend--house,
+  .cmap[data-view='house'] .cmap__legend--senate { display: none; }
+  .cmap__sw {
+    display: inline-block;
+    width: 14px;
+    height: 10px;
+    flex: none;
+  }
+  .cmap__sw[data-fill='dem'] { background: var(--dem); }
+  .cmap__sw[data-fill='gop'] { background: var(--gop); }
+  .cmap__sw[data-fill='ind'] { background: var(--ind); }
+  .cmap__sw[data-fill='no-race'] { background: var(--no-race); box-shadow: inset 0 0 0 1px var(--rule); }
+  .cmap__sw[data-fill='pending'] {
+    background-color: var(--paper);
+    background-image: radial-gradient(var(--ink-3) 0.8px, transparent 0.9px);
+    background-size: 4px 4px;
+    box-shadow: inset 0 0 0 1px var(--rule);
+  }
+  .cmap__sw--flip {
+    background: repeating-linear-gradient(45deg, var(--ink-2) 0 1.4px, var(--paper) 1.4px 2.8px);
+  }
+  .cmap__sw--lead {
+    background: linear-gradient(90deg, var(--dem-tint) 50%, var(--gop-tint) 50%);
+  }
+  .cmap__sq {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    flex: none;
+  }
+  .cmap__sq[data-kind='dem'] { background: var(--dem); }
+  .cmap__sq[data-kind='gop'] { background: var(--gop); }
+  .cmap__sq[data-kind='ind-dem'] { background: var(--ind); }
+  .cmap__sq[data-kind='vacant'] { background: var(--paper); box-shadow: inset 0 0 0 1px var(--ink-3); }
+  .cmap__sq[data-kind='missing'] { background: var(--no-race); box-shadow: inset 0 0 0 1px var(--ink-3); }
+
+  .cmap__bar { margin-top: var(--sp-5); }
+  .cmap[data-view='senate'] .cmap__bar--house,
+  .cmap[data-view='house'] .cmap__bar--senate { display: none; }
+  .cmap__control-note {
+    margin-top: var(--sp-2);
+    max-width: var(--prose-max);
+    font-size: var(--fs-1);
+    color: var(--ink-2);
+  }
+  .cmap__control-note[hidden] { display: none; }
+
+  /* ---- Map and details panel ---- */
+  .cmap__body {
+    margin-top: var(--sp-5);
+    display: grid;
+    gap: var(--sp-5);
+  }
+  @media (min-width: 1024px) {
+    .cmap__body {
+      grid-template-columns: minmax(0, 1fr) 260px;
+      align-items: start;
+    }
+  }
+  .cmap__map {
+    position: relative;
+    container-type: inline-size;
+    min-width: 0;
+  }
+  .cmap__defs { position: absolute; width: 0; height: 0; overflow: hidden; }
+
+  .cmap__layout { position: relative; display: none; width: 100%; }
+  @media (max-width: 639.98px) { .cmap__layout--narrow { display: block; } }
+  @media (min-width: 640px) and (max-width: 1023.98px) { .cmap__layout--mid { display: block; } }
+  @media (min-width: 1024px) { .cmap__layout--wide { display: block; } }
+  .cmap__svg { display: block; width: 100%; height: 100%; }
+
+  .cmap__ocean { fill: var(--ocean); }
+  .cmap__contours { fill: none; stroke: var(--ocean-line); stroke-width: 0.75; }
+  .cmap__land { fill: var(--land); stroke: var(--land); stroke-width: 0.5; }
+  .cmap__lakes { fill: var(--ocean); }
+  .cmap__inset-rule { fill: none; stroke: var(--ink-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
+
+  /* States: flat fills, white 0.75px borders. */
+  .cmap__state {
+    fill: var(--no-race);
+    stroke: var(--border);
+    stroke-width: 0.75;
+    cursor: pointer;
+    transition: fill var(--dur-data) var(--ease-data);
+  }
+  .cmap__state:focus { outline: none; }
+  .cmap__state[data-fill='dem'] { fill: var(--dem); }
+  .cmap__state[data-fill='gop'] { fill: var(--gop); }
+  .cmap__state[data-fill='ind'] { fill: var(--ind); }
+  .cmap__state[data-fill='other'] { fill: var(--ink-3); }
+  .cmap__state[data-fill='dem-lead'] { fill: var(--dem-tint); }
+  .cmap__state[data-fill='gop-lead'] { fill: var(--gop-tint); }
+  .cmap__state[data-fill='ind-lead'] { fill: var(--ind); }
+  .cmap__hatch {
+    pointer-events: none;
+    stroke: var(--border);
+    stroke-width: 0.75;
+    opacity: 0;
+    fill: none;
+    transition: opacity var(--dur-data) var(--ease-data);
+  }
+  .cmap__hatch[data-hatch='dem'],
+  .cmap__hatch[data-hatch='gop'],
+  .cmap__hatch[data-hatch='ind'] { opacity: 1; }
+
+  /* House view: plain white states with a hairline, squares on top. */
+  .cmap[data-view='house'] .cmap__state { fill: var(--land); stroke: var(--ink-3); stroke-width: 0.5; }
+  .cmap[data-view='house'] .cmap__hatch { opacity: 0; }
+
+  /* Hover outline (1px) and the selected or focused state (2px ink, white edge). */
+  .cmap__ring { fill: none; pointer-events: none; display: none; }
+  .cmap__ring[href] { display: inline; }
+  .cmap__ring--hover { stroke: var(--ink); stroke-width: 1; }
+  .cmap__ring--outer { stroke: var(--paper); stroke-width: 5; }
+  .cmap__ring--inner { stroke: var(--ink); stroke-width: 2; }
+
+  .cmap__leaders :global(line) {
+    stroke: var(--paper);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+  .cmap__leaders line.cmap__leader--land { stroke: var(--ink-2); }
+  /* House leaders cross both white land and dark water. */
+  .cmap__leaders--house :global(line) { stroke: var(--ink-3); }
+  .cmap[data-view='senate'] .cmap__leaders--house,
+  .cmap[data-view='senate'] .cmap__squares,
+  .cmap[data-view='house'] .cmap__leaders--senate { display: none; }
+
+  /* Seat squares (House view). Same fills as the seat bar. */
+  .cmap__squares :global(g) { cursor: pointer; }
+  .cmap__squares :global(rect) { transition: fill var(--dur-data) var(--ease-data); }
+  .cmap__squares :global(rect[data-kind='dem']) { fill: var(--dem); }
+  .cmap__squares :global(rect[data-kind='gop']) { fill: var(--gop); }
+  .cmap__squares :global(rect[data-kind='dem-lead']) { fill: var(--dem-tint); }
+  .cmap__squares :global(rect[data-kind='gop-lead']) { fill: var(--gop-tint); }
+  .cmap__squares :global(rect[data-kind^='ind']) { fill: var(--ind); }
+  .cmap__squares :global(rect[data-kind='other']) { fill: var(--ink-3); }
+  .cmap__squares :global(rect[data-kind='vacant']) { fill: var(--paper); stroke: var(--ink-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .cmap__squares :global(rect[data-kind='missing']) { fill: var(--no-race); stroke: var(--ink-3); stroke-width: 1; vector-effect: non-scaling-stroke; }
+
+  /* ---- Labels (HTML over the map, so text stays at least 12px) ---- */
+  .cmap__labels { position: absolute; inset: 0; pointer-events: none; }
+  .cmap[data-view='senate'] .cmap__labels--house,
+  .cmap[data-view='house'] .cmap__labels--senate { display: none; }
+  .cmap__label,
+  .cmap__labels :global(.cmap__label) {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    white-space: nowrap;
+    color: var(--ink);
+  }
+  @media (min-width: 1024px) {
+    .cmap__label, .cmap__labels :global(.cmap__label) { font-size: 13px; }
+  }
+  .cmap__label--start { transform: translate(0, -50%); padding-left: 3px; }
+  .cmap__label--end { transform: translate(-100%, -50%); padding-right: 3px; }
+  .cmap__label--middle[data-callout] { transform: translate(-50%, -100%); padding-bottom: 2px; }
+  .cmap__label[data-tone='dark'],
+  .cmap__label[data-tone='water'],
+  .cmap__labels :global(.cmap__label[data-tone='water']) { color: var(--paper); }
+  .cmap__label[data-callout][data-tone='land'] { color: var(--ink); }
+  /* Badge under the code; the code stays on the anchor. */
+  .cmap__label--stack { flex-direction: column; gap: 2px; transform: translate(-50%, -7px); }
+  /* "2": the state held a regular and a special election that year. */
+  .cmap__races {
+    display: inline-block;
+    min-width: 13px;
+    padding: 1px 2px 0;
+    border: 1px solid currentColor;
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 11px;
+    letter-spacing: 0;
+    text-align: center;
+  }
+  .cmap__races--key { color: var(--ink); }
+  .cmap__races[hidden] { display: none; }
+  /* House labels: a white chip, so they read on land, water and squares
+     alike. The anchor is the chip's edge that faces the grid. */
+  .cmap__labels :global(.cmap__label--chip) {
+    padding: 1px 2px 1px calc(2px + var(--tracking-label));
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .cmap__labels :global(.cmap__label--above) { transform: translate(-50%, -100%); }
+  .cmap__labels :global(.cmap__label--below) { transform: translate(-50%, 0); }
+  .cmap__labels :global(.cmap__label--right) { transform: translate(0, 0); }
+  .cmap__labels :global(.cmap__label--left) { transform: translate(-100%, 0); }
+
+  /* ---- Title block: bottom-left over the water, as in the reference ---- */
+  .cmap__titleblock {
+    pointer-events: none;
+  }
+  .cmap__title {
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: var(--cm-title);
+    line-height: 1;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+  .cmap__subtitle {
+    margin-top: var(--sp-2);
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.3;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  @media (min-width: 640px) {
+    .cmap__titleblock {
+      position: absolute;
+      left: 2.5%;
+      bottom: 4%;
+      z-index: 1;
+      max-width: 24%;
+    }
+    .cmap__title { color: var(--paper); }
+    .cmap__subtitle { color: var(--rule); }
+  }
+  @media (max-width: 639.98px) {
+    .cmap__titleblock { margin-bottom: var(--sp-3); }
+    .cmap { --cm-title: 26px; }
+  }
+
+  /* ---- Tooltip and panel ---- */
+  .cmap__tooltip {
+    position: absolute;
+    z-index: 3;
+    width: max-content;
+    max-width: 260px;
+    padding: var(--sp-3);
+    background: var(--paper);
+    border: 1px solid var(--ink-3);
+    border-radius: var(--radius-tooltip);
+    box-shadow: var(--shadow-tooltip);
+    pointer-events: none;
+    font-size: var(--fs-1);
+  }
+  .cmap__tooltip[hidden] { display: none; }
+
+  /* The panel only works with the island running. */
+  .cmap:not(.is-ready) .cmap__panel { display: none; }
+  .cmap__panel {
+    border-top: 1px solid var(--ink);
+    padding-top: var(--sp-3);
+    font-size: var(--fs-2);
+  }
+  .cmap__panel-empty { color: var(--ink-2); }
+  .cmap__clear {
+    margin-top: var(--sp-4);
+    appearance: none;
+    padding: 6px var(--sp-3);
+    border: 1px solid var(--ink-3);
+    border-radius: var(--radius-control);
+    background: var(--paper);
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: var(--fs-1);
+    letter-spacing: 0.04em;
+    cursor: pointer;
+  }
+  .cmap__clear:hover { background: var(--paper-2); }
+  .cmap__clear:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .cmap__clear[hidden] { display: none; }
+
+  /* Details content, shared by tooltip and panel (built as HTML strings). */
+  .cmap :global(.cmd__state) {
+    font-family: var(--font-display);
+    font-size: var(--fs-4);
+    font-weight: 600;
+    line-height: 1.15;
+  }
+  .cmap__tooltip :global(.cmd__state) { font-size: var(--fs-3); }
+  .cmap :global(.cmd__race + .cmd__race) {
+    margin-top: var(--sp-3);
+    padding-top: var(--sp-3);
+    border-top: var(--hairline);
+  }
+  .cmap :global(.cmd__kicker) {
+    margin-top: var(--sp-1);
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .cmap :global(.cmd__winner) {
+    margin-top: var(--sp-2);
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-label);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+  }
+  .cmap :global(.cmd__swatch) { width: 10px; height: 10px; flex: none; background: var(--ink-3); }
+  .cmap :global(.cmd__swatch[data-party='DEM']) { background: var(--dem); }
+  .cmap :global(.cmd__swatch[data-party='GOP']) { background: var(--gop); }
+  .cmap :global(.cmd__swatch[data-party='IND']) { background: var(--ind); }
+  .cmap :global(.cmd__party) { color: var(--ink-2); font-size: var(--fs-1); }
+  .cmap :global(.cmd__nums) {
+    margin: var(--sp-2) 0 0;
+    display: grid;
+    gap: 2px;
+  }
+  .cmap :global(.cmd__nums div) {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--sp-4);
+    border-bottom: var(--hairline);
+    padding-block: 2px;
+  }
+  .cmap :global(.cmd__nums dt) { color: var(--ink-2); }
+  .cmap :global(.cmd__nums dd) {
+    margin: 0;
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .cmap :global(.cmd__status) { margin-top: var(--sp-2); }
+  .cmap :global(.cmd__status--flip) { font-weight: 600; }
+  .cmap :global(.cmd__counts) { margin-top: var(--sp-2); }
+  .cmap :global(.cmd__note) { margin-top: var(--sp-2); font-size: var(--fs-1); color: var(--ink-2); }
+</style>

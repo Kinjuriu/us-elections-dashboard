@@ -5,6 +5,8 @@ import ChartFrame from '../components/ChartFrame.astro';
 import SeatBar from '../components/SeatBar.astro';
 import SegmentedControl from '../components/SegmentedControl.astro';
 import Footnote from '../components/Footnote.astro';
+import CongressMap from '../components/CongressMap.astro';
+import { loadMapData } from '../lib/mapData';
 import { compiledContent as sourcesHtml } from '../../data/SOURCES.md';
 import {
   loadChamberControl, loadIndependents, loadMidtermSwing, loadSenateRaces,
@@ -114,6 +116,15 @@ const sources = (await sourcesHtml())
   .replace(/<(\/?)h3/g, '<$1h4')
   .replace(/<(\/?)h2/g, '<$1h3');
 
+// The map: its headline follows the year shown; this is the default view.
+const mapData = loadMapData();
+const mapLatestYear = Math.max(...mapData.years);
+const mapHeadline = mapData.senate[mapLatestYear].headline;
+const mapLatestHasResults = mapData.senate[mapLatestYear].decided > 0;
+const oddSpecials = races
+  .filter((r) => r.year % 2 === 1)
+  .map((r) => `${mapData.stateNames[r.state]} in ${r.year}`);
+
 const fmt = (n: number) => n.toLocaleString('en-US');
 const pageAsOf = controlAsOf;
 ---
@@ -213,22 +224,35 @@ const pageAsOf = controlAsOf;
     <section class="wrap section" aria-labelledby="map">
       <SectionHeader id="map" kicker="The map" title="Where each party won, state by state" />
       <ChartFrame
-        title="Senate races and House delegations in every state since 2000"
-        subtitle="The winning party of each Senate race, or each state's House delegation with one square per seat. States with no Senate race that year are grey; hatching marks a seat that changed party."
-        source="MIT Election Data and Science Lab, U.S. Senate and U.S. House statewide returns. 2026 entered by hand from official results."
+        title={mapHeadline}
+        subtitle="The party that won each state's Senate race, or each state's House delegation with one square per seat, for every election from 2000. Hatching marks a Senate seat that changed party."
+        source="MIT Election Data and Science Lab, U.S. Senate and U.S. House statewide returns; US Senate Historical Office and House Office of the Historian for seats at the opening of each Congress. Map: US Census Bureau state boundaries (us-atlas); water and neighbouring land from Natural Earth."
         dataAsOf={senateAsOf}
         provisional
-        pending="Map of the states, with a year control, built in step 03"
-        pendingHeight={480}
       >
-        <SegmentedControl
-          slot="legend"
-          name="chamber"
-          label="Chamber"
-          showLabel
-          options={[{ value: 'senate', label: 'Senate' }, { value: 'house', label: 'House' }]}
-          selected="senate"
-        />
+        <CongressMap />
+        <Fragment slot="notes">
+          <Footnote>
+            A Senate seat counts as flipped when it passes from one party's caucus to the other's, compared with whoever
+            held it on election day. Independents count with the party they caucus with.
+          </Footnote>
+          {oddSpecials.length > 0 && (
+            <Footnote>
+              Special elections held in odd years are not on the map: {listNames(oddSpecials)}.
+            </Footnote>
+          )}
+          <Footnote>
+            The Senate bar shows seats at the opening of the new Congress. The House bar and squares show seats won in
+            the November election, from the state returns, grouped by party within each state rather than by district.
+          </Footnote>
+          <Footnote>Winners' names are printed as the source spells them.</Footnote>
+          {!mapLatestHasResults && (
+            <Footnote>
+              {mapLatestYear} results are not yet entered. States with a {mapLatestYear} Senate race are dotted, and the
+              House squares are outlined, until results are entered from official sources.
+            </Footnote>
+          )}
+        </Fragment>
       </ChartFrame>
     </section>
 
