@@ -3,6 +3,8 @@
 *, *::before, *::after { box-sizing: border-box; }
 
 html {
+  /* Jump links and focused elements land below the sticky control bar. */
+  scroll-padding-top: calc(var(--cbar-h) + var(--sp-4));
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
 }

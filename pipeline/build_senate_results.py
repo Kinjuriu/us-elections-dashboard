@@ -29,8 +29,8 @@ from __future__ import annotations
 import pandas as pd
 
 from common import (
-    MANUAL, NON_VOTE_RE, PROVISIONAL_YEAR, RAW, STATES, election_day, load_2026, normalise_party,
-    write_csv,
+    MANUAL, NON_VOTE_RE, PROVISIONAL_YEAR, RAW, STATES, display_name, election_day, load_2026,
+    load_display_names, normalise_party, write_csv,
 )
 
 FIRST_YEAR = 2000
@@ -118,7 +118,7 @@ def add_2026(df: pd.DataFrame) -> pd.DataFrame:
     for r in m.itertuples():
         rows.append({"year": PROVISIONAL_YEAR, "state_po": r.state_po, "special": bool(r.special),
                      **{c: getattr(r, c) for c in ("winner_name", "winner_party", "runner_up_party",
-                                                   "winner_pct", "runner_up_pct")},
+                                                   "winner_pct", "runner_up_pct", "called")},
                      "source_id": "manual_2026_provisional"})
     return pd.concat([df, pd.DataFrame(rows)], ignore_index=True)
 
@@ -219,12 +219,16 @@ def build() -> pd.DataFrame:
     df["winner_pct"] = df.winner_pct.round(2)
     df["runner_up_pct"] = df.runner_up_pct.round(2)
     df["is_provisional"] = df.year >= PROVISIONAL_YEAR
+    # Every certified race is called; provisional ones carry the call from the manual file.
+    df["called"] = df.called.where(df.is_provisional, True).astype("boolean")
+    names = load_display_names()
+    df["winner_display_name"] = [display_name(n, names) if pd.notna(n) else pd.NA for n in df.winner_name]
     for c in ("flipped_vs_last_election", "flipped_vs_holder", "party_changed"):
         df[c] = df[c].astype("boolean")
     cols = ["year", "state", "state_po", "special", "winner_name", "winner_party", "runner_up_party",
             "winner_pct", "runner_up_pct", "margin_pts", "flipped_vs_last_election", "previous_party",
             "flipped_vs_holder", "holder_party", "holder_caucus", "winner_caucus", "party_changed",
-            "is_provisional", "source_id"]
+            "is_provisional", "called", "winner_display_name", "source_id"]
     df = df.sort_values(["year", "state_po", "special"])
     write_csv(df[cols], "senate_results_by_state.csv")
     # Side detail kept out of the main file: seat class and MEDSL's own "unofficial" flag.

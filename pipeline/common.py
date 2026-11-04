@@ -137,3 +137,47 @@ def write_csv(df: pd.DataFrame, name: str) -> Path:
 
 def load_2026() -> pd.DataFrame:
     return pd.read_csv(MANUAL / "2026_provisional.csv", dtype={"state_po": "string"})
+
+
+# ---- display names --------------------------------------------------------------------
+
+_SUFFIX = re.compile(r"^(JR\.?|SR\.?|II|III|IV)$", re.I)
+_ROMAN = {"II", "III", "IV"}
+
+
+def load_display_names() -> dict[str, str]:
+    """Hand-checked exceptions to the title-case rule (data/manual/display_names.csv)."""
+    df = pd.read_csv(MANUAL / "display_names.csv")
+    return dict(zip(df.source_name, df.display_name))
+
+
+def display_name(raw: str, exceptions: dict[str, str]) -> str:
+    """Title-cased name for display. The data keeps the source spelling.
+
+    "MURKOWSKI, LISA" -> "Lisa Murkowski"; "ROBERT P. CASEY, JR." -> "Robert P. Casey, Jr.";
+    "CINDY HYDE-SMITH" -> "Cindy Hyde-Smith". Names the rule gets wrong (Mc, De, JD, source
+    typos) are listed in the exceptions file. Names already in mixed case are kept as given.
+    """
+    name = " ".join(raw.split())
+    if name in exceptions:
+        return exceptions[name]
+    m = re.match(r"^([^,]+),\s*(.+)$", name)
+    if m and not _SUFFIX.match(m.group(2)):
+        name = f"{m.group(2)} {m.group(1)}"
+    if name != name.upper():
+        return name
+
+    def word(w: str) -> str:
+        bare = w.strip(",")
+        if bare in _ROMAN:
+            return w
+        # Capitalise the first letter and any letter after a hyphen, quote or apostrophe.
+        return re.sub(r"(^|[-\"'])([a-z])", lambda x: x.group(1) + x.group(2).upper(), w.lower())
+
+    return " ".join(word(w) for w in name.split(" "))
+
+
+# Prefixes the title-case rule always gets wrong; any winner name with one must be
+# listed in data/manual/display_names.csv (checked by the tests). De, La and Mac
+# cannot be caught this way (Dean, Lamar, Mack), so those are added by hand.
+NEEDS_DISPLAY_EXCEPTION = re.compile(r"\b(MC[A-Z]|O'[A-Z]|JD\b)")

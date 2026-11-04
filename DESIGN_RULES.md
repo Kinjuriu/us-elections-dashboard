@@ -66,7 +66,7 @@ Rules:
   --dem-tint:     #9EBEF0;  /* leading, not called */
   --gop:          #D7262E;  /* bright Republican red, called / won */
   --gop-tint:     #F2A6A6;  /* leading, not called */
-  --ind:          #8A6D1F;  /* independents (ochre, not purple) */
+  --ind:          #E8B730;  /* independents (amber, not purple); text on it is --ink */
   --no-race:      #ECECEA;  /* state with no race this cycle */
 
   --ocean:        #0D1117;  /* map water */
@@ -79,7 +79,8 @@ Rules:
 - Party colours are only ever used for party data. Links are `--ink` with an underline.
 - Flipped seats: diagonal hatching (45 degrees, 2px stripes) in the winning party colour over its tint.
 - Colour is never the only signal: pair it with a label, pattern or position.
-- Check contrast: text on `--dem` and `--gop` fills must be white and at least 4.5:1.
+- Check contrast: text on `--dem` and `--gop` fills must be white and at least 4.5:1. Text on `--ind` must be `--ink` (about 10:1); never white.
+- `--ind` was changed from ochre `#8A6D1F` to amber `#E8B730` in step 05 because ochre was too close to `--gop` for deuteranopia. See `review/05-report.md` for the simulation result.
 
 ## 5. Shape, spacing, layout
 

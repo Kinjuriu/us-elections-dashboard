@@ -1,0 +1,172 @@
+---
+// The story: the explanation and the findings in words. No charts here.
+// Each finding links to the dashboard at the year it is about.
+import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
+import Footer from '../components/Footer.astro';
+import { loadMapData, defaultYear } from '../lib/mapData';
+import { loadControlChart, loadMidtermChart, loadFlipsChart } from '../lib/chartData';
+import {
+  loadChamberControl, loadMidtermSwing, latestElection, sourceAccessedAt, formatDate,
+  type ChamberControl, type Chamber,
+} from '../lib/data';
+
+const base = import.meta.env.BASE_URL;
+const control = loadChamberControl();
+const swing = loadMidtermSwing();
+const asOfDates = ['house_historian_party_divisions', 'senate_party_division']
+  .map(sourceAccessedAt)
+  .filter((d): d is Date => d !== null);
+if (!asOfDates.length) throw new Error('No access date in manifest for the control sources');
+const pageAsOf = formatDate(new Date(Math.max(...asOfDates.map((d) => d.getTime()))));
+
+const majorityOf = (r: ChamberControl) => r.majorityMostOfCongress ?? r.majorityParty;
+const pendingYear = (() => {
+  const { newest, withCounts } = latestElection(control, 'house');
+  return withCounts && newest.electionYear !== withCounts.electionYear ? newest.electionYear : null;
+})();
+
+// Control since 1946: Congresses with counts.
+const certified = control.filter((r) => !r.isProvisional && r.dem !== null);
+const firstYear = Math.min(...certified.map((r) => r.electionYear));
+const lastCertifiedYear = Math.max(...certified.map((r) => r.electionYear));
+const nCongresses = new Set(certified.map((r) => r.congress)).size;
+const demHeld = (chamber: Chamber) =>
+  certified.filter((r) => r.chamber === chamber && majorityOf(r) === 'DEM').length;
+
+// Longest unbroken run of one party in the House majority.
+const houseRows = certified.filter((r) => r.chamber === 'house').sort((a, b) => a.congress - b.congress);
+let best = { party: majorityOf(houseRows[0]), start: houseRows[0], end: houseRows[0], n: 1 };
+let cur = { ...best };
+for (const r of houseRows.slice(1)) {
+  cur = majorityOf(r) === cur.party ? { ...cur, end: r, n: cur.n + 1 } : { party: majorityOf(r), start: r, end: r, n: 1 };
+  if (cur.n > best.n) best = { ...cur };
+}
+const runStart = Number(best.start.yearsServed.slice(0, 4));
+const runEnd = Number(best.end.yearsServed.slice(-4));
+
+// Midterms: president's party in the House.
+const houseMidterms = swing.filter((s) => s.chamber === 'house' && !s.isProvisional && s.change !== null);
+const houseLosses = houseMidterms.filter((s) => (s.change ?? 0) < 0);
+const houseGains = houseMidterms.filter((s) => (s.change ?? 0) > 0);
+const midFirst = Math.min(...houseMidterms.map((s) => s.year));
+const midLast = Math.max(...houseMidterms.map((s) => s.year));
+const listNames = (xs: string[]) =>
+  xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`;
+const gainers = listNames(houseGains.map((s) => `${s.president} in ${s.year}`));
+
+// The findings, each with the dashboard view it is about.
+const mapData = loadMapData();
+const startYear = defaultYear(mapData);
+const controlChart = loadControlChart();
+const midtermChart = loadMidtermChart();
+const flipsChart = loadFlipsChart(mapData);
+const top = [...flipsChart.cycles].filter((c) => !c.provisional).sort((a, b) => b.toDem + b.toGop - (a.toDem + a.toGop))[0];
+const dash = (q: string) => `${base}?${q}`;
+const findings = [
+  {
+    headline: controlChart.headline,
+    note: 'The history chart shows every Congress. The strip at the top of the dashboard colours each one by the majority party.',
+    href: dash(`year=${startYear}&chamber=senate`),
+    link: `Open the dashboard at ${startYear}`,
+  },
+  {
+    headline: midtermChart.headline.house,
+    note: `The midterm chart gives the seat change for each election. The dashboard opens on ${midLast}, the latest certified midterm.`,
+    href: dash(`year=${midLast}&chamber=house`),
+    link: `Open the House in ${midLast}`,
+  },
+  {
+    headline: midtermChart.headline.senate,
+    note: 'Senate counts before each midterm are from election day, and counts after are from the opening of the new Congress.',
+    href: dash(`year=${midLast}&chamber=senate`),
+    link: `Open the Senate in ${midLast}`,
+  },
+  {
+    headline: flipsChart.headline,
+    note: 'A seat counts as flipped when it passes from one caucus to the other, compared with whoever held it on election day.',
+    href: dash(`year=${top.year}&chamber=senate`),
+    link: `Open the Senate in ${top.year}`,
+  },
+  {
+    headline: mapData.senate[startYear].headline,
+    note: 'The map starts in 2000. Select a state on it for every Senate race and House delegation since.',
+    href: dash(`year=${startYear}&chamber=senate`),
+    link: `Open the map at ${startYear}`,
+  },
+];
+---
+<Base
+  title="The story: US Congress, 1946 to 2026"
+  description={`What the data shows about who controlled the House and Senate since ${firstYear}, and how the president's party fares in midterm elections.`}
+>
+  <Masthead current="story" />
+  <main id="main" class="wrap story">
+    <article class="story__prose">
+      <p class="label story__kicker">Congress since {firstYear}</p>
+      <h1>The president's party lost House seats in {houseLosses.length} of the {houseMidterms.length} midterms since {midFirst}</h1>
+      <div class="story__standfirst">
+        <p>
+          Congress is two chambers: the House of Representatives, whose 435 voting seats are all elected every two
+          years, and the Senate, whose 100 seats are elected a third at a time. A midterm is the election held halfway
+          through a president's term.
+        </p>
+        <p>
+          Democrats held the House for {demHeld('house')} and the Senate for {demHeld('senate')} of the
+          {' '}{nCongresses} Congresses elected from {firstYear} to {lastCertifiedYear}, including an unbroken
+          {' '}{runEnd - runStart}-year run in the House from {runStart} to {runEnd}.
+          In midterms, the president's party gained House seats only {houseGains.length === 2 ? 'twice' : `${houseGains.length} times`}: {gainers}.
+        </p>
+        {pendingYear && (
+          <p>
+            Results of the {pendingYear} midterm are provisional until they are certified. Every {pendingYear} figure on
+            the dashboard is marked until then.
+          </p>
+        )}
+      </div>
+      <p class="story__dateline">Data as of <time>{pageAsOf}</time></p>
+
+      <h2 class="story__h2">What the data shows</h2>
+      <ol class="story__findings">
+        {findings.map((f) => (
+          <li>
+            <h3>{f.headline}</h3>
+            <p>{f.note}</p>
+            <p><a href={f.href}>{f.link}</a></p>
+          </li>
+        ))}
+      </ol>
+      <p class="story__back"><a href={base}>Go to the dashboard</a></p>
+    </article>
+  </main>
+  <Footer asOf={pageAsOf} />
+</Base>
+
+<style>
+  .story { padding-top: var(--sp-7); }
+  .story__prose { max-width: var(--prose-max); }
+  .story__kicker { margin-bottom: var(--sp-3); }
+  .story__standfirst {
+    margin-top: var(--sp-5);
+    display: grid;
+    gap: var(--sp-4);
+    font-size: var(--fs-3);
+  }
+  @media (min-width: 768px) {
+    .story__standfirst { font-size: var(--fs-4); line-height: 1.45; }
+  }
+  .story__dateline { margin-top: var(--sp-4); font-size: var(--fs-1); color: var(--ink-2); }
+  .story__h2 { margin-top: var(--sp-8); }
+  .story__findings {
+    margin: var(--sp-5) 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: var(--sp-6);
+  }
+  .story__findings li { padding-top: var(--sp-4); border-top: var(--hairline); }
+  .story__findings h3 { font-size: var(--fs-5); }
+  .story__findings p { margin-top: var(--sp-2); font-size: var(--fs-2); color: var(--ink-2); }
+  .story__findings p:last-child { color: var(--ink); }
+  .story__back { margin-top: var(--sp-7); }
+</style>

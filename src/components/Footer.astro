@@ -1,0 +1,27 @@
+---
+const base = import.meta.env.BASE_URL;
+interface Props {
+  asOf: string;
+}
+const { asOf } = Astro.props;
+---
+<footer class="wrap site-footer">
+  <p>
+    Every number on this site is read from the files in <code>data/processed/</code>, built by the scripts in
+    {' '}<code>pipeline/</code>. Data as of <time>{asOf}</time>.
+  </p>
+  <p><a href={`${base}story`}>Read the story</a> · <a href={base}>Dashboard</a> · <a href={`${base}#notes`}>Notes and sources</a></p>
+</footer>
+
+<style>
+  .site-footer {
+    margin-top: var(--sp-8);
+    padding-block: var(--sp-5) var(--sp-7);
+    border-top: 1px solid var(--ink);
+    font-size: var(--fs-1);
+    color: var(--ink-2);
+    display: grid;
+    gap: var(--sp-2);
+  }
+  .site-footer a { color: var(--ink); }
+</style>

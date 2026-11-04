@@ -98,6 +98,22 @@ export interface MidtermSwing {
   flag: string;
 }
 
+/**
+ * The name a reader would use for a president. The data keeps the source's
+ * formal name; copy uses the common one ("Bill Clinton", not "William J. Clinton").
+ */
+const COMMON_NAMES: Record<string, string> = {
+  'Donald J. Trump': 'Donald Trump',
+  'Dwight D. Eisenhower': 'Dwight Eisenhower',
+  'Gerald R. Ford': 'Gerald Ford',
+  'Harry S. Truman': 'Harry Truman',
+  'Joseph R. Biden Jr.': 'Joe Biden',
+  'Lyndon B. Johnson': 'Lyndon Johnson',
+  'Richard M. Nixon': 'Richard Nixon',
+  'William J. Clinton': 'Bill Clinton',
+};
+export const commonName = (name: string) => COMMON_NAMES[name] ?? name;
+
 export function loadChamberControl(): ChamberControl[] {
   return readCsv('data/processed/chamber_control.csv').map((r) => ({
     congress: Number(r.congress),
@@ -114,7 +130,7 @@ export function loadChamberControl(): ChamberControl[] {
     majorityMostOfCongress: (r.majority_party_most_of_congress || null) as Party | null,
     majorityNote: r.majority_note,
     majorityThreshold: Number(r.majority_threshold),
-    president: r.president,
+    president: commonName(r.president),
     presidentParty: r.president_party as Party,
     isMidterm: bool(r.is_midterm),
     isProvisional: bool(r.is_provisional),
@@ -136,7 +152,7 @@ export function loadIndependents(): Independent[] {
 export function loadMidtermSwing(): MidtermSwing[] {
   return readCsv('data/processed/midterm_swing.csv').map((r) => ({
     year: Number(r.year),
-    president: r.president,
+    president: commonName(r.president),
     presidentParty: r.president_party as Party,
     chamber: r.chamber as Chamber,
     seatsBefore: num(r.seats_before),
