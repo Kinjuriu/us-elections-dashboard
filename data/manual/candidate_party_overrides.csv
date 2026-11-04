@@ -1,0 +1,6 @@
+chamber,year,state_po,district,special,candidate,party,source_url,accessed_at,note
+senate,2020,WY,,false,MERAV BEN DAVID,,,,Party missing in MEDSL (runner-up)
+senate,2022,AK,,false,"TSHIBAKA, KELLY C.",,,,Party missing in MEDSL (runner-up)
+senate,2010,AK,,false,LISA MURKOWSKI,GOP,https://doi.org/10.7910/DVN/PEJ5QU,2026-11-04T13:00:00Z,"Party blank in MEDSL (she won as a write-in after losing the GOP primary). MEDSL lists her as REPUBLICAN in 2004 and 2016. To confirm"
+senate,2022,AK,,false,"MURKOWSKI, LISA",GOP,https://doi.org/10.7910/DVN/PEJ5QU,2026-11-04T13:00:00Z,"Party blank in MEDSL (top-four primary, ranked-choice general). MEDSL lists her as REPUBLICAN in 2004 and 2016. To confirm"
+senate,2020,WY,,false,CYNTHIA M. LUMMIS,GOP,https://doi.org/10.7910/DVN/IG0UN2,2026-11-04T13:00:00Z,"Party blank in MEDSL Senate file. MEDSL House file lists CYNTHIA M LUMMIS (WY) as REPUBLICAN 2008 to 2014. To confirm"

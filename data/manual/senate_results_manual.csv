@@ -1,0 +1,9 @@
+year,state_po,special,issue,winner_name,winner_party,runner_up_party,winner_pct,runner_up_pct,source_url,accessed_at,note
+2002,LA,false,medsl_rounds_mixed,,,,,,,,MEDSL lists the November open primary and the December runoff both as stage gen and they cannot be told apart
+2014,LA,false,medsl_values_suspect,,,,,,,,MEDSL finalist totals (1712379 and 1561210) look like the December runoff plus 1000000; enter official runoff result
+2016,LA,false,medsl_runoff_missing,,,,,,,,MEDSL has only the November open primary; the December runoff decided the seat
+2018,MS,true,medsl_runoff_missing,,,,,,,,MEDSL has only the 6 November first round; the 27 November runoff decided the seat
+2010,MA,true,missing_in_medsl,,,,,,,,January 2010 special election is not in MEDSL (even-year November data only)
+2013,MA,true,missing_in_medsl,,,,,,,,June 2013 special election is not in MEDSL
+2013,NJ,true,missing_in_medsl,,,,,,,,October 2013 special election is not in MEDSL
+2017,AL,true,missing_in_medsl,,,,,,,,December 2017 special election is not in MEDSL

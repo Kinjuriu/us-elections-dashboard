@@ -1,0 +1,88 @@
+record_type,chamber,year,state_po,special,winner_name,winner_party,runner_up_party,winner_pct,runner_up_pct,dem,gop,ind,other,vacant,dem_vote_share,gop_vote_share,called,certified,race_list_source_url,result_source_url,result_accessed_at,notes
+senate_race,senate,2026,AK,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,AL,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,AR,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,CO,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,DE,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,GA,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,IA,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,ID,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,IL,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,KS,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,KY,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,LA,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,MA,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,ME,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,MI,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,MN,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,MS,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,MT,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,NC,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,NE,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,NH,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,NJ,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,NM,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,OK,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,OR,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,RI,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,SC,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,SD,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,TN,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,TX,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,VA,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,WV,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,WY,false,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 2 regular race; list cross-checked against MEDSL 2020 class 2 races
+senate_race,senate,2026,FL,true,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 3 special election
+senate_race,senate,2026,OH,true,,,,,,,,,,,,,false,false,https://en.wikipedia.org/wiki/2026_United_States_Senate_elections,,,Class 3 special election
+house_delegation,house,2026,AL,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,AK,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,AZ,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,AR,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,CA,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,CO,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,CT,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,DE,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,FL,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,GA,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,HI,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,ID,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,IL,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,IN,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,IA,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,KS,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,KY,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,LA,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,ME,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,MD,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,MA,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,MI,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,MN,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,MS,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,MO,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,MT,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,NE,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,NV,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,NH,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,NJ,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,NM,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,NY,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,NC,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,ND,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,OH,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,OK,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,OR,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,PA,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,RI,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,SC,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,SD,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,TN,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,TX,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,UT,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,VT,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,VA,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,WA,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,WV,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,WI,false,,,,,,,,,,,,,false,false,,,,
+house_delegation,house,2026,WY,false,,,,,,,,,,,,,false,false,,,,
+chamber_seats,house,2026,,false,,,,,,,,,,,,,false,false,,,,Seats won by each party for the 120th Congress
+chamber_seats,senate,2026,,false,,,,,,,,,,,,,false,false,,,,Senators by party at the start of the 120th Congress (all 100 seats)
