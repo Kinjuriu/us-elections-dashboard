@@ -1,10 +1,10 @@
 # Step 01 report: data pipeline
 
-4 November 2026, the day after the 2026 midterms. Revised the same day after Stephane's decisions (see "Revision 1" at the end).
+4 November 2026, the day after the 2026 midterms. Revised the same day after Stephane's decisions and after the 8 manual Senate races were filled (see "Revision 1" and "Revision 2" at the end).
 
 ## What was built
 
-A Python pipeline in `pipeline/` that anyone can re-run with `python pipeline/run_all.py`. It downloads the sources, builds every output and runs 23 pytest checks. All 23 pass. Two runs in a row give identical files (checked by hash).
+A Python pipeline in `pipeline/` that anyone can re-run with `python pipeline/run_all.py`. It downloads the sources, builds every output and runs 25 pytest checks. All 25 pass. Two runs in a row give identical files (checked by hash).
 
 | Script | Output |
 |---|---|
@@ -13,7 +13,7 @@ A Python pipeline in `pipeline/` that anyone can re-run with `python pipeline/ru
 | `build_midterm_swing.py` | `midterm_swing.csv` |
 | `build_senate_results.py` | `senate_results_by_state.csv`, plus `senate_results_detail.csv` (seat class, MEDSL "unofficial" flag) |
 | `build_house_delegations.py` | `house_delegations_by_state.csv`, plus `house_district_winners.csv` |
-| `tests/test_totals.py` | totals, cross-checks against a second official table, flip and swing rules, 5 spot checks |
+| `tests/test_totals.py` | totals, cross-checks against a second official table, flip and swing rules, a source check on every manual row, 5 spot checks |
 
 Setup: a Python 3.11 virtualenv (`.venv`, made with `uv`) holding pandas, requests and pytest. The system Python is 3.9 with no pandas. No other dependencies were added; HTML is parsed with the standard library.
 
@@ -60,24 +60,7 @@ I checked each against the raw source text, and they're also written into `test_
 
 ## Data gaps (all null in the outputs, none estimated)
 
-**Senate races with no result**, waiting for `data/manual/senate_results_manual.csv`:
-
-| Race | Problem in MEDSL |
-|---|---|
-| LA 2002 | Both rounds labelled `gen` |
-| LA 2014 | Finalist totals look like the runoff plus 1,000,000 each |
-| LA 2016 | Runoff missing |
-| MS 2018 special | Runoff missing |
-| MA Jan 2010 special, MA 2013 special, NJ 2013 special, AL 2017 special | Not in MEDSL |
-
-**Knock-on:** both flip columns are null for the next race in the same seat:
-- LA 2008, 2020, 2022
-- MA 2012, 2014
-- NJ 2014
-- AL 2020
-- MS 2020
-
-`holder_party` is also null for those, because the previous winner is unknown. The NJ 2013 special already has a holder (GOP, Chiesa) but no result.
+**Senate races:** none missing any more. The 8 races MEDSL lacked or got wrong are now filled in `data/manual/senate_results_manual.csv` from official sources (Clerk of the House, FEC, and the MA, NJ and AL election offices). Every race from 2000 to 2024 has a winner and both flip values.
 
 **Missing runner-up party:** WY 2020 and AK 2022. Unopposed races (ID 2004, SD 2010, AL 2014) have only write-ins as runner-up.
 
@@ -97,14 +80,15 @@ I checked each against the raw source text, and they're also written into `test_
 ## Open questions
 
 1. **AZ 2024 counts as a flip under `flipped_vs_holder`.** Sinema held the seat as an independent and Gallego won it as a Democrat. Because Sinema caucused with the Democrats, AP may treat it as a hold. Should the holder rule compare caucuses instead of parties? WV 2024 (Manchin, an independent caucusing with Democrats, then Justice R) is a flip either way.
-2. **`senate_seat_changes.csv` coverage for 2025 and 2026.** My own knowledge stops in mid-2026, and the archived Senate page shows no party-changing appointment or switch in the 119th Congress up to 2 November 2026. Please confirm nothing is missing for 2026.
-3. **Sinema's switch date (9 December 2022)** comes from general knowledge, not the source. It falls after the 2022 election, so it only affects AZ 2024's holder, which doesn't depend on the exact date.
-4. **Midterm "before" for the Senate now uses election day**, so several historic Senate swings move by about a seat from the opening-day version. For example, 1946 is now -12 (was -13), 2002 +2 (was +1), 2010 -6 (was -5), and 2018 +2 (was +1). This is the intended effect, but it will change any copy written from the old numbers.
+2. **Name style is mixed.** The 8 manual races use title case ("Doug Jones"), while MEDSL rows are upper case ("TOMMY TUBERVILLE"). The site needs a display-name step either way; I have not changed either source.
+3. **`senate_seat_changes.csv` coverage for 2025 and 2026.** My own knowledge stops in mid-2026, and the archived Senate page shows no party-changing appointment or switch in the 119th Congress up to 2 November 2026. Please confirm nothing is missing for 2026.
+4. **Sinema's switch date (9 December 2022)** comes from general knowledge, not the source. It falls after the 2022 election, so it only affects AZ 2024's holder, which doesn't depend on the exact date.
+5. **Midterm "before" for the Senate now uses election day**, so several historic Senate swings move by about a seat from the opening-day version. For example, 1946 is now -12 (was -13), 2002 +2 (was +1), 2010 -6 (was -5), and 2018 +2 (was +1). This is the intended effect, but it will change any copy written from the old numbers.
 
 ## What you need to enter or confirm by hand
 
 1. **2026 results** in `data/manual/2026_provisional.csv`.
-2. **The 8 Senate races** in `data/manual/senate_results_manual.csv`.
+2. **The 8 Senate races** in `data/manual/senate_results_manual.csv` are filled. Each note asks for a spot-check against its source (see Revision 2).
 3. **Seat classes** in `data/manual/senate_specials.csv` (all 28 rows `verified = false`).
 4. **Independents** in `data/manual/independents.csv`: unverified rows, plus five House rows with no name.
 5. **Party overrides** in `data/manual/candidate_party_overrides.csv`: confirm Murkowski and Lummis; add Ben David and Tshibaka.
@@ -135,3 +119,24 @@ None. This step is data only.
   - NC-9 2018 counted as vacant (never certified, re-run in 2019).
   - NY-22 2020 kept Republican with a note (count finished after the Congress opened).
 - **Manual files:** left as they were, apart from the new seat-changes file.
+
+## Revision 2 (the 8 manual Senate races)
+
+- **Pipeline:** re-run with your filled `data/manual/senate_results_manual.csv`. 25 of 25 tests pass, and two runs give identical outputs.
+- **Knock-on flips resolve:** every race from 2000 to 2024 now has both flip values. Alabama 2020 (Tuberville) is a flip from DEM under both definitions: the previous winner and the holder are both Jones (D, 2017 special). Other results:
+  - Flips: MA 2010 special and MA 2012 (Brown in, then Warren out), LA 2014, AL 2017 special.
+  - NJ 2013 special: a flip under the holder rule only (Booker won the seat Chiesa (R) held by appointment).
+  - LA 2008, 2016, 2020, 2022; MS 2018 special and 2020; MA 2013 and 2014; NJ 2014: no flip.
+- **New test `test_every_manual_row_has_source_url`:**
+  - **Strict on every row:** fails if any row in `presidents.csv`, `independents.csv`, `senate_specials.csv`, `senate_seat_changes.csv` or `senate_results_manual.csv` has a blank source URL.
+  - **Templates:** in `candidate_party_overrides.csv` and `2026_provisional.csv`, it fails if any row holding a value has no source URL. I didn't make it strict there, because the empty placeholder rows you asked me to leave would fail today: two blank party overrides, and the 2026 House and chamber rows, which have no source column filled until results arrive.
+  - **Coverage:** the test also fails if a new CSV appears in `data/manual/` without being registered in it.
+  - **Proof it bites:** I blanked one `source_url` in a temporary edit and the test failed, then restored your file byte for byte.
+- **New test `test_manual_results_resolve_knock_on_flips`:** pins the Alabama 2020 result and the absence of null flips before 2026.
+- **Arithmetic check:** each manual row's percentages match the vote counts quoted in its note, to two decimals.
+- **Two corrections to my first diagnosis of MEDSL:**
+  - **MS 2018 special:** MEDSL already holds the 27 November runoff. Its two rows (486,769 and 420,819 of 907,588) are the same as the official runoff, so "runoff missing" was wrong.
+  - **LA 2016:** MEDSL mixes rounds. The finalists' rows carry runoff totals (536,191 and 347,816) while the other candidates carry first-round totals.
+
+  Both races still needed manual values, so the outputs are the same either way. The `issue` column in your file keeps my original wording; you may want to correct it.
+- **Something to check:** every note in the file says "Filled by Claude from the official source". I did not fill these values in this session, and I have not fetched those source URLs. If another session filled them, the spot-check the notes ask for is still worth doing, particularly the PDF sources.

@@ -72,7 +72,7 @@ Seats are counted by **caucus**: the president's party plus the independents who
 - **Years used:** 1994 to 2024 (1994 to 1998 only to find the previous winner of each seat)
 - **Caveats:**
   - Only even-year November elections and their runoffs are included. The off-cycle specials MA January 2010, MA 2013, NJ 2013 and AL 2017 are missing.
-  - LA 2002 mixes both rounds under one stage label. LA 2014 finalist totals look wrong. LA 2016 and the MS 2018 special lack their runoffs. These races are null until entered in `data/manual/senate_results_manual.csv`.
+  - LA 2002 mixes both rounds under one stage label. LA 2014 finalist totals look wrong (runoff plus 1,000,000). LA 2016 mixes runoff totals for the finalists with first-round totals for the rest. These races, the MS 2018 special and the four off-cycle specials come from `data/manual/senate_results_manual.csv` instead (source_id `manual_senate_results`), filled from official sources: Clerk of the House, FEC, and the MA, NJ and AL election offices. For the MS 2018 special, MEDSL's two rows turned out to equal the official runoff.
   - Some 2018 to 2024 rows are flagged `unofficial` by MEDSL. They are kept, and the flag is in `senate_results_detail.csv`.
   - A few candidates have no party label. Where the winner's party is clear from MEDSL's own other rows, it is set in `data/manual/candidate_party_overrides.csv`; otherwise it is left null.
   - Vote shares use valid votes: over votes, under votes, blanks and exhausted ballots are removed from the denominator. Alaska 2022 is the first ranked-choice round.
