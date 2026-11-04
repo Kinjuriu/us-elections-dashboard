@@ -1,0 +1,102 @@
+# Sources
+
+Every number in `data/processed/` comes from one of the sources below, through a script in `pipeline/`. Raw files sit in `data/raw/` and are never edited; `data/raw/manifest.json` records the URL, access time and SHA-256 of each download. All dates accessed are 4 November 2026 unless stated.
+
+Party codes used in every file: `DEM` (Democratic, including Minnesota's Democratic-Farmer-Labor), `GOP` (Republican), `IND` (independent), `OTHER` (any other party).
+
+## Timing rule: seats at the start of each Congress
+
+`chamber_control.csv` and `midterm_swing.csv` count seats **at the opening of each Congress**, not on election night and not at the end of the Congress.
+
+- **House:** the Historian's table gives divisions "as of the initial election results for a particular Congress"; later deaths, resignations, special elections and party switches are not included.
+- **Senate:** we take the first dated row of each Congress's 1st session in the Senate's table, which is the opening-day division. The Senate's summary line is sometimes a later position (for the 117th it shows 48 D and 50 R, the position after 20 January 2021), so we do not use it.
+- **Majority party (Senate):** the party the Senate lists first for the opening day. Two Congresses are affected by the opening-day rule:
+  - 107th: DEM, because Vice President Gore broke ties from 3 to 20 January 2001.
+  - 117th: GOP, because the 51 R opening count came before the Georgia runoff winners were seated on 20 January 2021.
+- **Majority threshold:** `floor(total_seats / 2) + 1`, so 218 for a 435-seat House and 51 for a 100-seat Senate. In a 50-50 Senate the Vice President's tie-breaking vote decides control; the threshold column does not model that.
+
+## Statehood seats, 1959 to 1963
+
+- **House:** 435 seats, except 436 at the opening of the 86th Congress (Alaska seated in January 1959; Hawaii's member joined on 21 August 1959) and 437 in the 87th. Back to 435 from the 88th.
+- **Senate:** 96 senators through the 85th Congress, 98 at the opening of the 86th (Alaska's two senators), and 100 from the 87th. Hawaii's two senators were seated on 21 August 1959.
+
+## Midterm swing definition
+
+`seats_before` is the president's party's seats at the opening of the outgoing Congress; `seats_after` is the same at the opening of the new Congress. The president is the one in office on election day (so 1974 is Ford). Because both ends use opening-day counts, opening-day oddities carry through: the 2022 Senate change (+2 for Democrats) starts from 46, the 117th's opening count taken before the Georgia runoff winners were seated.
+
+## Source list
+
+### `house_historian_party_divisions`
+- **Title:** Party Divisions of the House of Representatives, 1789 to Present
+- **Publisher:** US House of Representatives, Office of the Historian and Office of Art and Archives
+- **URL:** https://history.house.gov/Institution/Party-Divisions/Party-Divisions/
+- **Licence:** US government work, public domain
+- **Years used:** 79th to 119th Congress (1945 to 2027)
+- **Caveats:** Counts are as of the initial election results. Delegates and the Resident Commissioner are excluded. Vacancies are not a column: we derive them as total minus party seats, and the only non-zero cases match the source footnotes (99th one vacancy; 116th NC-9 and 117th NY-22 not certified at the opening). The "Other" column is split by its labels: "Independent" and "Independent Democrat" go to `ind`, every other party (e.g. American Labor) to `other`. The label text is kept in `chamber_other_detail.csv`.
+
+### `senate_party_division`
+- **Title:** Party Division
+- **Publisher:** US Senate Historical Office
+- **URL:** https://www.senate.gov/about/parties-leadership/party-division.htm (formerly /history/partydiv.htm)
+- **Copy used:** Internet Archive capture `20261102191213` (2 November 2026, 19:12:13 UTC): https://web.archive.org/web/20261102191213/https://www.senate.gov/about/parties-leadership/party-division.htm. It includes the 119th Congress.
+- **Why a copy:** senate.gov answers scripted requests with HTTP 403. The archived page is the Senate's own page as published.
+- **Licence:** US government work, public domain
+- **Years used:** 79th to 119th Congress
+- **Caveats:** The "Other" cell is split by label: Independent and Independent Democrat go to `ind`; Conservative (James Buckley, NY, 92nd to 94th) goes to `other`.
+
+### `house_historian_presidents` and `house_historian_party_government`
+- **Titles:** Presidents, Vice Presidents, and Coinciding Sessions of Congress; Party Government Since 1857
+- **Publisher:** US House of Representatives, Office of the Historian
+- **URLs:** https://history.house.gov/Institution/Presidents-Coinciding/Presidents-Coinciding/ and https://history.house.gov/Institution/Presidents-Coinciding/Party-Government/
+- **Licence:** public domain
+- **Use:** The source of `data/manual/presidents.csv` (term dates from the first page, party from the second). The tests check each president and majority party against the Party Government page.
+
+### `medsl_senate`
+- **Title:** U.S. Senate statewide 1976 to 2024
+- **Publisher:** MIT Election Data and Science Lab, Harvard Dataverse, doi:10.7910/DVN/PEJ5QU
+- **Version:** 8.0, released 11 May 2026. Last election covered: 2024 (plus the January 2021 Georgia runoffs).
+- **Licence:** CC0 1.0
+- **Years used:** 1994 to 2024 (1994 to 1998 only to find the previous winner of each seat)
+- **Caveats:**
+  - Only even-year November elections and their runoffs are included. The off-cycle specials MA January 2010, MA 2013, NJ 2013 and AL 2017 are missing.
+  - LA 2002 mixes both rounds under one stage label. LA 2014 finalist totals look wrong. LA 2016 and the MS 2018 special lack their runoffs. These races are null until entered in `data/manual/senate_results_manual.csv`.
+  - Some 2018 to 2024 rows are flagged `unofficial` by MEDSL. They are kept, and the flag is in `senate_results_detail.csv`.
+  - A few candidates have no party label. Where the winner's party is clear from MEDSL's own other rows, it is set in `data/manual/candidate_party_overrides.csv`; otherwise it is left null.
+  - Vote shares use valid votes: over votes, under votes, blanks and exhausted ballots are removed from the denominator. Alaska 2022 is the first ranked-choice round.
+
+### `medsl_house`
+- **Title:** U.S. House 1976 to 2024
+- **Publisher:** MIT Election Data and Science Lab, Harvard Dataverse, doi:10.7910/DVN/IG0UN2
+- **Version:** 15.0, released 9 March 2026. Last election covered: 2024.
+- **Licence:** CC0 1.0. The download sits behind a Dataverse guestbook, so Stephane downloaded it by hand on 4 November 2026 into `data/raw/medsl/1976-2024-house.tab`. Despite the extension, the file is comma-separated.
+- **Years used:** 2000 to 2024
+- **Caveats:**
+  - DC's non-voting delegate is excluded.
+  - Texas 2006: four redrawn districts were flagged as specials and are used as that year's race.
+  - Florida does not print unopposed candidates on the ballot, so those seats add no votes to vote shares. Uncontested seats everywhere make vote shares an imperfect measure of support.
+  - Maine's ranked-choice districts: 2018 and 2024 rows are final-round totals; 2022 mixes rounds, and its exhausted-ballot row is dropped.
+  - Seat counts rebuilt from MEDSL match the House Historian's opening-day counts in every year from 2000 to 2024, except NC-9 (2018) and NY-22 (2020), which MEDSL counts as Republican wins and the Historian lists as vacant at the opening.
+
+### `manual_2026_provisional`
+- **File:** `data/manual/2026_provisional.csv`
+- **Contents:**
+  - The 2026 Senate race list: 33 Class 2 seats plus the Florida and Ohio Class 3 specials, from https://en.wikipedia.org/wiki/2026_United_States_Senate_elections (race list only). The tests check it against MEDSL's 2020 Class 2 races.
+  - Empty slots for results.
+- **Status:** No 2026 results are entered yet. AP (apnews.com) blocks automated access, and on 4 November 2026 no certified results existed. Results must be entered by hand from AP or official state pages, with `result_source_url` and `result_accessed_at` on every row.
+- **Labelling:** every 2026 row is `is_provisional = true`. 2026 House seats per state reuse 2024 counts, since apportionment is unchanged from 2022 to 2030.
+
+### Manual reference files (`data/manual/`)
+- **`presidents.csv`:** see the House Historian presidents and party government entries above.
+- **`independents.csv`:** names and caucus for every independent counted in `ind`. Rows marked `verified_in_source = false` rely on general knowledge and need checking. Some House rows have no name yet.
+- **`senate_specials.csv`:** the seat class for each special election from 1994 to 2026, used to link each race to the previous one for the same seat. Each row cites the Wikipedia article for that special. Every class is marked `verified = false`.
+- **`senate_results_manual.csv`:** races MEDSL lacks or gets wrong, to be filled from official state results.
+- **`candidate_party_overrides.csv`:** party labels MEDSL leaves blank.
+
+## Definition of `flipped` (Senate)
+
+`previous_party` is the party that won the last election for the same seat (same state and Senate class, earlier year). `flipped` is true when the winner's party differs. This compares one election with the previous one, so it ignores appointments and party switches in between. For example:
+
+- Toomey (GOP) in PA 2010 is not a flip, because Specter won the seat as a Republican in 2004, even though Specter was a Democrat by 2010.
+- Murphy (DEM) in CT 2012 is a flip from Lieberman (IND, 2006).
+
+AP and other newsrooms usually compare with the party holding the seat on election day.
