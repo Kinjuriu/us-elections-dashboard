@@ -13,6 +13,11 @@ Party codes used in every file: `DEM` (Democratic, including Minnesota's Democra
 - **Majority party (Senate):** the party the Senate lists first for the opening day. Two Congresses are affected by the opening-day rule:
   - 107th: DEM, because Vice President Gore broke ties from 3 to 20 January 2001.
   - 117th: GOP, because the 51 R opening count came before the Georgia runoff winners were seated on 20 January 2021.
+- **Majority for most of the Congress:** `majority_party_most_of_congress` is the party that held the Senate for the most days, measured from the dated session tables. `majority_note` explains every Congress where control changed hands, using the Senate page's footnotes. Only the 107th and 117th qualify:
+  - 107th: DEM at the opening, GOP from 20 January 2001, DEM from 6 June 2001 (Jeffords). DEM for most of the Congress.
+  - 117th: GOP at the opening, DEM from 20 January 2021. DEM for most of the Congress.
+
+  The House Historian gives one division per Congress and no House majority changed hands during a Congress in this period, so for the House the column equals `majority_party`. Charts use `majority_party_most_of_congress`, with a footnote marker where `majority_note` is set.
 - **Majority threshold:** `floor(total_seats / 2) + 1`, so 218 for a 435-seat House and 51 for a 100-seat Senate. In a 50-50 Senate the Vice President's tie-breaking vote decides control; the threshold column does not model that.
 
 ## Statehood seats, 1959 to 1963
@@ -22,7 +27,15 @@ Party codes used in every file: `DEM` (Democratic, including Minnesota's Democra
 
 ## Midterm swing definition
 
-`seats_before` is the president's party's seats at the opening of the outgoing Congress; `seats_after` is the same at the opening of the new Congress. The president is the one in office on election day (so 1974 is Ford). Because both ends use opening-day counts, opening-day oddities carry through: the 2022 Senate change (+2 for Democrats) starts from 46, the 117th's opening count taken before the Georgia runoff winners were seated.
+Seats are counted by **caucus**: the president's party plus the independents who caucus with it. Third-party members such as the Conservative James Buckley are not counted.
+
+- **Senate `seats_before`:** the composition on election day. This is the last dated row in the Senate's session tables on or before election day in the outgoing Congress (`before_basis = election_day`, `before_as_of` is the row date).
+- **House `seats_before`:** the House Historian records only opening-day divisions, so House rows keep the opening day of the outgoing Congress (`before_basis = opening_day`) and are flagged.
+- **`seats_after`:** the opening day of the new Congress.
+- **Independents:** which way each one caucuses comes from `data/manual/independents.csv`. A senator who became an independent during the Congress (Jeffords, 2001) is taken from `data/manual/senate_seat_changes.csv`.
+- **`flag`:** set on any row resting on a caucus that is unverified or unknown. Independents with an unknown caucus are left out of the count.
+- **President:** the one in office on election day (so 1974 is Ford).
+- **Check:** the 2022 Senate row comes out at +1 for the Democratic caucus (50 on election day, 51 at the opening of the 118th).
 
 ## Source list
 
@@ -75,7 +88,9 @@ Party codes used in every file: `DEM` (Democratic, including Minnesota's Democra
   - Texas 2006: four redrawn districts were flagged as specials and are used as that year's race.
   - Florida does not print unopposed candidates on the ballot, so those seats add no votes to vote shares. Uncontested seats everywhere make vote shares an imperfect measure of support.
   - Maine's ranked-choice districts: 2018 and 2024 rows are final-round totals; 2022 mixes rounds, and its exhausted-ballot row is dropped.
-  - Seat counts rebuilt from MEDSL match the House Historian's opening-day counts in every year from 2000 to 2024, except NC-9 (2018) and NY-22 (2020), which MEDSL counts as Republican wins and the Historian lists as vacant at the opening.
+  - Independents go in `ind` (Sanders VT 2000 to 2004, Goode VA 2000); other parties go in `other`.
+  - NC-9 2018 is counted as vacant, because the election was never certified and was re-run in 2019. NY-22 2020 stays a Republican seat, because the count finished after the 117th Congress opened. Both rows carry a `note`.
+  - With those rules, seat counts rebuilt from MEDSL match the House Historian's opening-day counts in every year from 2000 to 2024. The one difference is NY-22 2020, which the Historian lists as vacant at the opening.
 
 ### `manual_2026_provisional`
 - **File:** `data/manual/2026_provisional.csv`
@@ -91,12 +106,22 @@ Party codes used in every file: `DEM` (Democratic, including Minnesota's Democra
 - **`senate_specials.csv`:** the seat class for each special election from 1994 to 2026, used to link each race to the previous one for the same seat. Each row cites the Wikipedia article for that special. Every class is marked `verified = false`.
 - **`senate_results_manual.csv`:** races MEDSL lacks or gets wrong, to be filled from official state results.
 - **`candidate_party_overrides.csv`:** party labels MEDSL leaves blank.
+- **`senate_seat_changes.csv`:** party switches and appointments from 2000 to 2026 that changed a seat's party: Coverdell to Miller (GA 2000), Jeffords (VT 2001), Wellstone to Barkley (MN 2002), Specter (PA 2009), Lautenberg to Chiesa (NJ 2013), Sinema (AZ 2022) and Manchin (WV 2024). Each cites the archived Senate party division page and is marked `verified = false`. The page gives no date for Sinema's switch; that date comes from general knowledge.
 
-## Definition of `flipped` (Senate)
+## Flip definitions (Senate)
 
-`previous_party` is the party that won the last election for the same seat (same state and Senate class, earlier year). `flipped` is true when the winner's party differs. This compares one election with the previous one, so it ignores appointments and party switches in between. For example:
+Both are kept. The site displays `flipped_vs_holder`.
 
-- Toomey (GOP) in PA 2010 is not a flip, because Specter won the seat as a Republican in 2004, even though Specter was a Democrat by 2010.
-- Murphy (DEM) in CT 2012 is a flip from Lieberman (IND, 2006).
+- **`flipped_vs_last_election`:** compares the winner's party with `previous_party`, the party that won the last election for the same seat (same state and Senate class, earlier year).
+- **`flipped_vs_holder`:** AP's convention. It compares the winner's party with `holder_party`, the party holding the seat on election day. That is `previous_party`, updated by any change in `senate_seat_changes.csv` dated between 3 January after the last election and this election day. Starting on 3 January means an interim appointment made after an election and ended when the elected senator was sworn in (Barkley, MN 2002) does not carry over.
+- **Off-cycle specials** missing from MEDSL (MA 2010 and 2013, NJ 2013, AL 2017) are dated to their year's November election day for this purpose. No listed seat change falls between their real date and that one.
 
-AP and other newsrooms usually compare with the party holding the seat on election day.
+The two definitions differ in these races (2000 to 2024, where both are known):
+
+| Race | `previous_party` | `holder_party` | Winner | vs last election | vs holder |
+|---|---|---|---|---|---|
+| GA 2000 special | GOP | DEM | DEM | flip | no flip |
+| VT 2006 | GOP | IND | IND | flip | no flip |
+| PA 2010 | GOP | DEM | GOP | no flip | flip |
+| AZ 2024 | DEM | IND | DEM | no flip | flip |
+| WV 2024 | DEM | IND | GOP | flip | flip |

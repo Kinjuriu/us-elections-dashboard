@@ -83,6 +83,28 @@ def test_majority_party_matches_party_government_page(cc):
     assert sorted(mismatches) == [("senate", 107), ("senate", 117)]
 
 
+def test_majority_most_of_congress(cc):
+    """Matches the Party Government page in every Congress (it lists the 107th Senate as
+    'Republicans / Democrats'); notes are set exactly where Senate control changed."""
+    words = {"Democrats": "DEM", "Republicans": "GOP"}
+    for r in html_rows(RAW / "house_historian" / "party_government.html"):
+        n = congress_number(r[0]) if r else None
+        if not n or not 80 <= n <= 119:
+            continue
+        for chamber, cell in (("house", r[1]), ("senate", r[2])):
+            ours = cc[(cc.congress == n) & (cc.chamber == chamber)].iloc[0].majority_party_most_of_congress
+            if "/" in cell:
+                assert ours in {words[w.strip().rstrip("0123456789")] for w in cell.split("/")}
+            else:
+                assert ours == words[cell.rstrip("0123456789")], (chamber, n)
+    noted = cc[cc.majority_note.fillna("") != ""]
+    assert sorted(zip(noted.chamber, noted.congress)) == [("senate", 107), ("senate", 117)]
+    s107 = cc[(cc.congress == 107) & (cc.chamber == "senate")].iloc[0]
+    s117 = cc[(cc.congress == 117) & (cc.chamber == "senate")].iloc[0]
+    assert (s107.majority_party, s107.majority_party_most_of_congress) == ("DEM", "DEM")
+    assert (s117.majority_party, s117.majority_party_most_of_congress) == ("GOP", "DEM")
+
+
 def test_presidents_match_party_government_page(cc):
     party_word = {"Democrat": "DEM", "Republican": "GOP"}
     for r in html_rows(RAW / "house_historian" / "party_government.html"):
@@ -117,10 +139,21 @@ def test_midterm_swing(cc):
     done = m.dropna(subset=["change"])
     assert (done.seats_after - done.seats_before == done.change).all()
     assert m[m.year == 2026].is_provisional.all()
-    # "after" is the president's party at the opening of the new Congress.
+    assert (m[m.chamber == "senate"].before_basis == "election_day").all()
+    house = m[m.chamber == "house"]
+    assert (house.before_basis == "opening_day").all() and house.flag.str.contains("opening-day").all()
+    # "after" is the president's party at the opening of the new Congress plus at most
+    # the independents counted that day.
     for r in done.itertuples():
         row = cc[(cc.election_year == r.year) & (cc.chamber == r.chamber)].iloc[0]
-        assert row[r.president_party.lower()] == r.seats_after
+        extra = r.seats_after - row[r.president_party.lower()]
+        assert 0 <= extra <= row.ind, (r.year, r.chamber)
+
+
+def test_midterm_2022_senate_is_plus_one_for_democratic_caucus():
+    m = pd.read_csv(PROCESSED / "midterm_swing.csv")
+    r = m[(m.year == 2022) & (m.chamber == "senate")].iloc[0]
+    assert (r.president_party, r.seats_before, r.seats_after, r.change) == ("DEM", 50, 51, 1)
 
 
 # ---- senate_results_by_state ------------------------------------------------------
@@ -166,27 +199,42 @@ def test_2026_senate_race_list(senate):
     assert set(s26[~s26.special].state_po) == reg2020
 
 
+def test_flip_definitions(senate):
+    def race(y, s):
+        return senate[(senate.year == y) & (senate.state_po == s) & ~senate.special].iloc[0]
+    pa = race(2010, "PA")  # Specter switched to Democrat in 2009
+    assert not pa.flipped_vs_last_election and pa.flipped_vs_holder and pa.holder_party == "DEM"
+    mn = race(2008, "MN")  # Barkley's interim appointment ended in January 2003
+    assert mn.holder_party == "GOP"
+    same = senate.dropna(subset=["previous_party", "holder_party", "winner_party"])
+    same = same[same.previous_party == same.holder_party]
+    assert (same.flipped_vs_last_election == same.flipped_vs_holder).all()
+
+
 # ---- house_delegations_by_state ----------------------------------------------------
 
 def test_house_delegations_sum_to_435(house):
     for year, g in house.groupby("year"):
         assert g.seats.sum() == 435, year
         assert len(g) == 50, year
-    done = house.dropna(subset=["dem", "gop", "other", "vacant"])
-    assert (done[["dem", "gop", "other", "vacant"]].sum(axis=1) == done.seats).all()
+    parts = ["dem", "gop", "ind", "other", "vacant"]
+    done = house.dropna(subset=parts)
+    assert (done[parts].sum(axis=1) == done.seats).all()
 
 
 def test_house_delegations_match_historian(house, cc):
-    """Seats won (MEDSL) against the opening-day division (House Historian). The only
-    gaps allowed are the two Historian footnotes: NC-9 (2018) and NY-22 (2020) were
-    not certified at the opening, and MEDSL counts both as Republican wins."""
-    h = house[~house.is_provisional].groupby("year")[["dem", "gop", "other"]].sum()
+    """Seats won (MEDSL) against the opening-day division (House Historian). NC-9 2018
+    is counted as vacant, as the Historian does. The one gap left is NY-22 2020, kept
+    as a Republican seat with a note (count finished after the Congress opened)."""
+    h = house[~house.is_provisional].groupby("year")[["dem", "gop", "ind", "other", "vacant"]].sum()
     hist = cc[cc.chamber == "house"].set_index("election_year")
     for year, row in h.iterrows():
         ref = hist.loc[year]
-        assert row.dem == ref.dem, year
-        assert row.other == ref.ind + ref.other, year
-        assert row.gop == ref.gop + (1 if year in (2018, 2020) else 0), year
+        assert (row.dem, row.ind, row.other) == (ref.dem, ref.ind, ref.other), year
+        assert row.gop == ref.gop + (1 if year == 2020 else 0), year
+        assert row.vacant == ref.vacant - (1 if year == 2020 else 0), year
+    noted = house[house.note.fillna("") != ""]
+    assert sorted(zip(noted.year, noted.state_po)) == [(2018, "NC"), (2020, "NY")]
 
 
 def test_house_vote_shares(house):
@@ -198,7 +246,8 @@ def test_house_vote_shares(house):
 
 def test_manual_rows_have_sources():
     for name, url_col in [("presidents.csv", "dates_source_url"), ("independents.csv", "source_url"),
-                          ("senate_specials.csv", "source_url")]:
+                          ("senate_specials.csv", "source_url"),
+                          ("senate_seat_changes.csv", "source_url")]:
         df = pd.read_csv(MANUAL / name)
         assert df[url_col].notna().all(), name
         assert df.accessed_at.notna().all(), name
@@ -230,7 +279,8 @@ def test_spot_checks(cc, senate, house):
     #    Ossoff 2,269,262 and Perdue 2,213,979 of 4,483,241.
     r = senate[(senate.year == 2020) & (senate.state_po == "GA") & ~senate.special].iloc[0]
     assert r.winner_party == "DEM" and r.winner_pct == 50.62 and r.runner_up_pct == 49.38
-    assert bool(r.flipped) and r.previous_party == "GOP"
+    assert bool(r.flipped_vs_last_election) and r.previous_party == "GOP"
+    assert bool(r.flipped_vs_holder) and r.holder_party == "GOP"
     # 5. Maine House 2024 (MEDSL): both seats DEM; ME-2 final round Golden 197,151 v Theriault 194,445.
     r = house[(house.year == 2024) & (house.state_po == "ME")].iloc[0]
     assert (r.seats, r.dem, r.gop) == (2, 2, 0)
