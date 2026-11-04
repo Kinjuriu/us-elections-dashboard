@@ -305,7 +305,7 @@ const unifiedAt = new Set(cs.filter((c) => c.unified).map((c) => c.congress));
   /* ---- Wide ---- */
   .cc__wide { display: none; }
   .cc__narrow { display: grid; gap: 2px; }
-  @media (min-width: 1024px) {
+  @container chart (min-width: 700px) {
     .cc__wide {
       display: grid;
       grid-template-columns: var(--cc-gutter) minmax(0, 1fr);

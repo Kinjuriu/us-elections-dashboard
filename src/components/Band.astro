@@ -1,0 +1,165 @@
+---
+// The summary band: one row per chamber with the Democratic count, a row of
+// squares, the Republican count and the majority line. With a comparison
+// year set, each chamber gains a second row and the change written between
+// them. Drawn at build time for the default year; src/scripts/band.ts
+// redraws it from the JSON block below.
+import { shapes, kinds, independentsText, countText, rowLabel, CELL, type BandChamber } from '../lib/band';
+import type { HeaderYear } from '../lib/dashboardData';
+
+interface Props {
+  years: Record<number, HeaderYear>;
+  year: number;
+}
+const { years, year } = Astro.props;
+const h = years[year];
+const chambers: { id: BandChamber; label: string }[] = [
+  { id: 'house', label: 'House' },
+  { id: 'senate', label: 'Senate' },
+];
+---
+<div class="band" data-band>
+  {chambers.map(({ id, label }) => {
+    const c = h[id];
+    const sh = shapes(id, c.total, c.threshold);
+    const ks = kinds(id, c.balance, c.total);
+    return (
+      <div class="band__chamber" data-chamber={id}>
+        {(['primary', 'compare'] as const).map((slot) => (
+          <>
+            {slot === 'compare' && <p class="band__change" data-change hidden></p>}
+            <div class="band__row" data-slot={slot} hidden={slot === 'compare'}>
+              <p class="band__name label">{label}<span class="band__yr" data-yr hidden></span></p>
+              <p class="band__n band__n--dem" data-num="dem">{countText(c.balance.dem)}<span class="band__letter" aria-hidden="true"> D</span></p>
+              <div class="band__plot" role="img" aria-label={rowLabel(id, '', c.balance, c.total, c.threshold)} data-total={c.total} data-threshold={c.threshold}>
+                {sh.map((s) => (
+                  <div class={`band__shape band__shape--${s.id}`}>
+                    <span class="band__tick-n" style={`left:${s.tickPct}%`} aria-hidden="true">{c.threshold}</span>
+                    <svg viewBox={`0 0 ${s.width} ${s.height}`} aria-hidden="true" focusable="false">
+                      {s.at.map(([x, y], i) => (
+                        <rect x={x} y={y} width={CELL} height={CELL} data-kind={ks[i]} />
+                      ))}
+                      <line class="band__tick" x1={s.tickX} x2={s.tickX} y1="-2" y2={s.height + 2} />
+                    </svg>
+                  </div>
+                ))}
+              </div>
+              <p class="band__n band__n--gop" data-num="gop">{countText(c.balance.gop)}<span class="band__letter" aria-hidden="true"> R</span></p>
+              <p class="band__maj"><span data-win>{c.threshold} to win</span><span class="band__ind" data-ind>{independentsText(c.balance)}</span></p>
+            </div>
+          </>
+        ))}
+      </div>
+    );
+  })}
+  <script type="application/json" data-band-data set:html={JSON.stringify(years)}></script>
+</div>
+
+<script>
+  import '../scripts/band';
+</script>
+
+<style>
+  .band {
+    display: grid;
+    gap: var(--sp-3);
+    padding: var(--sp-4) var(--sp-4) var(--sp-2);
+  }
+  .band__chamber { display: grid; gap: var(--sp-1); }
+  .band__row[hidden],
+  .band__change[hidden],
+  .band__yr[hidden] { display: none; }
+  .band__row {
+    display: grid;
+    grid-template-columns: 56px 44px minmax(0, 1fr) 44px;
+    grid-template-areas:
+      'name dem plot gop'
+      'maj  maj maj  maj';
+    align-items: end;
+    gap: var(--sp-1) var(--sp-2);
+  }
+  .band__name { grid-area: name; align-self: end; line-height: 1.1; }
+  .band__yr { display: block; font-weight: 500; color: var(--ink-2); letter-spacing: 0.04em; }
+  .band__n {
+    font-family: var(--font-label);
+    font-weight: 700;
+    font-size: var(--fs-4);
+    line-height: 1;
+    font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+  }
+  .band__n--dem { grid-area: dem; color: var(--dem); text-align: right; }
+  .band__n--gop { grid-area: gop; color: var(--gop); }
+  .band__letter { font-size: var(--fs-1); font-weight: 600; }
+  .band__plot { grid-area: plot; position: relative; padding-top: 16px; min-width: 0; }
+  .band__shape { position: relative; }
+  .band__shape svg { display: block; width: 100%; height: auto; overflow: visible; }
+  .band__shape--narrow { display: block; }
+  .band__shape--wide { display: none; }
+  .band__tick { stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .band__tick-n {
+    position: absolute;
+    top: -16px;
+    transform: translateX(-50%);
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .band__maj {
+    grid-area: maj;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 var(--sp-4);
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: var(--fs-1);
+    color: var(--ink-2);
+  }
+  .band__maj :global([data-win]:empty) { display: none; }
+  .band__change {
+    margin-top: var(--sp-1);
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .band__change :global(.band__delta) { white-space: nowrap; }
+  .band__change :global(.band__delta + .band__delta)::before {
+    content: '';
+    display: inline-block;
+    width: var(--sp-3);
+  }
+
+  .band rect[data-kind='dem'] { fill: var(--dem); }
+  .band rect[data-kind='gop'] { fill: var(--gop); }
+  .band rect[data-kind='ind-dem'],
+  .band rect[data-kind='ind-gop'],
+  .band rect[data-kind='ind-unknown'] { fill: var(--ind); }
+  .band rect[data-kind='other'] { fill: var(--ink-3); }
+  .band rect[data-kind='vacant'] { fill: var(--paper); stroke: var(--ink-2); stroke-width: 1; vector-effect: non-scaling-stroke; }
+  .band rect[data-kind='missing'] {
+    fill: var(--no-race);
+    stroke: var(--ink-3);
+    stroke-width: 1;
+    stroke-dasharray: 1 1;
+    vector-effect: non-scaling-stroke;
+  }
+
+  @media (min-width: 640px) {
+    .band__row {
+      grid-template-columns: 72px 52px minmax(0, 1fr) 52px 190px;
+      grid-template-areas: 'name dem plot gop maj';
+      align-items: center;
+    }
+    .band__plot { align-self: end; }
+    .band__shape--wide { display: block; }
+    .band__shape--narrow { display: none; }
+    .band__maj { flex-direction: column; gap: 0; }
+    .band__n { align-self: end; padding-bottom: 0; }
+  }
+  @media (min-width: 640px) {
+    .band__name { align-self: end; }
+  }
+</style>

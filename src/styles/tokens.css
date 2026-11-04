@@ -15,7 +15,7 @@
   --dem-tint:     #9EBEF0;  /* leading, not called */
   --gop:          #D7262E;  /* Republican, called / won */
   --gop-tint:     #F2A6A6;  /* leading, not called */
-  --ind:          #8A6D1F;  /* independents */
+  --ind:          #E8B730;  /* independents; text on it is --ink */
   --no-race:      #ECECEA;  /* no race this cycle, or no data yet */
 
   /* Colour: map */

@@ -61,12 +61,12 @@ export function houseTitle(h: HouseYear): { title: string; subtitle: string } {
 
 // ---------- Fills and label tone ----------
 
-const DARK: SenateFill[] = ['dem', 'gop', 'ind', 'other'];
+const DARK: SenateFill[] = ['dem', 'gop', 'other'];
 
-/** White labels on full party fills and hatching, ink on tints and greys. */
+/** White labels on Democratic, Republican and other fills and hatching; ink on tints, greys and the amber independent colour. */
 export function senateTone(fill: SenateFill, flipped: boolean, split: [SenateFill, SenateFill] | null = null): 'dark' | 'light' {
   if (split) return DARK.includes(split[0]) && DARK.includes(split[1]) ? 'dark' : 'light';
-  if (flipped) return 'dark';
+  if (flipped) return fill.startsWith('ind') ? 'light' : 'dark';
   return DARK.includes(fill) ? 'dark' : 'light';
 }
 
@@ -316,4 +316,96 @@ export function houseChanged(data: RecordData, a: number, b: number): Set<string
     if (p && q && p !== q) changed.add(st);
   }
   return changed;
+}
+
+// ---------- National panel: what the side panel shows before a state is chosen ----------
+
+/** What the panel needs to know about the Congress a year's bars show. */
+export interface NationalHeader {
+  congress: number;
+  yearsServed: string;
+  /** Why the bars show another year's Congress, or ''. */
+  note: string;
+  /** Senate control note for the Congress, or ''. */
+  senateNote: string;
+  /** The source gives a count of independents but not their caucus. */
+  unverifiedInd: boolean;
+}
+
+type NationalData = RecordData & Pick<MapData, 'stateNames'>;
+
+/** "Montana, Ohio and Pennsylvania" as links that open each state's record. */
+function stateLinks(sts: string[], view: View, year: number, names: Record<string, string>): string {
+  if (!sts.length) return '';
+  const link = (st: string) =>
+    `<a href="?year=${year}&amp;chamber=${view}&amp;state=${st}" data-open-state="${st}">${esc(names[st])}</a>`;
+  const list = [...sts].sort((a, b) => names[a].localeCompare(names[b])).map(link);
+  return list.length === 1 ? list[0] : `${list.slice(0, -1).join(', ')} and ${list[list.length - 1]}`;
+}
+
+/**
+ * The side panel with no state selected: the headline numbers for the year
+ * and chamber on the map. With a comparison year, the states that changed.
+ */
+export function nationalHtml(
+  view: View, year: number, data: NationalData, header: NationalHeader | undefined, compare: number | null,
+): string {
+  const sy = data.senate[year];
+  const hy = data.house[year] ?? data.house[year - 1];
+  const names = data.stateNames;
+  const bal = view === 'senate' ? sy.balance : hy.totals;
+  const provisional = view === 'senate' ? sy.provisional : hy.provisional;
+  const row = (dt: string, dd: string) => `<div><dt>${dt}</dt><dd>${dd}</dd></div>`;
+  const rows: string[] = [];
+  let flipped = '';
+  let entered = '';
+
+  if (view === 'senate') {
+    rows.push(row('Seats up', fmt(sy.seatsUp)));
+    rows.push(row('Flipped', sy.decided === 0 ? 'n/a' : fmt(sy.flips)));
+    const flips = Object.entries(sy.states).filter(([, s]) => s.flipped).map(([st]) => st);
+    if (flips.length) flipped = `<p class="cmn__states">${stateLinks(flips, view, year, names)}</p>`;
+    entered = `${sy.decided} of ${sy.seatsUp} races entered`;
+  } else {
+    rows.push(row('Seats up', fmt(hy.totals.seats)));
+    const before = data.house[year - 2];
+    const changed = before ? [...houseChanged(data, year - 2, year)] : null;
+    rows.push(row('Delegations that changed majority', changed ? fmt(changed.length) : 'n/a'));
+    if (changed?.length) flipped = `<p class="cmn__states">${stateLinks(changed, view, year, names)}</p>`;
+    const done = Object.values(hy.states).filter((s) => s.dem !== null).length;
+    entered = `${done} of ${Object.keys(hy.states).length} state delegations entered`;
+  }
+
+  const ind = bal.indDem + bal.indGop + bal.indUnknown;
+  const caucus = [bal.indDem && `${bal.indDem} with the Democrats`, bal.indGop && `${bal.indGop} with the Republicans`,
+    bal.indUnknown && `${bal.indUnknown} caucus not known`].filter(Boolean).join(', ');
+  rows.push(row('Independents', fmt(ind)));
+  const indNote = ind && caucus ? `<p class="cmn__note">Caucusing: ${caucus}.</p>` : '';
+  rows.push(row('Majority', view === 'senate' ? '51' : '218'));
+
+  const title = view === 'senate' ? senateTitle(sy).title : houseTitle(hy).title;
+  const congress = header ? `${ordinal(header.congress)} Congress, ${header.yearsServed.replace('-', ' to ')}` : '';
+
+  const notes = [
+    provisional ? `Provisional. Results are entered as states certify: ${entered}.` : '',
+    header?.note ?? '',
+    view === 'senate' && header?.senateNote ? `Senate control. ${header.senateNote}` : '',
+    header?.unverifiedInd ? 'The source gives the number of independents but not their caucus for this Congress; the caucus shown is still to be confirmed.' : '',
+  ].filter(Boolean).map((t) => `<p class="cmn__note">${esc(t)}</p>`).join('');
+
+  let cmp = '';
+  if (compare !== null) {
+    const [a, b] = compare < year ? [compare, year] : [year, compare];
+    const set = view === 'senate' ? senateChanged(data, a, b) : houseChanged(data, a, b);
+    cmp = `<h4 class="cmn__head">Changed between ${a} and ${b}</h4>` +
+      (set.size
+        ? `<p class="cmn__states">${stateLinks([...set], view, year, names)}</p>`
+        : `<p class="cmn__note">${view === 'senate' ? 'No Senate seat' : 'No House delegation'} changed hands between these years.</p>`);
+  }
+
+  return `<h3 class="cmn__title">${title}</h3>
+<p class="cmn__sub">${congress}</p>
+<dl class="cmn__nums">${rows.join('')}</dl>
+${flipped}${indNote}${cmp}${notes}
+<p class="cmn__hint">Select a state on the map, or Tab to the map and use the arrow keys, for its record since 2000.</p>`;
 }

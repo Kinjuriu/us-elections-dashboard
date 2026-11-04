@@ -145,7 +145,7 @@ const decided = cyc.find((c) => c.year === year)?.decided ?? 0;
     font-variant-numeric: tabular-nums lining-nums;
   }
   .fl__cycle[aria-pressed='true'] .fl__year { color: var(--ink); }
-  @media (max-width: 639.98px) {
+  @container chart (max-width: 639.98px) {
     .fl__cycle:not(.is-major):not([aria-pressed='true']) .fl__year,
     /* Columns are narrow: a selected year's neighbours give it room. */
     .fl__cycle[aria-pressed='true'] + .fl__cycle .fl__year,
@@ -209,7 +209,7 @@ const decided = cyc.find((c) => c.year === year)?.decided ?? 0;
   .fl :global(.fl__label) { display: block; font-size: 12px; color: var(--ink-2); font-weight: 400; }
   .fl :global(tr.is-label) { color: var(--ink-2); }
   .fl :global(.fl__short) { display: none; }
-  @media (max-width: 639.98px) {
+  @container chart (max-width: 639.98px) {
     .fl :global(.fl__long) { display: none; }
     .fl :global(.fl__short) { display: inline; }
     .fl :global(.fl__table) { font-size: var(--fs-1); }

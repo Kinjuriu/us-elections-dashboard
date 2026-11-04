@@ -6,11 +6,10 @@
 import type { MapData, SenateYear, HouseYear, HouseStateYear } from '../lib/mapData';
 import type { HouseGrid } from '../lib/geo';
 import type { DashState } from '../lib/store';
-import { setSeatBar } from '../lib/seatbar-client';
 import { store, openState, closeState } from './dashboard';
 import {
-  senateTitle, houseTitle, senateTone, hatchParty, detailsHtml, ariaLabel, senateBarCaption,
-  stateRecordHtml, senateChanged, houseChanged, type View,
+  senateTitle, houseTitle, senateTone, hatchParty, detailsHtml, ariaLabel, nationalHtml,
+  stateRecordHtml, senateChanged, houseChanged, type View, type NationalHeader,
 } from '../lib/mapText';
 
 type Pt = [number, number];
@@ -24,7 +23,12 @@ interface LayoutData {
   anchors: Record<string, Pt>;
   house: Record<string, HouseGrid[]>;
 }
-type ClientData = MapData & { stateOrder: string[]; regions: Record<string, string>; layouts: LayoutData[] };
+type ClientData = MapData & {
+  stateOrder: string[];
+  regions: Record<string, string>;
+  layouts: LayoutData[];
+  header: Record<number, NationalHeader>;
+};
 
 const SVG = 'http://www.w3.org/2000/svg';
 
@@ -37,11 +41,9 @@ function init(root: HTMLElement) {
   const panel = root.querySelector<HTMLElement>('[data-panel]')!;
   const panelRoot = root.querySelector<HTMLElement>('[data-panel-root]')!;
   const clearBtn = root.querySelector<HTMLButtonElement>('[data-clear]')!;
-  const panelEmpty = panel.innerHTML;
-  const headline = root.closest('figure')?.querySelector<HTMLElement>('.chart-frame__title') ?? null;
-  const senateBar = root.querySelector<HTMLElement>('.cmap__bar--senate [data-seat-bar]')!;
-  const houseBar = root.querySelector<HTMLElement>('.cmap__bar--house [data-seat-bar]')!;
-  const controlNote = root.querySelector<HTMLElement>('[data-control-note]')!;
+  // The finding line and its provisional tag sit above the map, in the board.
+  const finding = document.querySelector<HTMLElement>('[data-finding]');
+  const provTag = document.querySelector<HTMLElement>('[data-prov-tag]');
   const layoutEls = new Map<string, HTMLElement>(
     [...root.querySelectorAll<HTMLElement>('[data-layout]')].map((el) => [el.dataset.layout!, el]),
   );
@@ -87,11 +89,6 @@ function init(root: HTMLElement) {
       if (!('callout' in el.dataset)) el.dataset.tone = senateTone(s?.fill ?? 'no-race', s?.flipped ?? false, s?.split ?? null);
       el.querySelector<HTMLElement>('.cmap__races')!.hidden = (s?.races.length ?? 0) < 2;
     }
-    const b = sy.balance;
-    setSeatBar(senateBar, b, sy.provisional);
-    senateBar.querySelector('.seat-bar__caption')!.textContent = senateBarCaption(sy.congress);
-    controlNote.textContent = sy.controlNote;
-    controlNote.hidden = !sy.controlNote;
   }
 
   /** Square kinds for one state, in the same order as the seat bar. */
@@ -181,8 +178,6 @@ function init(root: HTMLElement) {
         (r as SVGRectElement).dataset.kind = kinds[i];
       });
     }
-    const t = hy.totals;
-    setSeatBar(houseBar, t, hy.provisional);
   }
 
   function draw() {
@@ -194,7 +189,8 @@ function init(root: HTMLElement) {
     const t = view === 'senate' ? senateTitle(sy) : houseTitle(hy);
     root.querySelector('[data-title]')!.textContent = t.title;
     root.querySelector('[data-subtitle]')!.textContent = t.subtitle;
-    if (headline) headline.textContent = view === 'senate' ? sy.headline : hy.headline;
+    if (finding) finding.textContent = view === 'senate' ? sy.headline : hy.headline;
+    if (provTag) provTag.hidden = !(view === 'senate' ? sy.provisional : hy.provisional);
 
     if (view === 'senate') drawSenate();
     else drawHouse();
@@ -228,6 +224,7 @@ function init(root: HTMLElement) {
       li.hidden = compare === null;
       li.querySelector('[data-compare-key-text]')!.textContent = text;
     }
+    if (!state.pinned) showNational();
   }
 
   // ---------- Selection rings ----------
@@ -278,6 +275,11 @@ function init(root: HTMLElement) {
     showTooltip(st, box.left - mapBox.left + (ax / l.width) * box.width, box.top - mapBox.top + (ay / l.height) * box.height);
   }
 
+  /** The panel with no state open: the nation for the year and chamber shown. */
+  function showNational() {
+    panel.innerHTML = nationalHtml(state.view, state.year, data, data.header[state.year], state.compare);
+    clearBtn.hidden = true;
+  }
   function showPanel(st: string) {
     panel.innerHTML = stateRecordHtml(state.view, st, name(st), data, state.year);
     clearBtn.hidden = false;
@@ -288,11 +290,22 @@ function init(root: HTMLElement) {
     showPanel(st);
     setRoving(st);
     updateRings();
+    revealPanel();
+  }
+  /**
+   * Where the panel sits under the map (below 1100px), scroll so the bottom of
+   * the map and the top of the panel are both on screen.
+   */
+  function revealPanel() {
+    if (matchMedia('(min-width: 1100px)').matches) return;
+    const r = panelRoot.getBoundingClientRect();
+    if (r.top > 0 && r.top < innerHeight * 0.7) return;
+    const mapBottom = map.getBoundingClientRect().bottom + scrollY;
+    scrollTo({ top: Math.max(0, mapBottom - innerHeight * 0.45), behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
   function unpin() {
     state.pinned = null;
-    panel.innerHTML = panelEmpty;
-    clearBtn.hidden = true;
+    showNational();
     updateRings();
   }
 
@@ -388,6 +401,12 @@ function init(root: HTMLElement) {
       hideTooltip();
       closeState();
     }
+  });
+  panel.addEventListener('click', (e) => {
+    const a = (e.target as Element).closest<HTMLAnchorElement>('a[data-open-state]');
+    if (!a) return;
+    e.preventDefault();
+    openState(a.dataset.openState!, a);
   });
   clearBtn.addEventListener('click', () => {
     const st = state.pinned;
