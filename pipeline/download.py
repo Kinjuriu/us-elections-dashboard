@@ -12,11 +12,16 @@ import argparse
 import gzip
 import hashlib
 import json
+import re
 import sys
+import time
 from datetime import datetime, timezone
 from pathlib import Path
 
 import requests
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from common import STATES  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 RAW = ROOT / "data" / "raw"
@@ -110,6 +115,79 @@ MANUAL_RAW = [
 ]
 
 
+WIKI_API = "https://en.wikipedia.org/w/api.php"
+GOVERNORS_DIR = "wikipedia_governors"
+
+
+def wikitables(html: str) -> str:
+    """Keep only the top-level <table class="wikitable ..."> elements of a page.
+
+    The full pages are about 500KB each. The governor lists sit in these tables,
+    so keeping only them keeps data/raw/ small without changing any table.
+    """
+    tag = re.compile(r"<(/?)table\b[^>]*>")
+    out, depth, start = [], 0, None
+    for m in tag.finditer(html):
+        if not m.group(1):
+            if depth == 0:
+                if 'class="wikitable' not in m.group(0):
+                    start = None
+                    depth = 1
+                    continue
+                start = m.start()
+            depth += 1
+        else:
+            depth -= 1
+            if depth == 0 and start is not None:
+                out.append(html[start:m.end()])
+                start = None
+    return "\n".join(out) + "\n"
+
+
+def fetch_governor_page(name: str) -> tuple[str, int]:
+    """Return (rendered page HTML, revision id) for 'List of governors of <name>'."""
+    params = {"action": "parse", "page": f"List of governors of {name}", "prop": "text|revid",
+              "format": "json", "formatversion": 2, "redirects": 1}
+    for attempt in range(6):
+        r = requests.get(WIKI_API, params=params, headers={"User-Agent": USER_AGENT}, timeout=120)
+        try:
+            parsed = r.json()["parse"]
+            return parsed["text"], parsed["revid"]
+        except (ValueError, KeyError):
+            time.sleep(5 * (attempt + 1))  # Wikipedia rate-limits bursts with a non-JSON reply
+    raise requests.RequestException(f"no usable reply for {name} (last status {r.status_code})")
+
+
+def download_governors(manifest: dict, force: bool, failures: list) -> None:
+    """Wikipedia 'List of governors of <State>' pages, CC BY-SA 4.0 (see data/SOURCES.md)."""
+    for po, name in STATES.items():
+        key = f"wikipedia_governors_{po}"
+        dest = RAW / GOVERNORS_DIR / f"{po}.html"
+        if dest.exists() and not force:
+            print(f"skip  {GOVERNORS_DIR}/{po}.html (exists)")
+            continue
+        try:
+            html, revid = fetch_governor_page(name)
+        except requests.RequestException as e:
+            failures.append(f"{key}: {e}")
+            print(f"FAIL  {GOVERNORS_DIR}/{po}.html: {e}")
+            continue
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(wikitables(html), encoding="utf-8")
+        title = f"List_of_governors_of_{name.replace(' ', '_')}"
+        manifest[key] = {
+            "url": f"https://en.wikipedia.org/w/index.php?title={title}&oldid={revid}",
+            "revision_id": revid,
+            "note": "wikitable elements only, from the rendered page",
+            "path": f"data/raw/{GOVERNORS_DIR}/{po}.html",
+            "accessed_at": datetime.now(timezone.utc).isoformat(timespec="seconds"),
+            "sha256": sha256(dest),
+            "bytes": dest.stat().st_size,
+        }
+        print(f"ok    {GOVERNORS_DIR}/{po}.html (revision {revid}, {dest.stat().st_size:,} bytes)")
+        time.sleep(1)
+
+
 def sha256(path: Path) -> str:
     h = hashlib.sha256()
     with path.open("rb") as f:
@@ -157,6 +235,8 @@ def main() -> int:
             "bytes": dest.stat().st_size,
         }
         print(f"ok    {src['path']} ({dest.stat().st_size:,} bytes)")
+
+    download_governors(manifest, args.force, failures)
 
     for src in MANUAL_RAW:
         dest = RAW / src["path"]

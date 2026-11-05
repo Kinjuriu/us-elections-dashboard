@@ -19,6 +19,7 @@ Last updated: 4 November 2026, 20:30 Nairobi time. Ticks render as checkboxes on
 - [x] Step 04: dashboard layer and history charts (PR #3 open, stacked on #2)
 - [x] Design review: page read as an AP article; Fable's memo picks direction A, the map board (review/design-direction.md)
 - [x] Step 05: rebuild as a dashboard, map first (Sonnet 5.5), PR open
+- [x] Step 07: data for the next visuals (PR #5): A county shift, B members, women and age, E governors (Wikipedia, CC BY-SA 4.0) built; C issue heatmap in the backlog
 - [ ] Inspection of step 05 (Opus), then Claude's review
 - [ ] Step 06: audit against the rules, Lighthouse, deploy to GitHub Pages
 

@@ -17,6 +17,7 @@ STEPS = [
     ["build_house_delegations.py"],
     ["build_members.py"],
     ["build_county_shift.py"],
+    ["build_governors.py"],
     ["geo/build_geo.py"],  # map shapes; needs `npm install` for mapshaper
 ]
 
