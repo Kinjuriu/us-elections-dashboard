@@ -71,15 +71,88 @@ test('changing the year updates the map, the cards and the panel together', asyn
   assert.deepEqual(page.errors, []);
 });
 
-test('comparing two years writes the change and lists the states that changed', async () => {
-  await page.goto(srv.url + '?year=2022&chamber=senate&compare=2018');
-  const t = await page.eval<{ change: string; panel: string }>(`({
-    change: document.querySelector('[data-card="senate"] .hemi__chg').textContent,
-    panel: document.querySelector('[data-panel]').textContent,
-  })`);
-  assert.match(t.change, /since 2018/);
-  assert.match(t.panel, /Changed between 2018 and 2022/);
+/** What the page shows while comparing: the line, the cards, the map and the bar. */
+const readCompare = () => page.eval<{
+  url: string; finding: string; title: string; subtitle: string; legend: string[]; cardsCaption: string[];
+  house: string[]; houseNotes: string[]; senateNotes: string[]; senateSvgs: number; mapGrey: number; mapStates: number;
+  stop: boolean; ybar: string;
+}>(`({
+  url: location.search,
+  finding: document.querySelector('[data-finding]').textContent,
+  title: document.querySelector('.cmap [data-title]').textContent,
+  subtitle: document.querySelector('.cmap [data-subtitle]').textContent,
+  legend: [...document.querySelectorAll('.cmap__legend--senate li')].filter((l) => getComputedStyle(l).display !== 'none').map((l) => l.textContent.trim()),
+  cardsCaption: [...document.querySelectorAll('.card__sub')].map((e) => e.textContent),
+  house: [...document.querySelectorAll('[data-card="house"] .cmpbar')].map((b) => b.querySelector('.cmpbar__year').textContent + ':' + [...b.querySelectorAll('.block__n')].map((n) => n.textContent).join('/')),
+  houseNotes: [...document.querySelectorAll('[data-card="house"] [data-cmp] .card__line')].map((e) => e.textContent),
+  senateNotes: [...document.querySelectorAll('[data-card="senate"] [data-cmp] .card__line')].map((e) => e.textContent),
+  senateSvgs: document.querySelectorAll('[data-card="senate"] .chemi svg').length,
+  mapGrey: [...document.querySelector('[data-layout]').querySelectorAll('.cmap__state')].filter((e) => e.dataset.fill === 'no-race').length,
+  mapStates: document.querySelector('[data-layout]').querySelectorAll('.cmap__state').length,
+  stop: !document.querySelector('[data-stop]').hidden,
+  ybar: document.querySelector('[data-ybar-year]').textContent,
+})`);
+
+for (const [order, q] of [['2020 on the railway, 2024 in the menu', '?year=2020&chamber=senate&compare=2024'],
+                          ['2024 on the railway, 2020 in the menu', '?year=2024&chamber=senate&compare=2020']] as const) {
+  test(`comparing 2020 with 2024 (${order}) shows the two years and the difference`, async () => {
+    await page.goto(srv.url + q);
+    const c = await readCompare();
+    // The pair is always earlier first.
+    assert.match(c.finding, /^2020 compared with 2024: /);
+    assert.match(c.finding, /Republicans gained 2 Senate seats and 8 House seats/);
+    assert.doesNotMatch(c.finding, /since/);
+    assert.equal(c.title, 'Senate 2020 to 2024');
+    assert.match(c.subtitle, /^\d+ seats changed caucus$/);
+    assert.deepEqual(c.legend, [c.subtitle]);
+    assert.deepEqual(c.cardsCaption, ['2020 compared with 2024', '2020 compared with 2024']);
+    assert.deepEqual(c.house, ['2020:222/212', '2024:215/220']);
+    assert.deepEqual(c.houseNotes, ['Democrats 222 to 215 (-7)', 'Republicans 212 to 220 (+8)']);
+    assert.deepEqual(c.senateNotes, ['Democrats 46 to 45 (-1)', 'Republicans 51 to 53 (+2)']);
+    assert.equal(c.senateSvgs, 2);
+    assert.ok(c.stop);
+    assert.equal(c.ybar, '2020 vs 2024');
+    // The map: changed states outlined, every other state grey.
+    const n = Number(c.subtitle.split(' ')[0]);
+    assert.ok(n > 0);
+    const changedStates = await page.eval<number>(`new Set([...document.querySelector('[data-layout]').querySelectorAll('.cmap__chg')].map((u) => u.getAttribute('href'))).size`);
+    assert.ok(changedStates > 0 && changedStates <= n);
+    assert.equal(c.mapGrey, c.mapStates - changedStates);
+    assert.deepEqual(page.errors, []);
+  });
+}
+
+test('the House map says how many delegations changed, and Esc or the button stops comparing', async () => {
+  await page.goto(srv.url + '?year=2020&chamber=house&compare=2024');
+  const c = await readCompare();
+  assert.equal(c.title, 'House 2020 to 2024');
+  assert.match(c.subtitle, /^\d+ delegations changed majority$/);
+  const n = await page.eval<number>(`document.querySelectorAll('.cmap__squares g[data-cmp="changed"]').length / document.querySelectorAll('[data-layout]').length`);
+  assert.equal(n, Number(c.subtitle.split(' ')[0]));
+  await page.key('Escape');
+  assert.equal((await readCompare()).url, '?year=2020&chamber=house');
+  await page.goto(srv.url + '?year=2020&chamber=senate&compare=2024');
+  await page.click('[data-stop]');
+  const after = await readCompare();
+  assert.equal(after.url, '?year=2020&chamber=senate');
+  assert.equal(after.title, 'Senate 2020');
+  assert.doesNotMatch(after.finding, /compared with/);
+  assert.equal(after.stop, false);
   assert.deepEqual(page.errors, []);
+});
+
+test('the Senate card names the party in control, and gives opening day underneath', async () => {
+  await page.goto(srv.url + '?year=2020&chamber=senate');
+  const t = await page.eval<{ big: string; who: string; line: string; finding: string }>(`({
+    big: document.querySelector('[data-card="senate"] [data-big]').textContent,
+    who: document.querySelector('[data-card="senate"] [data-who]').textContent,
+    line: document.querySelector('[data-card="senate"] [data-line]').textContent,
+    finding: document.querySelector('[data-finding]').textContent,
+  })`);
+  assert.equal(t.big, 'Democrats');
+  assert.match(t.who, /majority for most of this Congress/);
+  assert.equal(t.line, 'On opening day: 51 Republicans, 46 Democrats, 2 independents, 1 vacant');
+  assert.match(t.finding, /Democrats/);
 });
 
 test('a chart can set the year too, and the URL survives a reload', async () => {

@@ -209,8 +209,7 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
                 >
                   <span class="cmap__code">{s.state}</span>
                   <span class="cmap__races" hidden={(senate.states[s.state]?.races.length ?? 0) < 2}>2</span>
-                  <span class="cmap__changed" hidden></span>
-                </span>
+                                  </span>
               ))}
             </div>
             <div class="cmap__labels cmap__labels--house" aria-hidden="true"></div>
@@ -240,7 +239,7 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
     <li><span class="cmap__sw" data-fill="pending"></span>Result not yet entered</li>
     <li><span class="cmap__races cmap__races--key">2</span>Two races: regular and special election</li>
     <li data-split-key hidden={!Object.values(senate.states).some((s) => s.split)}><span class="cmap__sw cmap__sw--split"></span>Split: the two races went different ways (regular top left)</li>
-    <li data-compare-key hidden><span class="cmap__changed cmap__changed--key"></span><span data-compare-key-text></span></li>
+    <li data-compare-key hidden><span class="cmap__changed--key"></span><span data-compare-key-text></span></li>
   </ul>
     <ul class="cmap__legend cmap__legend--house" aria-label="Key">
     <li><span class="cmap__sq" data-kind="dem"></span>Democrat</li>
@@ -249,7 +248,7 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
     <li><span class="cmap__sq" data-kind="vacant"></span>Vacant</li>
     <li><span class="cmap__sq" data-kind="missing"></span>Not yet entered</li>
     <li>One square per seat, grouped by party</li>
-    <li data-compare-key hidden><span class="cmap__changed cmap__changed--key"></span><span data-compare-key-text></span></li>
+    <li data-compare-key hidden><span class="cmap__changed--key"></span><span data-compare-key-text></span></li>
   </ul>
     <p class="cmap__floor">Years before 2000 show as a faded track on the railway but have no map.</p>
   </div>
@@ -460,21 +459,29 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
     text-align: center;
   }
   .cmap__races--key { color: var(--ink); }
-  /* Compare: a small diamond on states that changed between the two years. */
-  .cmap__changed,
-  .cmap__labels :global(.cmap__changed) {
+  /* Compare: the later year's colour on each state that changed, outlined in
+     ink at 2px; everything else is drawn in the no-race grey. */
+  .cmap :global(.cmap__chg) {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+  .cmap__squares :global(g[data-cmp='same'] rect[data-kind]) { fill: var(--no-race); stroke: none; }
+  .cmap__changed--key {
     display: inline-block;
-    width: 8px;
-    height: 8px;
-    margin-left: 2px;
+    width: 14px;
+    height: 14px;
+    margin: 0 var(--sp-2) 0 0;
     flex: none;
-    transform: rotate(45deg);
-    background: var(--paper);
+    vertical-align: -2px;
+    background: var(--no-race);
     border: 2px solid var(--ink);
   }
-  .cmap__changed[hidden],
-  .cmap__labels :global(.cmap__changed[hidden]) { display: none; }
-  .cmap__changed--key { margin: 0 3px; }
+  /* While comparing, the key says one thing. */
+  .cmap[data-compare] .cmap__legend li:not([data-compare-key]) { display: none; }
   .cmap__races[hidden] { display: none; }
   /* House labels: a white chip, so they read on land, water and squares
      alike. The anchor is the chip's edge that faces the grid. */

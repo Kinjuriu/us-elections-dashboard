@@ -5,6 +5,10 @@ import Base from '../layouts/Base.astro';
 import Masthead from '../components/Masthead.astro';
 import Footer from '../components/Footer.astro';
 import StoryPreview from '../components/StoryPreview.astro';
+import ChartFrame from '../components/ChartFrame.astro';
+import WomenChart from '../components/WomenChart.astro';
+import { loadWomenChart } from '../lib/women';
+import { asOf } from '../lib/pageData';
 import { loadMapData, defaultYear } from '../lib/mapData';
 import { loadControlChart, loadMidtermChart, loadFlipsChart } from '../lib/chartData';
 import {
@@ -13,6 +17,10 @@ import {
 } from '../lib/data';
 
 const base = import.meta.env.BASE_URL;
+const women = loadWomenChart();
+const womenFirst = women.rows[0];
+const womenLast = women.rows[women.rows.length - 1];
+const womenAsOf = asOf('congress_legislators_current', 'congress_legislators_historical');
 const control = loadChamberControl();
 const swing = loadMidtermSwing();
 const asOfDates = ['house_historian_party_divisions', 'senate_party_division']
@@ -134,12 +142,26 @@ const findings: Array<{ headline: string; note: string; href: string; link: stri
 
       <h2 class="story__h2">What the data shows</h2>
       <ol class="story__findings">
-        {findings.map((f) => (
-          <li>
-            <h3>{f.headline}</h3>
-            <p>{f.note}</p>
-            <StoryPreview {...(f.preview as any)} href={f.href} label={f.link} />
-          </li>
+        {findings.map((f, i) => (
+          <>
+            <li>
+              <h3>{f.headline}</h3>
+              <p>{f.note}</p>
+              <StoryPreview {...(f.preview as any)} href={f.href} label={f.link} />
+            </li>
+            {i === 0 && (
+              <li class="story__women">
+                <ChartFrame
+                  title={women.headline}
+                  subtitle={`Share of members of the House and Senate who were women, by Congress, ${womenFirst.startYear} to ${womenLast.startYear}. One square is 1% of members.`}
+                  source="unitedstates/congress-legislators (public domain). Members who served at any point in each Congress, House and Senate together; delegates excluded."
+                  dataAsOf={womenAsOf}
+                >
+                  <WomenChart chart={women} />
+                </ChartFrame>
+              </li>
+            )}
+          </>
         ))}
       </ol>
       <p class="story__back"><a href={base}>Go to the dashboard</a></p>
@@ -174,5 +196,6 @@ const findings: Array<{ headline: string; note: string; href: string; link: stri
   .story__findings h3 { font-size: var(--fs-5); }
   .story__findings p { margin-top: var(--sp-2); font-size: var(--fs-2); color: var(--ink-2); }
   .story__findings p:last-child { color: var(--ink); }
+  .story__findings .story__women :global(p) { color: inherit; font-size: inherit; }
   .story__back { margin-top: var(--sp-7); }
 </style>

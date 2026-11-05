@@ -108,3 +108,10 @@ test('store: changing the year clears a comparison that would equal it', () => {
   store.set({ year: 2022 });
   assert.equal(store.get().compare, null);
 });
+
+test('a year with no results of its own cannot be compared', () => {
+  const c = { ...cfg, shownYears: { 2026: 2024 } };
+  assert.equal(parseState('?year=2020&compare=2026', c).compare, null);
+  assert.equal(parseState('?year=2026&compare=2020', c).compare, null);
+  assert.equal(parseState('?year=2020&compare=2024', c).compare, 2024);
+});

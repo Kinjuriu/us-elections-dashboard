@@ -35,6 +35,9 @@ export const CHAMBERS: Chamber[] = ['senate', 'house'];
 /** The Congress elected in (or, for an odd year, sitting during) a year. */
 export const congressFor = (year: number) => Math.floor((year - 1786) / 2);
 
+/** A year can be compared only when it has results of its own: not an even year shown as the election before. */
+const comparable = (y: number, cfg: StoreConfig) => !(cfg.shownYears && y in cfg.shownYears);
+
 /** The years the year control offers for a chamber, in order. */
 export function yearsFor(chamber: Chamber, cfg: StoreConfig): number[] {
   const ys = chamber === 'senate' ? [...cfg.years, ...cfg.senateOnlyYears] : [...cfg.years];
@@ -59,7 +62,7 @@ export function parseState(search: string, cfg: StoreConfig): DashState {
   const st = (p.get('state') ?? '').toUpperCase();
   const state = cfg.states.includes(st) ? st : null;
   const c = asYear(p.get('compare'));
-  const compare = c !== null && valid.includes(c) && c !== year ? c : null;
+  const compare = c !== null && valid.includes(c) && c !== year && comparable(c, cfg) && comparable(year, cfg) ? c : null;
   return { year, chamber, state, compare };
 }
 
@@ -88,7 +91,7 @@ export function normalize(s: DashState, cfg: StoreConfig): DashState {
     year = earlier.length ? earlier[earlier.length - 1] : cfg.defaultYear;
   }
   const state = s.state && cfg.states.includes(s.state) ? s.state : null;
-  const compare = s.compare !== null && valid.includes(s.compare) && s.compare !== year ? s.compare : null;
+  const compare = s.compare !== null && valid.includes(s.compare) && s.compare !== year && comparable(s.compare, cfg) && comparable(year, cfg) ? s.compare : null;
   return { year, chamber, state, compare };
 }
 

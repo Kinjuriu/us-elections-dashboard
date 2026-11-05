@@ -157,16 +157,16 @@ export interface ChamberView {
   /** "+2 since 2022" for each party, '' when there is no baseline. */
   change: { dem: string; gop: string };
   label: string;
+  /** The party that held the majority for most of the Congress. */
+  controller: Party | null;
 }
 
 /**
  * The cards for a year. The change is measured from the election before the
- * one shown, or from the comparison year when one is set.
+ * one shown. (Comparing two years has its own cards, below.)
  */
-export function cardViews(h: HeaderYear, compareWith: HeaderYear | null): ChamberView[] {
-  const baseline = compareWith && compareWith.shownYear !== h.shownYear
-    ? { year: compareWith.shownYear, house: compareWith.house.balance, senate: compareWith.senate.balance }
-    : compareWith ? null : h.before;
+export function cardViews(h: HeaderYear): ChamberView[] {
+  const baseline = h.before;
   return (['house', 'senate'] as const).map((id) => {
     const c = h[id];
     const base = baseline ? baseline[id] : null;
@@ -185,6 +185,7 @@ export function cardViews(h: HeaderYear, compareWith: HeaderYear | null): Chambe
         gop: changeText(c.balance.gop, base?.gop ?? null, since),
       },
       label: cardLabel(id === 'house' ? 'House' : 'Senate', c.caption, c.balance, c.total, c.threshold),
+      controller: c.controller === 'DEM' ? 'dem' : c.controller === 'GOP' ? 'gop' : null,
     };
   });
 }
@@ -205,16 +206,46 @@ export interface Centre {
   big: string;
   who: string;
   change: string;
+  /** The big text is a party name, not a seat count, so it is set smaller. */
+  word: boolean;
 }
 
-/** The number in the middle of the semicircle: the party picked, or else the one with more seats. */
+/**
+ * Opening day and most of the Congress can disagree (a tie broken by the vice
+ * president, a seat filled later). The card then names the party that held
+ * the majority for most of the Congress, because a number from opening day
+ * would contradict the finding line.
+ */
+export const controlDiffers = (v: ChamberView): boolean => v.controller !== null && v.controller !== leader(v.balance);
+
+/** The number in the middle of the semicircle: the party picked, or else the party in control. */
 export function centre(v: ChamberView, picked: Party | null): Centre {
   const b = v.balance;
-  if (b.dem === null || b.gop === null) return { big: 'n/a', who: 'Results not yet entered', change: '' };
-  const p = picked ?? leader(b);
-  if (!p) return { big: `${countText(b.dem)} to ${countText(b.gop)}`, who: "Tied: the vice president's party controls", change: '' };
-  return { big: countText(b[p]), who: PARTY_WORD[p], change: v.change[p] };
+  if (b.dem === null || b.gop === null) return { big: 'n/a', who: 'Results not yet entered', change: '', word: false };
+  if (picked) return { big: countText(b[picked]), who: PARTY_WORD[picked], change: v.change[picked], word: false };
+  if (v.controller && controlDiffers(v)) {
+    return { big: PARTY_WORD[v.controller], who: 'held the majority for most of this Congress', change: '', word: true };
+  }
+  const p = leader(b);
+  if (!p) return { big: `${countText(b.dem)} to ${countText(b.gop)}`, who: "Tied: the vice president's party controls", change: '', word: false };
+  return { big: countText(b[p]), who: PARTY_WORD[p], change: v.change[p], word: false };
 }
+
+/** "On opening day: 51 Republicans, 46 Democrats, 2 independents, 1 vacant". */
+export function openingDayLine(b: Balance): string {
+  if (b.dem === null || b.gop === null) return 'Results not yet entered';
+  const ind = b.indDem + b.indGop + b.indUnknown;
+  const parts = [
+    [b.gop, 'Republicans'], [b.dem, 'Democrats'],
+  ].sort((x, y) => (y[0] as number) - (x[0] as number)).map(([n, w]) => `${n} ${w}`);
+  if (ind) parts.push(`${ind} ${ind === 1 ? 'independent' : 'independents'}`);
+  if (b.other) parts.push(`${b.other} from another party`);
+  if (b.vacant) parts.push(`${b.vacant} vacant`);
+  return `On opening day: ${parts.join(', ')}`;
+}
+
+/** The line under a card: opening-day counts when the card names the party in control, else who the independents are. */
+export const cardLine = (v: ChamberView): string => (controlDiffers(v) ? openingDayLine(v.balance) : independentsLine(v.balance));
 
 const BLOCK_NAME: Record<Block['id'], string> = {
   dem: 'Democrats', ind: 'Independents', gop: 'Republicans', other: 'Other', vacant: 'Vacant',

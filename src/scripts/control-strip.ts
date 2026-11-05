@@ -1,7 +1,7 @@
 // Wires the chamber buttons and the compare menu to the store, and keeps
 // them in step when another module changes it (a click on a chart, or a link
 // with ?year=...). The year control lives in src/scripts/railway.ts.
-import { store } from './dashboard';
+import { store, config } from './dashboard';
 import type { DashState, Chamber } from '../lib/store';
 
 const bar = document.querySelector<HTMLElement>('[data-cbar]');
@@ -16,8 +16,13 @@ function init(bar: HTMLElement) {
     const { name, value } = (e as CustomEvent<{ name: string; value: string }>).detail;
     if (name === 'chamber') store.set({ chamber: value as Chamber });
   });
+  const stop = bar.querySelector<HTMLButtonElement>('[data-stop]')!;
   select.addEventListener('change', () => {
     store.set({ compare: select.value ? Number(select.value) : null });
+  });
+  stop.addEventListener('click', () => {
+    store.set({ compare: null });
+    select.focus();
   });
 
   function optionText() {
@@ -26,16 +31,26 @@ function init(bar: HTMLElement) {
     }
   }
 
+  const noResults = (y: number) => !!config.shownYears && y in config.shownYears;
+
+  // The menu is left alone when it already says the right thing: changing its
+  // options while its own list is still closing is needless work for the browser.
   function sync(s: DashState) {
     for (const b of bar.querySelectorAll<HTMLButtonElement>('[data-segmented="chamber"] .segmented__button')) {
-      b.setAttribute('aria-pressed', String(b.dataset.value === s.chamber));
+      const on = String(b.dataset.value === s.chamber);
+      if (b.getAttribute('aria-pressed') !== on) b.setAttribute('aria-pressed', on);
     }
     for (const o of select.options) {
       if (!o.value) continue;
-      o.hidden = !!o.dataset.only && o.dataset.only !== s.chamber;
-      o.disabled = o.hidden || Number(o.value) === s.year;
+      const hidden = !!o.dataset.only && o.dataset.only !== s.chamber;
+      // A year with no results of its own, or the year on the railway, cannot be compared with.
+      const disabled = hidden || Number(o.value) === s.year || noResults(Number(o.value));
+      if (o.hidden !== hidden) o.hidden = hidden;
+      if (o.disabled !== disabled) o.disabled = disabled;
     }
-    select.value = s.compare === null ? '' : String(s.compare);
+    const value = s.compare === null ? '' : String(s.compare);
+    if (select.value !== value) select.value = value;
+    stop.hidden = s.compare === null;
     if (s.compare === null) delete select.dataset.active;
     else select.dataset.active = '';
   }

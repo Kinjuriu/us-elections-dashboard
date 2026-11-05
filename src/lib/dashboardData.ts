@@ -15,6 +15,8 @@ export interface HeaderChamber {
   /** "116th Congress, elected 2018" */
   caption: string;
   majorityNote: string;
+  /** The party that held the majority for most of the Congress, which can differ from the opening-day count. */
+  controller: Party | null;
   unverifiedInd: boolean;
 }
 
@@ -79,6 +81,7 @@ export function loadHeaderYears(map: MapData): Record<number, HeaderYear> {
       provisional: r.isProvisional,
       caption: `${ordinal(r.congress)} Congress, elected ${r.electionYear}`,
       majorityNote: r.majorityNote,
+      controller: majorityOf(r),
       unverifiedInd: inds.some((i) => i.chamber === c && i.congress === r.congress && !i.verified),
     });
 

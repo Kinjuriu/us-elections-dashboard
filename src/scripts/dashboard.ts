@@ -44,9 +44,14 @@ export function closeState(): HTMLElement | null {
 }
 
 document.addEventListener('keydown', (e) => {
-  if (e.key !== 'Escape' || !store.get().state || e.defaultPrevented) return;
+  if (e.key !== 'Escape' || e.defaultPrevented) return;
   // A native select handles its own Esc.
   if ((e.target as Element | null)?.closest?.('select')) return;
-  const back = closeState();
-  back?.focus();
+  // Esc closes the state record first; with none open, it stops comparing.
+  if (store.get().state) {
+    const back = closeState();
+    back?.focus();
+  } else if (store.get().compare !== null) {
+    store.set({ compare: null });
+  }
 });

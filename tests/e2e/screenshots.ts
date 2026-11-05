@@ -1,6 +1,7 @@
 // Saves the step 09 review screenshots into review/09/. Build first, then:
 //   node tests/e2e/screenshots.ts
-// Every page at 390 (2x) and 1440 wide, plus the compact year bar showing.
+// Every page at 390 (2x) and 1440 wide, plus the compact year bar showing,
+// the comparison (2020 with 2024) and the women chart on the story page.
 import { writeFile, mkdir } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import { serve, launch } from './browser.ts';
@@ -42,6 +43,18 @@ try {
     const r = await page.send('Page.captureScreenshot', { format: 'png' });
     await writeFile(file, Buffer.from(r.data, 'base64'));
     console.log(file);
+    // Comparing 2020 with 2024: the whole board, then the women chart.
+    await page.goto(srv.url + '?year=2020&chamber=senate&compare=2024');
+    await page.settle(300);
+    const clipOf = (sel: string) => page.eval<{ x: number; y: number; width: number; height: number }>(`(() => { const r = document.querySelector(${JSON.stringify(sel)}).getBoundingClientRect(); return { x: Math.max(0, r.left + scrollX - 8), y: r.top + scrollY - 8, width: Math.min(${w}, r.width + 16), height: r.height + 16 }; })()`);
+    await writeFile(`${OUT}/compare-senate-${w}.png`, await page.screenshot(await clipOf('.board')));
+    await page.goto(srv.url + '?year=2020&chamber=house&compare=2024');
+    await page.settle(300);
+    await writeFile(`${OUT}/compare-house-${w}.png`, await page.screenshot(await clipOf('.board')));
+    await page.goto(srv.url + 'story/');
+    await page.settle(300);
+    await writeFile(`${OUT}/women-${w}.png`, await page.screenshot(await clipOf('.story__women')));
+    console.log('compare and women shots', w);
   }
 } finally {
   await browser.close();

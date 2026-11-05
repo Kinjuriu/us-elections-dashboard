@@ -2,7 +2,8 @@
 // the previous election or from the comparison year, and handles picking a
 // party (outline it, fade the other) on either card.
 import { store } from './dashboard';
-import { cardViews, centre, blocksHtml, independentsLine, type Party, type ChamberView } from '../lib/cards';
+import { cardViews, centre, blocksHtml, cardLine, type Party, type ChamberView } from '../lib/cards';
+import { compareHouseHtml, compareSenateHtml, orderPair } from '../lib/compare';
 import type { HeaderYear } from '../lib/dashboardData';
 import type { DashState } from '../lib/store';
 
@@ -15,7 +16,7 @@ function init(root: HTMLElement) {
   const senateCard = root.querySelector<HTMLElement>('[data-card="senate"]')!;
   const seats = [...senateCard.querySelectorAll<SVGRectElement>('svg[data-hemi] rect')];
   let picked: Party | null = null;
-  let senate: ChamberView;
+  let senate: ChamberView | null = null;
 
   const text = (card: HTMLElement, sel: string, value: string) => {
     const el = card.querySelector(sel);
@@ -23,10 +24,13 @@ function init(root: HTMLElement) {
   };
 
   function drawCentre() {
+    if (!senate) return;
     const c = centre(senate, picked);
     text(senateCard, '[data-big]', c.big);
     text(senateCard, '[data-who]', c.who);
     text(senateCard, '[data-chg]', c.change);
+    const big = senateCard.querySelector<HTMLElement>('[data-big]')!;
+    if (c.word) big.dataset.word = ''; else delete big.dataset.word;
   }
 
   function drawPicked() {
@@ -39,19 +43,30 @@ function init(root: HTMLElement) {
   }
 
   function draw(s: DashState) {
+    if (s.compare !== null) {
+      const [a, b] = orderPair(s.year, s.compare);
+      root!.dataset.comparing = '';
+      for (const card of [houseCard, senateCard]) text(card, '[data-caption]', `${a} compared with ${b}`);
+      houseCard.querySelector('[data-cmp]')!.innerHTML = compareHouseHtml(years[a], years[b]);
+      senateCard.querySelector('[data-cmp]')!.innerHTML = compareSenateHtml(years[a], years[b]);
+      for (const el of root!.querySelectorAll<HTMLElement>('[data-cmp]')) el.hidden = false;
+      return;
+    }
+    delete root!.dataset.comparing;
+    for (const el of root!.querySelectorAll<HTMLElement>('[data-cmp]')) { el.hidden = true; el.replaceChildren(); }
+
     const h = years[s.year];
-    const compare = s.compare !== null ? years[s.compare] : null;
-    const [house, sen] = cardViews(h, compare);
+    const [house, sen] = cardViews(h);
     senate = sen;
 
     seats.forEach((r, i) => { if (r.dataset.kind !== sen.kinds[i]) r.dataset.kind = sen.kinds[i]; });
     senateCard.querySelector('svg[data-hemi]')!.setAttribute('aria-label', sen.label);
     for (const p of ['dem', 'gop'] as const) text(senateCard, `[data-n="${p}"]`, String(sen.balance[p] ?? 'n/a'));
     text(senateCard, '[data-caption]', sen.caption);
-    text(senateCard, '[data-line]', independentsLine(sen.balance));
+    text(senateCard, '[data-line]', cardLine(sen));
 
     text(houseCard, '[data-caption]', house.caption);
-    text(houseCard, '[data-line]', independentsLine(house.balance));
+    text(houseCard, '[data-line]', cardLine(house));
     houseCard.querySelector('[data-blocks-row]')!.innerHTML = blocksHtml(house, picked);
     drawCentre();
   }

@@ -4,6 +4,7 @@
 import { store, config } from './dashboard';
 import { yearsFor, type DashState } from '../lib/store';
 import { nearest, stationYearFor } from '../lib/railway';
+import { orderPair } from '../lib/compare';
 
 const bar = document.querySelector<HTMLElement>('[data-ybar]');
 const full = document.querySelector<HTMLElement>('[data-year-control]');
@@ -52,7 +53,8 @@ function init(bar: HTMLElement, full: HTMLElement) {
   rail.addEventListener('pointercancel', stop);
 
   function sync(s: DashState) {
-    out.textContent = String(s.year);
+    // While comparing, the bar names both years, earlier first.
+    out.textContent = s.compare === null ? String(s.year) : orderPair(s.year, s.compare).join(' vs ');
     const here = stationYearFor(s.year);
     for (const st of sts) {
       if (Number(st.dataset.year) === here) st.dataset.selected = 'true';

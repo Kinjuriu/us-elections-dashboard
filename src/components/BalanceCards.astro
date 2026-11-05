@@ -5,7 +5,7 @@
 // to scale with a dotted line at 218. A party can be picked on either card
 // (outlined, the other fades). Drawn at build time for the default year;
 // src/scripts/cards.ts redraws them from the JSON block below.
-import { hemicycle, HEMI, cardViews, centre, blocksHtml, independentsLine, markPct, seatMark, PARTY_WORD } from '../lib/cards';
+import { hemicycle, HEMI, cardViews, centre, blocksHtml, cardLine, markPct, seatMark, PARTY_WORD } from '../lib/cards';
 import PartyMark from './PartyMark.astro';
 import type { HeaderYear } from '../lib/dashboardData';
 
@@ -14,7 +14,7 @@ interface Props {
   year: number;
 }
 const { years, year } = Astro.props;
-const [house, senate] = cardViews(years[year], null);
+const [house, senate] = cardViews(years[year]);
 const seats = hemicycle(senate.total);
 const mid = centre(senate, null);
 const mark = seatMark(seats, senate.threshold);
@@ -34,8 +34,9 @@ const box = HEMI.outer + HEMI.pad;
       <div class="blocks__row" role="group" aria-label="House seats by party. Pick a party to outline it." data-blocks-row set:html={blocksHtml(house, null)}></div>
       <span class="blocks__line" style={`left:${markPct(house.threshold, house.total)}%`} aria-hidden="true"></span>
     </div>
-    <p class="card__line" data-line>{independentsLine(house.balance)}</p>
+    <p class="card__line" data-line>{cardLine(house)}</p>
     <p class="card__line card__line--major" data-major>{house.threshold} seats for a majority</p>
+    <div class="card__cmp" data-cmp hidden></div>
   </article>
 
   <article class="card card--senate" data-card="senate" aria-labelledby="card-senate-h">
@@ -56,7 +57,7 @@ const box = HEMI.outer + HEMI.pad;
         <line class="hemi__line" x1={mark.x1} x2={mark.x2} y1={mark.y1} y2={mark.y2} />
       </svg>
       <p class="hemi__centre" aria-hidden="true">
-        <span class="hemi__big" data-big>{mid.big}</span>
+        <span class="hemi__big" data-big data-word={mid.word ? "" : undefined}>{mid.big}</span>
         <span class="hemi__who" data-who>{mid.who}</span>
         <span class="hemi__chg" data-chg>{mid.change}</span>
       </p>
@@ -68,8 +69,9 @@ const box = HEMI.outer + HEMI.pad;
         </button>
       ))}
     </div>
-    <p class="card__line" data-line>{independentsLine(senate.balance)}</p>
+    <p class="card__line" data-line>{cardLine(senate)}</p>
     <p class="card__line card__line--major" data-major>{senate.threshold} seats for a majority. A 50-50 Senate is controlled by the vice president's party.</p>
+    <div class="card__cmp" data-cmp hidden></div>
   </article>
   <script type="application/json" data-cards-data set:html={JSON.stringify(years)}></script>
 </div>
@@ -95,6 +97,22 @@ const box = HEMI.outer + HEMI.pad;
   .card__sub { font-family: var(--font-label); font-weight: 500; font-size: var(--fs-1); color: var(--ink-2); }
   .card__line { font-family: var(--font-label); font-weight: 500; font-size: var(--fs-1); color: var(--ink-2); max-width: none; }
   .card__line--major { color: var(--ink); font-weight: 600; }
+
+  /* Comparing two years: the card's own view replaces everything under its heading. */
+  .cards[data-comparing] .card > :not(.card__head):not(.card__cmp) { display: none; }
+  .card__cmp { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .card__cmp[hidden] { display: none; }
+  .chemis { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-3); }
+  .chemi { margin: 0; display: flex; flex-direction: column; gap: var(--sp-1); }
+  .chemi svg { width: 100%; height: auto; overflow: visible; }
+  .chemi__year, .cmpbar__year { margin: 0; font-family: var(--font-label); font-weight: 700; font-size: var(--fs-2); line-height: 1.2; font-variant-numeric: tabular-nums lining-nums; max-width: none; }
+  .chemi__n { margin: 0; font-family: var(--font-label); font-weight: 600; font-size: var(--fs-1); color: var(--ink-2); max-width: none; font-variant-numeric: tabular-nums lining-nums; }
+  .cmpblocks { display: flex; flex-direction: column; gap: var(--sp-2); }
+  .cmpbar { display: flex; flex-direction: column; gap: 2px; }
+  .cmpbar__row { height: 56px; }
+  .block--cmp { padding: var(--sp-2) var(--sp-3); justify-content: center; }
+  .block--cmp .block__n { font-size: var(--fs-4); }
+  .cmpblocks .blocks__line { top: 26px; }
 
   /* Threshold mark: a number over a small triangle, as on AP's balance bars. */
   .mark {
@@ -147,6 +165,7 @@ const box = HEMI.outer + HEMI.pad;
     line-height: 1;
     font-variant-numeric: tabular-nums lining-nums;
   }
+  .hemi__big[data-word] { font-size: var(--fs-3); line-height: 1.05; }
   .hemi__who { font-weight: 600; font-size: var(--fs-1); }
   .hemi__chg { font-weight: 500; font-size: 12px; color: var(--ink-2); min-height: 14px; }
 
@@ -237,6 +256,7 @@ const box = HEMI.outer + HEMI.pad;
   @media (min-width: 900px) {
     .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp-5); padding: var(--sp-4); align-items: start; }
     .hemi__big { font-size: var(--fs-7); }
+    .hemi__big[data-word] { font-size: var(--fs-5); }
     .hemi__who { font-size: var(--fs-2); }
     .blocks__row { height: 168px; }
   }

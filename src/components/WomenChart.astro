@@ -1,0 +1,48 @@
+---
+// A pictogram of women's share of Congress: one row per Congress, 100 squares
+// per row, one square for each 1% of members. Squares for women are ink, the
+// rest rule grey; this is not party data, so no party colours. The percentage
+// is written at the end of each row. A row is two lines of 50 squares, so
+// the squares stay large enough to count.
+import type { WomenChart } from '../lib/women';
+
+interface Props { chart: WomenChart }
+const { chart } = Astro.props;
+const squares = (n: number, cols: number, rows: number) =>
+  Array.from({ length: cols * rows }, (_, i) => ({
+    x: (i % cols) * 10, y: Math.floor(i / cols) * 10, on: i < n,
+  }));
+const plural = (n: number, w: string) => `${n} ${w}`;
+---
+<ol class="women">
+  {chart.rows.map((r) => {
+    const tip = `${r.startYear}: ${plural(r.women, 'women')} and ${plural(r.men, 'men')}. Women by party: ${r.womenDem} Democrats, ${r.womenGop} Republicans${r.womenOther ? `, ${r.womenOther} other` : ''}.`;
+    return (
+      <li class="women__row" title={tip} aria-label={`${tip} Share of members: ${r.pct}%.`}>
+        <span class="women__year">{r.startYear}</span>
+        <svg class="women__sq" viewBox="0 0 500 19" aria-hidden="true">
+          {squares(r.squares, 50, 2).map((s) => <rect x={s.x + 1} y={s.y} width="8" height="8" class={s.on ? 'on' : ''} />)}
+        </svg>
+        <span class="women__pct">{r.pct}%</span>
+      </li>
+    );
+  })}
+</ol>
+
+<style>
+  .women { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
+  .women__row {
+    display: grid;
+    grid-template-columns: 3.2rem minmax(0, 1fr) 3.6rem;
+    max-width: 640px;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-label);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .women__year { font-weight: 600; font-size: var(--fs-1); }
+  .women__pct { font-weight: 700; font-size: var(--fs-2); text-align: right; }
+  .women__sq { width: 100%; height: auto; display: block; }
+  .women__sq rect { fill: var(--rule); }
+  .women__sq rect.on { fill: var(--ink); }
+</style>

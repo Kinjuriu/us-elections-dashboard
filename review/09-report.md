@@ -43,3 +43,38 @@ The toolbar did not appear in headless Chrome, so I bundled Astro's own audit ru
 ## Checks
 
 `npm test` 15 of 15; `npm run test:e2e` 22 of 22 (new: pages, year carried, sticky bar switch, bar controls, phone stepper, governor card and layout, Senate page links, independents table, no sideways scroll at 360px on all pages, JavaScript off, and that every internal link in `dist/` resolves). Screenshots in `review/09/` at 390 and 1440 for every page plus `year-bar-*.png`. Deleted as out of date: all `review/02-*` to `review/05-*` PNGs and everything in `review/08/`.
+
+
+# Step 09b: comparing years, the Senate card's big number, women in Congress
+
+## Comparing (US Congress page)
+
+- The pair is always earlier then later ("2020 compared with 2024"), whichever year is on the railway. The finding line is replaced with a sentence built from the seat counts: "2020 compared with 2024: Republicans gained 2 Senate seats and 8 House seats" (when different parties made the biggest move in each chamber, both are named).
+- **Cards.** House: two bars on the same scale, labelled 2020 and 2024, with "Democrats 222 to 215 (-7)" and "Republicans 212 to 220 (+8)" underneath. Senate: **two small semicircles side by side**. I chose that over one semicircle with outlined seats because seats in a semicircle are sorted by party, so a seat has no identity from one year to the next and an outline on "the seats that changed" would be meaningless. Side by side, each is about 170px wide at 390 and 340px at 1440, and both stay readable. No "since" wording while comparing.
+- **Map.** Changed states keep the later year's colour and get a 2px ink outline (drawn as a separate layer so a neighbour never covers it); every other state is `--no-race` grey. House view: unchanged delegations' squares are grey, changed ones keep their colours, and the state is outlined. Title block "SENATE 2020 TO 2024" over "5 SEATS CHANGED CAUCUS" (or "4 DELEGATIONS CHANGED MAJORITY"); the legend is that one line only. The side panel while comparing lists the changed states.
+- "Stop comparing" button beside the menu; Esc also stops it (it closes an open state record first). The compact bar shows "2020 vs 2024".
+- A year with no results of its own (2026 today) cannot be compared; the menu disables it and the URL is tidied.
+- The old diamond markers are gone.
+
+## The hang after choosing a year
+
+**Could not reproduce.** I tried headed Chrome (`headless: false`), at 1440 and 390 wide, with the compact bar shown and hidden, also with `--force-renderer-accessibility`, choosing 2024 in the menu while 2020 was on the railway. Each change took 13 to 150 ms and no long tasks were recorded. I cannot open the native macOS menu popup from the test driver, so that part is untested. As a precaution I changed `control-strip.ts` so the change handler no longer rewrites the menu's options or value when they already say the right thing (it used to rewrite all of them inside the change event, while the native list was closing). If it still hangs for you, tell me the browser, whether VoiceOver or another screen reader is on, and which two years.
+
+## The Senate card's big number
+
+The card now names the party that held the majority for most of the Congress (`majority_most_of_congress`) when that differs from the opening-day leader, and the line under it gives opening day: "On opening day: 51 Republicans, 46 Democrats, 2 independents, 1 vacant".
+- **Years changed (2000 to 2026):** 2020 (opening day 51 R against 48 D with independents, but Democratic control) and 2000 (tied 50-50 on opening day, Democratic control). No other year, in either chamber, differs.
+- **Open question: the "50".** Your example said "50 Democrats, with the vice president". The data holds 46 Democrats and 2 independents on opening day, and does not hold the two Georgia winners seated in January 2021, so 50 is not a number I can show without making it up. The card says "Democrats held the majority for most of this Congress" in place of a number. If you want the 50, I can add a sourced row to `data/manual/` and have the pipeline carry it (that touches `pipeline/`, which this step said not to).
+
+## Women in Congress (Story page)
+
+Pictogram after the first finding: 11 rows (every fourth Congress from the 80th, plus the 119th), two lines of 50 squares per row so the squares stay large, ink for women and rule grey for the rest, no party colours, the percentage at the end of every row. Headline from the data: "Women held 28.2% of seats in Congress in 2025, up from 1.4% in 1947". Women divided by all members who served in that Congress, both chambers together. Hover gives a plain browser tooltip with women, men and women by party; the percentage is always visible. Squares are rounded to the nearest 1% (1.4% shows 1 square), the written percentage is exact to one decimal.
+
+## Not done / notes
+
+- Comparison with 2026 is switched off until results are entered.
+- The tooltip on the women chart is the browser's own `title`, which does not appear on touch; the row's accessible label carries the same numbers.
+
+## Checks
+
+`npm test` 21 of 21 (new: `tests/compare.test.ts`, a store test); `npm run test:e2e` 25 of 25 (new: comparing 2020 with 2024 in both orders, House map and Stop/Esc, the Senate card for 2020). Screenshots in `review/09/`: `compare-senate-*`, `compare-house-*`, `women-*` at 390 and 1440.
