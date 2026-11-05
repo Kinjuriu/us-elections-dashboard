@@ -24,6 +24,7 @@ const PAGES = [
   { path: '', label: 'US Congress' },
   { path: 'governors/', label: 'Governors' },
   { path: 'senate/', label: 'Senate' },
+  { path: 'firsts/', label: 'Firsts of 2026' },
   { path: 'story/', label: 'Story' },
   { path: 'sources/', label: 'Notes and sources' },
 ];

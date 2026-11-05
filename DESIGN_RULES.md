@@ -33,6 +33,8 @@ Never use any of the following:
 - Placeholder copy ("Lorem ipsum", "Insights at a glance", "Unlock the power of...")
 - Em dashes in copy; "not X, but Y" sentence constructions
 
+Exception: the women-in-Congress pictogram uses two person figures drawn for this site; no icon sets.
+
 ## 3. Typography
 
 The Financial Times uses **Financier Display** (headlines) and **Metric** (sans), both from Klim Type Foundry. They are commercial fonts; we must not self-host or hotlink them without a paid web licence. We use open fonts with the same character, and keep font names in CSS variables so a licensed font can be dropped in later.

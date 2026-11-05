@@ -5,7 +5,7 @@
 // src/scripts/nav-query.ts adds the current ?year= (and the rest of the
 // query) to each link, so moving between pages keeps the year.
 const base = import.meta.env.BASE_URL;
-export type PageId = 'congress' | 'governors' | 'senate' | 'story' | 'sources';
+export type PageId = 'congress' | 'governors' | 'senate' | 'firsts' | 'story' | 'sources';
 interface Props {
   current: PageId;
 }
@@ -14,6 +14,7 @@ const pages: { id: PageId; label: string; path: string }[] = [
   { id: 'congress', label: 'US Congress', path: '' },
   { id: 'governors', label: 'Governors', path: 'governors/' },
   { id: 'senate', label: 'Senate', path: 'senate/' },
+  { id: 'firsts', label: 'Firsts of 2026', path: 'firsts/' },
   { id: 'story', label: 'Story', path: 'story/' },
   { id: 'sources', label: 'Notes and sources', path: 'sources/' },
 ];

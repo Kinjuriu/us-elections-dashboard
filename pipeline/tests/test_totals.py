@@ -292,6 +292,8 @@ MANUAL_SOURCE_COLUMNS = {
     "display_names.csv": ["source_url", "accessed_at"],
     "women_crosscheck.csv": ["source_url", "accessed_at"],
     "governor_party_changes.csv": ["source_url", "accessed_at"],
+    "senate_control_day.csv": ["source_url", "accessed_at"],
+    "firsts.csv": ["source_url", "accessed_at"],
 }
 # Templates whose rows are placeholders until filled; every row holding a value
 # must carry a source.

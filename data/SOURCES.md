@@ -20,6 +20,19 @@ Party codes used in every file: `DEM` (Democratic, including Minnesota's Democra
   The House Historian gives one division per Congress and no House majority changed hands during a Congress in this period, so for the House the column equals `majority_party`. Charts use `majority_party_most_of_congress`, with a footnote marker where `majority_note` is set.
 - **Majority threshold:** `floor(total_seats / 2) + 1`, so 218 for a 435-seat House and 51 for a 100-seat Senate. In a 50-50 Senate the Vice President's tie-breaking vote decides control; the threshold column does not model that.
 
+## Senate count on the day control was settled
+
+`senate_control_day.csv` (from `data/manual/senate_control_day.csv`) gives the Senate count after opening day for the two Congresses where control differs from opening day. Each row is copied from a dated row of the Senate Historical Office's own party division page (archived copy above) and the pipeline checks the numbers against it.
+
+- 117th: 20 January 2021, 48 D, 50 R, 2 independents caucusing with the Democrats; Democratic control through the vice president's tie-breaking vote.
+- 107th: 6 June 2001, 50 D, 49 R, 1 independent (Jeffords) caucusing with the Democrats; 51 for the Democratic caucus, no vice president needed.
+
+The Congress card reads these as "50 Democrats, with the vice president" (2020) and "51 Democrats" (2000), with the opening-day count in the line underneath.
+
+## Firsts of 2026
+
+`data/manual/firsts.csv` holds one row per first, each with a source URL and access time. A first is entered only when CAWP, the House Historian, the Senate Historical Office, the National Governors Association, a state's official page or a major news organisation states it. No rows were entered on 5 November 2026 because no 2026 general-election result could be read from an allowed source.
+
 ## Statehood seats, 1959 to 1963
 
 - **House:** 435 seats, except 436 at the opening of the 86th Congress (Alaska seated in January 1959; Hawaii's member joined on 21 August 1959) and 437 in the 87th. Back to 435 from the 88th.

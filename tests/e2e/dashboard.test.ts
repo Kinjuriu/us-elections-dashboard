@@ -149,8 +149,8 @@ test('the Senate card names the party in control, and gives opening day undernea
     line: document.querySelector('[data-card="senate"] [data-line]').textContent,
     finding: document.querySelector('[data-finding]').textContent,
   })`);
-  assert.equal(t.big, 'Democrats');
-  assert.match(t.who, /majority for most of this Congress/);
+  assert.equal(t.big, '50');
+  assert.equal(t.who, 'Democrats, with the vice president');
   assert.equal(t.line, 'On opening day: 51 Republicans, 46 Democrats, 2 independents, 1 vacant');
   assert.match(t.finding, /Democrats/);
 });

@@ -4,6 +4,7 @@
 import { buildSquares, type Kind } from './seatbar.ts';
 import type { Balance } from './mapData';
 import type { HeaderYear } from './dashboardData';
+import type { SenateControlDay } from './data';
 
 /** The semicircle is drawn in this box: 100 units from the centre to the outer seat, plus room for the seat itself. */
 export const HEMI = { outer: 100, inner: 46, rows: 5, seat: 9.6, pad: 8 } as const;
@@ -159,6 +160,8 @@ export interface ChamberView {
   label: string;
   /** The party that held the majority for most of the Congress. */
   controller: Party | null;
+  /** The Senate count on the day control was settled, when that is not opening day. */
+  controlDay: SenateControlDay | null;
 }
 
 /**
@@ -186,6 +189,7 @@ export function cardViews(h: HeaderYear): ChamberView[] {
       },
       label: cardLabel(id === 'house' ? 'House' : 'Senate', c.caption, c.balance, c.total, c.threshold),
       controller: c.controller === 'DEM' ? 'dem' : c.controller === 'GOP' ? 'gop' : null,
+      controlDay: c.controlDay,
     };
   });
 }
@@ -218,12 +222,29 @@ export interface Centre {
  */
 export const controlDiffers = (v: ChamberView): boolean => v.controller !== null && v.controller !== leader(v.balance);
 
+const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+/** "2021-01-20" as "20 January 2021". */
+export const longDate = (iso: string): string => {
+  const [y, m, d] = iso.split('-').map(Number);
+  return `${d} ${MONTHS[m - 1]} ${y}`;
+};
+
 /** The number in the middle of the semicircle: the party picked, or else the party in control. */
 export function centre(v: ChamberView, picked: Party | null): Centre {
   const b = v.balance;
   if (b.dem === null || b.gop === null) return { big: 'n/a', who: 'Results not yet entered', change: '', word: false };
   if (picked) return { big: countText(b[picked]), who: PARTY_WORD[picked], change: v.change[picked], word: false };
   if (v.controller && controlDiffers(v)) {
+    const d = v.controlDay;
+    if (d && d.controller.toLowerCase() === v.controller) {
+      const n = v.controller === 'dem' ? d.dem + d.indWithDem : d.gop + d.indWithGop;
+      return {
+        big: String(n),
+        who: d.basis === 'vice_president' ? `${PARTY_WORD[v.controller]}, with the vice president` : PARTY_WORD[v.controller],
+        change: `From ${longDate(d.asOf)}`,
+        word: false,
+      };
+    }
     return { big: PARTY_WORD[v.controller], who: 'held the majority for most of this Congress', change: '', word: true };
   }
   const p = leader(b);

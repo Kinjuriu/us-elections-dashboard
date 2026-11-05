@@ -54,3 +54,18 @@ test('when opening day and the Congress as a whole disagree, the card names the 
   assert.ok(!controlDiffers(v2024));
   assert.equal(centre(v2024, null).big, '53');
 });
+
+test('with a control-day count the card reads the number that decided control', () => {
+  const day = { congress: 117, asOf: '2021-01-20', dem: 48, gop: 50, indWithDem: 2, indWithGop: 0, controller: 'DEM', basis: 'vice_president' } as const;
+  const v = { ...view(bal(46, 51, { indDem: 2, vacant: 1 }), 'dem'), controlDay: day } as ChamberView;
+  const c = centre(v, null);
+  assert.equal(c.big, '50');
+  assert.equal(c.who, 'Democrats, with the vice president');
+  assert.equal(c.change, 'From 20 January 2021');
+  assert.equal(openingDayLine(v.balance), 'On opening day: 51 Republicans, 46 Democrats, 2 independents, 1 vacant');
+  // Picking a party still shows that party's own seats.
+  assert.equal(centre(v, 'gop').big, '51');
+  // Without the vice president (2001: Jeffords makes 51).
+  const d2 = { congress: 107, asOf: '2001-06-06', dem: 50, gop: 49, indWithDem: 1, indWithGop: 0, controller: 'DEM', basis: 'majority' } as const;
+  assert.equal(centre({ ...view(bal(50, 50), 'dem'), controlDay: d2 } as ChamberView, null).who, 'Democrats');
+});

@@ -79,12 +79,14 @@ const defaultSenate = mapData.senate[startYear];
         </ChartFrame>
       </div>
     </section>
+    <p class="dash__more">New in 2026: the <a href={`${import.meta.env.BASE_URL}firsts/`} data-carry>Firsts of 2026</a> page lists the milestones in this year's elections.</p>
   </main>
 
   <Footer asOf={controlAsOf} />
 </Base>
 
 <style>
+  .dash__more { margin-top: var(--sp-6); font-size: var(--fs-2); }
   .dash { padding-top: var(--sp-4); }
   @media (min-width: 768px) { .dash { padding-top: var(--sp-5); } }
 

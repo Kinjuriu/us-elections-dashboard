@@ -1,7 +1,7 @@
 // Build-time data for the dashboard layer: the store's configuration and,
 // for every year the year control offers, the Congress the header seat bars
 // show. Read from data/processed/chamber_control.csv and independents.csv.
-import { loadChamberControl, loadIndependents, hasCounts, PARTY_NAME, type ChamberControl, type Party } from './data';
+import { loadChamberControl, loadIndependents, loadSenateControlDay, hasCounts, PARTY_NAME, type ChamberControl, type Party, type SenateControlDay } from './data';
 import { balanceFrom, defaultYear, type Balance, type MapData } from './mapData';
 import { ordinal } from './mapText';
 import type { StoreConfig } from './store';
@@ -18,6 +18,8 @@ export interface HeaderChamber {
   /** The party that held the majority for most of the Congress, which can differ from the opening-day count. */
   controller: Party | null;
   unverifiedInd: boolean;
+  /** The Senate count on the day control was settled, when that is not opening day. */
+  controlDay: SenateControlDay | null;
 }
 
 export interface HeaderYear {
@@ -49,6 +51,7 @@ export function headerTitle(houseMaj: Party | null, senateMaj: Party | null, yea
 export function loadHeaderYears(map: MapData): Record<number, HeaderYear> {
   const control = loadChamberControl();
   const inds = loadIndependents();
+  const controlDays = loadSenateControlDay();
   const latestWithCounts = Math.max(...control.filter(hasCounts).map((r) => r.electionYear));
   const row = (chamber: 'house' | 'senate', y: number) =>
     control.find((r) => r.chamber === chamber && r.electionYear === y);
@@ -83,6 +86,7 @@ export function loadHeaderYears(map: MapData): Record<number, HeaderYear> {
       majorityNote: r.majorityNote,
       controller: majorityOf(r),
       unverifiedInd: inds.some((i) => i.chamber === c && i.congress === r.congress && !i.verified),
+      controlDay: c === 'senate' ? controlDays.find((d) => d.congress === r.congress) ?? null : null,
     });
 
     out[year] = {

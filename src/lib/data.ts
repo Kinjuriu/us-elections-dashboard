@@ -138,6 +138,33 @@ export function loadChamberControl(): ChamberControl[] {
   }));
 }
 
+export interface SenateControlDay {
+  congress: number;
+  /** ISO date the count was taken, after opening day. */
+  asOf: string;
+  dem: number;
+  gop: number;
+  indWithDem: number;
+  indWithGop: number;
+  controller: Party;
+  /** 'vice_president': a 50-50 caucus split broken by the vice president; 'majority': a majority on its own. */
+  basis: 'vice_president' | 'majority';
+}
+
+/** Senate counts on the day control was settled, for Congresses where that differs from opening day. */
+export function loadSenateControlDay(): SenateControlDay[] {
+  return readCsv('data/processed/senate_control_day.csv').map((r) => ({
+    congress: Number(r.congress),
+    asOf: r.as_of,
+    dem: Number(r.dem),
+    gop: Number(r.gop),
+    indWithDem: Number(r.ind_with_dem),
+    indWithGop: Number(r.ind_with_gop),
+    controller: r.controller as Party,
+    basis: r.control_basis as SenateControlDay['basis'],
+  }));
+}
+
 export function loadIndependents(): Independent[] {
   return readCsv('data/processed/independents.csv').map((r) => ({
     chamber: r.chamber as Chamber,

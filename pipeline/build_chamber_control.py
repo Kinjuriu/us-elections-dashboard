@@ -226,10 +226,36 @@ def build() -> pd.DataFrame:
     detail = df[df.other_detail.fillna("") != ""][["congress", "chamber", "other_detail", "source_id"]]
     write_csv(detail, "chamber_other_detail.csv")
 
+    write_csv(senate_control_day(), "senate_control_day.csv")
+
     ind = pd.read_csv(MANUAL / "independents.csv")
     write_csv(ind[["chamber", "congress", "name", "state_po", "label_in_source", "caucuses_with",
                    "verified_in_source", "source_url", "note"]], "independents.csv")
     return df
+
+
+def senate_control_day() -> pd.DataFrame:
+    """Senate counts on the day control was settled, where that differs from opening day.
+
+    data/manual/senate_control_day.csv holds one row per Congress. Each row must
+    equal a dated row of the Senate's own session tables, which this checks.
+    """
+    m = pd.read_csv(MANUAL / "senate_control_day.csv", parse_dates=["as_of"])
+    rows = parse_senate_rows()
+    for r in m.itertuples():
+        hit = rows[(rows.congress == r.congress) & (pd.to_datetime(rows.as_of) == r.as_of)]
+        if len(hit) != 1:
+            raise ValueError(f"senate_control_day: no dated row for Congress {r.congress} on {r.as_of:%Y-%m-%d}")
+        h = hit.iloc[0]
+        for k in ("dem", "gop", "ind", "other", "vacant"):
+            if int(getattr(r, k)) != int(h[k]):
+                raise ValueError(f"senate_control_day: {k} is {getattr(r, k)} but the Senate table says {h[k]} ({r.congress})")
+        if r.ind_with_dem + r.ind_with_gop > r.ind:
+            raise ValueError(f"senate_control_day: more caucusing independents than independents ({r.congress})")
+        if r.dem + r.gop + r.ind + r.other + r.vacant != 100:
+            raise ValueError(f"senate_control_day: seats do not sum to 100 ({r.congress})")
+    m["as_of"] = m.as_of.dt.strftime("%Y-%m-%d")
+    return m.drop(columns=["note"])
 
 
 def all_congresses() -> pd.DataFrame:
