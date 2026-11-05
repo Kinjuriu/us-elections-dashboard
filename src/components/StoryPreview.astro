@@ -1,0 +1,137 @@
+---
+// A small static picture of the dashboard view a finding is about, drawn at
+// build time from the same data. The whole picture is the link to that view.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { geoPath } from 'd3-geo';
+import { feature } from 'topojson-client';
+import { FIPS } from '../lib/geo';
+import type { ControlChart, MidtermChart, FlipsChart } from '../lib/chartData';
+import type { SenateYear } from '../lib/mapData';
+
+type Props =
+  | { kind: 'control'; href: string; label: string; chart: ControlChart }
+  | { kind: 'midterm'; href: string; label: string; chart: MidtermChart; chamber: 'house' | 'senate'; highlight: number }
+  | { kind: 'flips'; href: string; label: string; chart: FlipsChart; highlight: number }
+  | { kind: 'map'; href: string; label: string; senate: SenateYear };
+const p = Astro.props;
+
+const COL: Record<string, string> = { DEM: 'var(--dem)', GOP: 'var(--gop)', IND: 'var(--ind)' };
+const W = 600;
+
+// Control: two rows of cells, House over Senate, one per Congress.
+let control: { x: number; w: number; house: string; senate: string; unified: boolean }[] = [];
+if (p.kind === 'control') {
+  const cs = p.chart.congresses;
+  const w = W / cs.length;
+  control = cs.map((c, i) => ({
+    x: i * w, w,
+    house: COL[c.house.majority ?? ''] ?? 'var(--no-race)',
+    senate: COL[c.senate.majority ?? ''] ?? 'var(--no-race)',
+    unified: c.unified !== null,
+  }));
+}
+
+// Midterm or flips: columns around a zero line.
+const CH = 120;
+let cols: { x: number; w: number; y: number; h: number; fill: string; hi: boolean }[] = [];
+let zeroY = CH / 2;
+if (p.kind === 'midterm') {
+  const bars = p.chart[p.chamber].filter((b) => b.change !== null);
+  const max = Math.max(...bars.map((b) => Math.abs(b.change!)), 1);
+  const slot = W / bars.length;
+  const s = (CH / 2 - 4) / max;
+  cols = bars.map((b, i) => ({
+    x: i * slot + slot * 0.2, w: slot * 0.6,
+    y: b.change! >= 0 ? zeroY - b.change! * s : zeroY,
+    h: Math.max(Math.abs(b.change!) * s, 1),
+    fill: b.presidentParty === 'DEM' ? 'var(--dem)' : 'var(--gop)',
+    hi: b.year === p.highlight,
+  }));
+}
+if (p.kind === 'flips') {
+  const cy = p.chart.cycles.filter((c) => c.decided > 0);
+  const slot = W / cy.length;
+  const s = (CH / 2 - 4) / Math.max(p.chart.max, 1);
+  cols = cy.flatMap((c) => {
+    const i = cy.indexOf(c);
+    const base = { x: i * slot + slot * 0.2, w: slot * 0.6, hi: c.year === p.highlight };
+    return [
+      ...(c.toDem ? [{ ...base, y: zeroY - c.toDem * s, h: c.toDem * s, fill: 'var(--dem)' }] : []),
+      ...(c.toGop ? [{ ...base, y: zeroY, h: c.toGop * s, fill: 'var(--gop)' }] : []),
+    ];
+  });
+}
+
+// Map: the Senate map of the year, flat fills.
+let shapes: { d: string; fill: string }[] = [];
+if (p.kind === 'map') {
+  const topo = JSON.parse(readFileSync(join(process.cwd(), 'node_modules/us-atlas/states-albers-10m.json'), 'utf8'));
+  const fc = feature(topo, topo.objects.states) as unknown as { features: { id: string }[] };
+  const path = geoPath();
+  const FILL: Record<string, string> = {
+    dem: 'var(--dem)', gop: 'var(--gop)', ind: 'var(--ind)', 'dem-lead': 'var(--dem-tint)', 'gop-lead': 'var(--gop-tint)',
+  };
+  shapes = fc.features.filter((f) => FIPS[f.id]).map((f) => {
+    const s = p.senate.states[FIPS[f.id]];
+    const fill = s ? (s.fill === 'split' && s.split ? s.split[0] : s.fill) : 'no-race';
+    return { d: path(f as never) ?? '', fill: FILL[fill] ?? 'var(--no-race)' };
+  });
+}
+---
+<a class="pv" href={p.href}>
+  {p.kind === 'control' && (
+    <svg viewBox={`0 0 ${W} 58`} aria-hidden="true">
+      {control.map((c) => (
+        <>
+          {c.unified && <rect x={c.x} y="0" width={c.w} height="58" fill="var(--paper-2)" />}
+          <rect x={c.x + 0.5} y="6" width={c.w - 1} height="20" fill={c.house} />
+          <rect x={c.x + 0.5} y="32" width={c.w - 1} height="20" fill={c.senate} />
+        </>
+      ))}
+    </svg>
+  )}
+  {(p.kind === 'midterm' || p.kind === 'flips') && (
+    <svg viewBox={`0 0 ${W} ${CH}`} aria-hidden="true">
+      {cols.map((c) => (
+        <>
+          <rect x={c.x} y={c.y} width={c.w} height={c.h} fill={c.fill} />
+          {c.hi && <rect x={c.x - 3} y={2} width={c.w + 6} height={CH - 4} fill="none" stroke="var(--ink)" stroke-width="2" />}
+        </>
+      ))}
+      <line x1="0" x2={W} y1={zeroY} y2={zeroY} stroke="var(--ink)" stroke-width="1" />
+    </svg>
+  )}
+  {p.kind === 'map' && (
+    <svg viewBox="0 0 975 610" aria-hidden="true" class="pv__map">
+      {shapes.map((s) => <path d={s.d} fill={s.fill} stroke="#fff" stroke-width="0.75" />)}
+    </svg>
+  )}
+  <span class="pv__label">{p.label}</span>
+</a>
+
+<style>
+  .pv {
+    display: block;
+    margin-top: var(--sp-3);
+    padding: var(--sp-3);
+    border: 1px solid var(--rule);
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .pv:hover { border-color: var(--ink); }
+  .pv:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .pv svg { display: block; width: 100%; height: auto; }
+  .pv__map { max-width: 420px; }
+  .pv__label {
+    display: block;
+    margin-top: var(--sp-2);
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    text-decoration: underline;
+    text-underline-offset: 0.18em;
+  }
+</style>

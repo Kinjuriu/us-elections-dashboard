@@ -1,0 +1,65 @@
+---
+// Senate races involving independents, or where the flip definitions give
+// different answers, 2000 to 2024. Read at build time from the table in
+// data/SOURCES.md ("Flip definitions"), so there is one copy of these facts.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+
+const md = readFileSync(join(process.cwd(), 'data/SOURCES.md'), 'utf8');
+const start = md.indexOf('Races involving independents, or where the definitions differ');
+if (start < 0) throw new Error('IndependentsTable: table not found in data/SOURCES.md');
+const lines = md.slice(start).split('\n').filter((l) => l.startsWith('|')).slice(2);
+const rows = lines
+  .map((l) => l.split('|').slice(1, -1).map((c) => c.trim()))
+  .filter((c) => c.length === 6)
+  .map(([race, holder, winner, vsHolder, changed, vsLast]) => ({ race, holder, winner, vsHolder, changed, vsLast }));
+if (!rows.length) throw new Error('IndependentsTable: no rows');
+const yes = (v: string) => (v === 'yes' ? 'Yes' : 'No');
+const party = (s: string) =>
+  s.replace(/\bDEM\b/g, 'Democrat').replace(/\bGOP\b/g, 'Republican').replace(/\bIND\b/g, 'Independent');
+---
+<div class="ind">
+  <table class="ind__table">
+    <thead>
+      <tr>
+        <th scope="col">Race</th>
+        <th scope="col">Seat held by (party, caucus)</th>
+        <th scope="col">Won by (party, caucus)</th>
+        <th scope="col">Counted as a flip</th>
+        <th scope="col">Party label changed</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.map((r) => (
+        <tr>
+          <th scope="row">{r.race}</th>
+          <td>{party(r.holder)}</td>
+          <td>{party(r.winner)}</td>
+          <td>{yes(r.vsHolder)}</td>
+          <td>{yes(r.changed)}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<style>
+  .ind { overflow-x: auto; }
+  .ind__table { width: 100%; border-collapse: collapse; font-size: var(--fs-2); }
+  .ind__table th, .ind__table td {
+    padding: var(--sp-2) var(--sp-3) var(--sp-2) 0;
+    border-bottom: var(--hairline);
+    text-align: left;
+    vertical-align: top;
+  }
+  .ind__table thead th {
+    border-bottom: 1px solid var(--ink);
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    vertical-align: bottom;
+  }
+  .ind__table tbody th { font-weight: 600; white-space: nowrap; }
+</style>

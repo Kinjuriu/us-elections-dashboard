@@ -49,7 +49,7 @@ const decided = cyc.find((c) => c.year === year)?.decided ?? 0;
           <>
             {c.toDem > 0 && <span style={`left:${x(i)}%;top:${HALF - h(c.toDem) - 17}px`}>{c.toDem}</span>}
             {c.toGop > 0 && <span style={`left:${x(i)}%;top:${HALF + h(c.toGop) + 1}px`}>{c.toGop}</span>}
-            {c.decided === 0 && <span class="fl__none" style={`left:${x(i)}%;top:${HALF - 22}px`}>No results yet</span>}
+            {c.decided === 0 && <span class="fl__none" style={`left:${x(i)}%;top:${HALF - 40}px`}>No results yet</span>}
           </>
         ))}
       </div>
@@ -97,7 +97,7 @@ const decided = cyc.find((c) => c.year === year)?.decided ?? 0;
   .fl :global(.fl__sw[data-party='GOP']) { background: var(--gop); }
   .fl :global(.fl__sw[data-party='IND']) { background: var(--ind); }
 
-  .fl__cycles { position: relative; max-width: 760px; }
+  .fl__cycles { position: relative; }
   .fl__plot { position: relative; padding-block: 18px; }
   .fl__plot svg { display: block; width: 100%; overflow: visible; }
   .fl__zero { stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -112,7 +112,7 @@ const decided = cyc.find((c) => c.year === year)?.decided ?? 0;
     font-variant-numeric: tabular-nums lining-nums;
   }
   .fl__vals .fl__none {
-    width: 4em;
+    width: 6em;
     text-align: center;
     font-size: 12px;
     font-weight: 500;

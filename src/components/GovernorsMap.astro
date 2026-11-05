@@ -1,0 +1,144 @@
+---
+// The governors map: which party held each state's governorship after the
+// elections of the year selected on the railway. Drawn at build time for the
+// default year, so it reads with JavaScript off; src/scripts/governors-map.ts
+// follows the shared year. Flat fills, white borders, no labels on the map:
+// the list under it gives every governor by name.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { geoPath } from 'd3-geo';
+import { feature } from 'topojson-client';
+import { FIPS } from '../lib/geo';
+import { govHeadline, govCounts, longDate, partyWord, type GovSnapshot } from '../lib/governors';
+
+interface Props {
+  snapshots: Record<number, GovSnapshot>;
+  year: number;
+  stateNames: Record<string, string>;
+}
+const { snapshots, year, stateNames } = Astro.props;
+const snap = snapshots[year];
+
+// us-atlas ships the states already projected with d3.geoAlbersUsa at 975 by 610.
+const topo = JSON.parse(readFileSync(join(process.cwd(), 'node_modules/us-atlas/states-albers-10m.json'), 'utf8'));
+const fc = feature(topo, topo.objects.states) as unknown as { features: { id: string; geometry: unknown }[] };
+const path = geoPath();
+const shapes = fc.features
+  .filter((f) => FIPS[f.id])
+  .map((f) => ({ st: FIPS[f.id], d: path(f as never) ?? '' }))
+  .sort((a, b) => a.st.localeCompare(b.st));
+
+const fillVar = { D: 'var(--dem)', R: 'var(--gop)', I: 'var(--ind)' } as const;
+const order = Object.keys(snap.states).sort((a, b) => stateNames[a].localeCompare(stateNames[b]));
+const caption = (s: GovSnapshot) =>
+  s.pending
+    ? `Governors in office on ${longDate(s.date)}, the latest date in the data.`
+    : `Governors in office on ${longDate(s.date)}, after the January inaugurations.`;
+---
+<div class="gov" data-gov data-year={year}>
+  <p class="gov__finding" data-gov-finding aria-live="polite">{govHeadline(snap)}</p>
+  <p class="gov__caption" data-gov-caption>{caption(snap)} <span data-gov-counts>{govCounts(snap)}</span>.</p>
+
+  <ul class="gov__legend" aria-label="Key">
+    <li><span class="gov__sw" style="background:var(--dem)"></span>Democratic governor</li>
+    <li><span class="gov__sw" style="background:var(--gop)"></span>Republican governor</li>
+    <li><span class="gov__sw" style="background:var(--ind)"></span>Independent governor</li>
+  </ul>
+
+  <div class="gov__layout">
+    <svg class="gov__svg" viewBox="0 0 975 610" role="img" aria-labelledby="gov-svg-title">
+      <title id="gov-svg-title">Map of governors by party. The list below gives every state.</title>
+      {shapes.map(({ st, d }) => {
+        const g = snap.states[st];
+        return (
+          <path class="gov__state" d={d} data-st={st} fill={fillVar[g.party]}>
+            <title>{`${stateNames[st]}: ${g.name} (${partyWord(g.party)})`}</title>
+          </path>
+        );
+      })}
+    </svg>
+    <p class="gov__readout" data-gov-readout>Select a state on the map, or open the list, for its governor.</p>
+  </div>
+
+  <details class="gov__list">
+    <summary>All 50 governors</summary>
+    <table class="gov__table">
+      <thead><tr><th scope="col">State</th><th scope="col">Governor</th><th scope="col">Party</th><th scope="col">Took office</th></tr></thead>
+      <tbody data-gov-tbody>
+        {order.map((st) => {
+          const g = snap.states[st];
+          return (
+            <tr>
+              <th scope="row">{stateNames[st]}</th>
+              <td>{g.name}</td>
+              <td><span class="gov__sw" style={`background:${fillVar[g.party]}`}></span>{g.detail}</td>
+              <td>{longDate(g.tookOffice)}</td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+  </details>
+
+  <script type="application/json" data-gov-data set:html={JSON.stringify({ snapshots, stateNames })}></script>
+</div>
+
+<script>
+  import '../scripts/governors-map';
+</script>
+
+<style>
+  .gov__finding {
+    max-width: none;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: var(--fs-4);
+    line-height: 1.25;
+  }
+  .gov__caption { margin-top: var(--sp-2); font-size: var(--fs-2); color: var(--ink-2); }
+  .gov__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    margin: var(--sp-3) 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: var(--fs-1);
+  }
+  .gov__sw {
+    display: inline-block;
+    width: 12px;
+    height: 12px;
+    margin-right: 6px;
+    vertical-align: -1px;
+  }
+  .gov__layout { margin-top: var(--sp-4); }
+  .gov__svg { display: block; width: 100%; max-width: 900px; height: auto; }
+  .gov__state { stroke: var(--border); stroke-width: 0.75; cursor: pointer; transition: fill var(--dur-data) var(--ease-data); }
+  .gov__state:hover, .gov__state.is-sel { stroke: var(--ink); stroke-width: 1.5; }
+  @media (prefers-reduced-motion: reduce) { .gov__state { transition: none; } }
+  .gov__readout { margin-top: var(--sp-3); font-size: var(--fs-2); min-height: 1.5em; }
+  .gov__list { margin-top: var(--sp-4); border-top: var(--hairline); }
+  .gov__list > summary {
+    padding-block: var(--sp-3);
+    font-family: var(--font-label);
+    font-size: var(--fs-2);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+  .gov__list > summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .gov__table { width: 100%; border-collapse: collapse; font-size: var(--fs-2); font-variant-numeric: tabular-nums lining-nums; }
+  .gov__table th, .gov__table td { padding: var(--sp-2) var(--sp-3) var(--sp-2) 0; border-bottom: var(--hairline); text-align: left; vertical-align: top; }
+  .gov__table thead th {
+    border-bottom: 1px solid var(--ink);
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+  .gov__table tbody th { font-weight: 600; }
+</style>

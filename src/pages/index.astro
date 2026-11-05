@@ -8,6 +8,9 @@ import Board from '../components/Board.astro';
 import ControlChart from '../components/ControlChart.astro';
 import MidtermChart from '../components/MidtermChart.astro';
 import FlipsChart from '../components/FlipsChart.astro';
+import GovernorsMap from '../components/GovernorsMap.astro';
+import IndependentsTable from '../components/IndependentsTable.astro';
+import { loadGovernors } from '../lib/governors';
 import { loadMapData, defaultYear } from '../lib/mapData';
 import { loadHeaderYears, storeConfig, stripColumns } from '../lib/dashboardData';
 import { loadControlChart, loadMidtermChart, loadFlipsChart } from '../lib/chartData';
@@ -54,7 +57,9 @@ const listNames = (xs: string[]) =>
 const sources = (await sourcesHtml())
   .replace(/<h1[^>]*>[\s\S]*?<\/h1>/, '')
   .replace(/<(\/?)h3/g, '<$1h5')
-  .replace(/<(\/?)h2/g, '<$1h4');
+  .replace(/<(\/?)h2/g, '<$1h4')
+  // The independents table is shown under the midterm chart instead.
+  .replace(/<p>Races involving independents[\s\S]*?<\/table>/, '');
 
 const mapData = loadMapData();
 const headerYears = loadHeaderYears(mapData);
@@ -71,6 +76,8 @@ const mapLatestYear = Math.max(...mapData.years);
 const startYear = defaultYear(mapData);
 const defaultSenate = mapData.senate[startYear];
 const mapLatestHasResults = mapData.senate[mapLatestYear].decided > 0;
+const govYears = [...dashConfig.years, ...dashConfig.senateOnlyYears].sort((a, b) => a - b);
+const governors = loadGovernors(govYears);
 const oddSpecials = races
   .filter((r) => r.year % 2 === 1)
   .map((r) => `${mapData.stateNames[r.state]} in ${r.year}`);
@@ -97,6 +104,17 @@ const oddSpecials = races
       provisional={defaultSenate.provisional}
     />
 
+    <section class="gov-section" aria-label="Governors">
+      <ChartFrame
+        title="Governors"
+        subtitle="The party of each state's governor after the elections of the year chosen on the railway, 2000 to 2024. Pick a year above to change it."
+        source="Wikipedia contributors, the List of governors page for each state (CC BY-SA 4.0); party switches from the footnotes on those pages."
+        dataAsOf={asOf(...Object.keys(mapData.stateNames).map((st) => `wikipedia_governors_${st}`))}
+      >
+        <GovernorsMap snapshots={governors} year={dashConfig.defaultYear} stateNames={mapData.stateNames} />
+      </ChartFrame>
+    </section>
+
     <section class="charts" aria-label="History charts">
       <div class="charts__cell">
         <ChartFrame
@@ -111,11 +129,21 @@ const oddSpecials = races
       <div class="charts__cell">
         <ChartFrame
           title="The midterm penalty"
-          subtitle={`Seats gained or lost by the president's party in each midterm, ${midFirst} to 2026.`}
+          subtitle={`Seats gained or lost by the party holding the White House in each midterm, ${midFirst} to 2026.`}
           source={MIDTERM_SOURCE}
           dataAsOf={controlAsOf}
         >
           <MidtermChart chart={midtermChart} chamber={dashConfig.defaultChamber} selectedYear={dashConfig.defaultYear} />
+        </ChartFrame>
+      </div>
+      <div class="charts__cell">
+        <ChartFrame
+          title="Senate races involving independents"
+          subtitle="Races from 2000 to 2024 where an independent held or won the seat, or where a seat changed party label without changing caucus. Only a change of caucus counts as a flip in the next chart."
+          source="MIT Election Data and Science Lab, U.S. Senate statewide returns; US Senate Historical Office for party switches and appointments."
+          dataAsOf={senateAsOf}
+        >
+          <IndependentsTable />
         </ChartFrame>
       </div>
       <div class="charts__cell">
@@ -228,9 +256,7 @@ const oddSpecials = races
     display: grid;
     gap: var(--sp-8) var(--sp-5);
   }
-  @media (min-width: 1024px) {
-    .charts { grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; }
-  }
+  .gov-section { margin-top: var(--sp-8); }
   /* The charts pick their narrow or wide drawing from the width of this cell. */
   .charts__cell {
     container: chart / inline-size;

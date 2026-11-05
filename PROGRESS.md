@@ -21,6 +21,9 @@ Last updated: 4 November 2026, 20:30 Nairobi time. Ticks render as checkboxes on
 - [x] Step 05: rebuild as a dashboard, map first (Sonnet 5.5), PR open
 - [x] Step 07: data for the next visuals (PR #5): A county shift, B members, women and age, E governors (Wikipedia, CC BY-SA 4.0) built; C issue heatmap in the backlog
 - [ ] Inspection of step 05 (Opus), then Claude's review
+- [x] Step 07: governors from Wikipedia, county shift, members, women and age (PR #5)
+- [x] Step 08: railway, Senate semicircle, House blocks, cards below the map (PR #6)
+- [x] Step 08b: governors map, charts stacked full width, independents table under the midterm chart, story previews (review/08b-report.md)
 - [ ] Step 06: audit against the rules, Lighthouse, deploy to GitHub Pages
 
 ## Pull requests to merge (in this order)
