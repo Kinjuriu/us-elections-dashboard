@@ -62,7 +62,7 @@ I checked each against the raw source text, and they're also written into `test_
 
 **Senate races:** none missing any more. The 8 races MEDSL lacked or got wrong are now filled in `data/manual/senate_results_manual.csv` from official sources (Clerk of the House, FEC, and the MA, NJ and AL election offices). Every race from 2000 to 2024 has a winner and both flip values.
 
-**Missing runner-up party:** WY 2020 and AK 2022. Unopposed races (ID 2004, SD 2010, AL 2014) have only write-ins as runner-up.
+**Missing runner-up party:** none since Revision 4 (WY 2020 and AK 2022 are now filled). Unopposed races (ID 2004, SD 2010, AL 2014) have only write-ins as runner-up.
 
 **Midterm swing flags** (each explained in the `flag` column):
 - **All 21 House rows:** "before" is the opening day, because the House Historian records no changes during a Congress.
@@ -82,18 +82,18 @@ I checked each against the raw source text, and they're also written into `test_
 1. **VT 2006 shows `party_changed = false`.** You listed it as a party-change case, but under the holder rule it isn't one. Jeffords had already become an independent in 2001, so on election day the seat went from one independent (caucusing D) to another (Sanders, caucusing D). It is a label change only against the previous election (Jeffords won as a Republican in 2000), where `flipped_vs_last_election` is true. If you want the map's note there too, `party_changed` could be measured against the last election instead; tell me which. CT 2006 (Lieberman, D to I) does come out `party_changed = true`.
 2. **Name style is mixed.** The 8 manual races use title case ("Doug Jones"), while MEDSL rows are upper case ("TOMMY TUBERVILLE"). The site needs a display-name step either way; I have not changed either source.
 3. **`senate_seat_changes.csv` coverage for 2025 and 2026.** My own knowledge stops in mid-2026, and the archived Senate page shows no party-changing appointment or switch in the 119th Congress up to 2 November 2026. Please confirm nothing is missing for 2026.
-4. **Sinema's switch date (9 December 2022)** comes from general knowledge, not the source. It falls after the 2022 election, so it only affects AZ 2024's holder, which doesn't depend on the exact date.
+4. **Sinema's switch date:** resolved in Revision 4. The FEC gives 3 January 2023 as the effective date; 9 December 2022 was the announcement.
 5. **Midterm "before" for the Senate now uses election day**, so several historic Senate swings move by about a seat from the opening-day version. For example, 1946 is now -12 (was -13), 2002 +2 (was +1), 2010 -6 (was -5), and 2018 +2 (was +1). This is the intended effect, but it will change any copy written from the old numbers.
 
 ## What you need to enter or confirm by hand
 
 1. **2026 results** in `data/manual/2026_provisional.csv`.
 2. **The 8 Senate races** in `data/manual/senate_results_manual.csv` are filled. Each note asks for a spot-check against its source (see Revision 2).
-3. **Seat classes** in `data/manual/senate_specials.csv` (all 28 rows `verified = false`).
+3. **Seat classes** in `data/manual/senate_specials.csv`: 21 of 28 verified against the FEC (Revision 4). The 7 left are OK 1994, TN 1994, KS 1996, GA 2000, MO 2002, FL 2026 and OH 2026.
 4. **Independents** in `data/manual/independents.csv`: unverified rows, plus five House rows with no name.
-5. **Party overrides** in `data/manual/candidate_party_overrides.csv`: confirm Murkowski and Lummis; add Ben David and Tshibaka.
-6. **Senate seat changes** in `data/manual/senate_seat_changes.csv`: all 7 rows `verified = false`, as you asked.
-7. **Caucus entries behind the holder rule.** Caucus flips involving independents now depend on `independents.csv` and `senate_seat_changes.csv`. The 110th Congress rows for Sanders and Lieberman (VT and CT 2006) are verified in the source. The rows for Sanders and King after 2012, and every seat-change row (Sinema, Manchin, Jeffords), are not yet verified.
+5. **Party overrides** in `data/manual/candidate_party_overrides.csv`: all five filled and sourced (Revision 4). The two Wyoming rows rest on one county's ballot, so the statewide canvass would be a stronger source.
+6. **Senate seat changes** in `data/manual/senate_seat_changes.csv`: Sinema verified (Revision 4); the other 6 rows are still `verified = false`.
+7. **Caucus entries behind the holder rule.** Caucus flips involving independents now depend on `independents.csv` and `senate_seat_changes.csv`. The 110th Congress rows for Sanders and Lieberman (VT and CT 2006) are verified in the source. The rows for Sanders and King after 2012, and the seat-change rows for Manchin and Jeffords, are not yet verified. Sinema's is verified (Revision 4).
 
 ## Effects and animations
 
@@ -152,3 +152,10 @@ None. This step is data only.
 - **`flipped_vs_last_election` is unchanged** (party labels against the previous election).
 - **`senate_results_manual.csv`:** the `issue` column now reads `medsl_rounds_mixed` for LA 2016 and `medsl_runoff_labelled_gen` for MS 2018. I edited only those two cells. The `note` cells in those rows still carry the old "Previous issue" wording.
 - **Tests:** the flip test now pins AZ 2024, CT 2006 and CT 2012 as party changes without a caucus flip, VT 2006, ME 2012 and WV 2024. It also checks that every caucus flip is a party change. 25 of 25 tests pass, and two runs give identical outputs.
+
+## Revision 4 (manual entries checked against official sources)
+
+- **`senate_specials.csv`:** sources moved from Wikipedia to the FEC's *Federal Elections* reports. 21 of 28 seat classes verified; the 7 left are consistent with the FEC table but not proven by it, and each note says why. No class value changed.
+- **`senate_seat_changes.csv`:** Sinema's switch now dated 3 January 2023, the effective date in the FEC's *Federal Elections 2022*, and verified.
+- **`candidate_party_overrides.csv`:** all five parties filled and sourced: Ben David (DEM) and Tshibaka (GOP) added; Murkowski 2010 and 2022 and Lummis confirmed.
+- **Outputs:** the only change is `runner_up_party` in `senate_results_by_state.csv`, filled for WY 2020 (DEM) and AK 2022 (GOP). The Sinema date and the specials changed no output. 25 of 25 tests pass, and two runs give identical outputs.
