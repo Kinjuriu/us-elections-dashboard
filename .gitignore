@@ -8,3 +8,7 @@ dist/
 
 # Natural Earth zips: re-fetched and hash-checked by pipeline/geo/build_geo.py
 data/raw/naturalearth/
+
+# Finder and iCloud duplicate copies
+* 2.*
+* 2
