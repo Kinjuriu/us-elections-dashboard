@@ -112,3 +112,27 @@ a:hover { text-decoration-thickness: 2px; }
   z-index: 10;
 }
 .skip-link:focus-visible { top: var(--sp-2); }
+
+/* State outline next to a label (StateShape.astro, stateShapeUse) */
+.stshape { display: inline-block; flex: none; vertical-align: middle; }
+
+/* Party mark: a small square with the party's letter. Not the parties' logos (trademarks). */
+.pmark {
+  display: inline-block;
+  flex: none;
+  width: 16px;
+  height: 16px;
+  vertical-align: -3px;
+  background: var(--no-race);
+  color: #fff;
+  font-family: var(--font-label);
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 16px;
+  text-align: center;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.pmark[data-party='D'] { background: var(--dem); }
+.pmark[data-party='R'] { background: var(--gop); }
+.pmark[data-party='I'] { background: var(--ind); color: var(--ink); }

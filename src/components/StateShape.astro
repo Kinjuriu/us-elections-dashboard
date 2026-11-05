@@ -1,0 +1,18 @@
+---
+// One state's outline, drawn at build time from us-atlas and fitted to a
+// square box. Each state fills its own box, so states are not to scale with
+// each other (the notes page says so). Fill is the text colour, so the
+// parent sets the colour. Decoration next to a text label, so hidden from
+// assistive technology.
+import { stateShapes } from '../lib/stateShapes';
+
+interface Props {
+  state: string;
+  size?: number;
+}
+const { state, size = 24 } = Astro.props;
+const shape = stateShapes()[state];
+if (!shape) throw new Error(`StateShape: no outline for "${state}"`);
+---
+<svg class="stshape" width={size} height={size} viewBox={shape.viewBox} fill="currentColor" aria-hidden="true" focusable="false"><path d={shape.d} /></svg>
+

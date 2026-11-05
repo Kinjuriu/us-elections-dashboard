@@ -6,6 +6,7 @@
 // (outlined, the other fades). Drawn at build time for the default year;
 // src/scripts/cards.ts redraws them from the JSON block below.
 import { hemicycle, HEMI, cardViews, centre, blocksHtml, independentsLine, markPct, seatMark, PARTY_WORD } from '../lib/cards';
+import PartyMark from './PartyMark.astro';
 import type { HeaderYear } from '../lib/dashboardData';
 
 interface Props {
@@ -63,7 +64,7 @@ const box = HEMI.outer + HEMI.pad;
     <div class="chips" role="group" aria-label="Senate seats by party. Pick a party to outline it.">
       {(['dem', 'gop'] as const).map((p) => (
         <button type="button" class="chip" data-party={p} aria-pressed="false">
-          <span class="chip__sw" data-kind={p}></span>{PARTY_WORD[p]} <span class="chip__n" data-n={p}>{senate.balance[p]}</span>
+          <PartyMark party={p === 'dem' ? 'D' : 'R'} /> {PARTY_WORD[p]} <span class="chip__n" data-n={p}>{senate.balance[p]}</span>
         </button>
       ))}
     </div>
@@ -183,7 +184,6 @@ const box = HEMI.outer + HEMI.pad;
   }
   .chip:hover { border-color: var(--ink); background: var(--paper-2); }
   .chip[aria-pressed='true'] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
-  .chip__sw { width: 12px; height: 12px; }
   .chip__n { font-variant-numeric: tabular-nums lining-nums; }
 
   /* ---- House: labelled blocks ---- */

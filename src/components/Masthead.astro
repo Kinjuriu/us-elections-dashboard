@@ -1,46 +1,74 @@
 ---
-// One line: the site name on the left, the other page and the sources on the
-// right. There is nothing to jump to, because the whole dashboard is in view.
+// One strip across the top of every page: the site name on the left and the
+// five pages on the right, the current one marked and underlined. On phones
+// the links wrap onto a second line; there is no menu to open.
+// src/scripts/nav-query.ts adds the current ?year= (and the rest of the
+// query) to each link, so moving between pages keeps the year.
 const base = import.meta.env.BASE_URL;
+export type PageId = 'congress' | 'governors' | 'senate' | 'story' | 'sources';
 interface Props {
-  current?: 'dashboard' | 'story';
-  /** The dashboard's own page title sits under the masthead, so it leaves this one out. */
-  showTitle?: boolean;
+  current: PageId;
 }
-const { current = 'dashboard', showTitle = true } = Astro.props;
+const { current } = Astro.props;
+const pages: { id: PageId; label: string; path: string }[] = [
+  { id: 'congress', label: 'US Congress', path: '' },
+  { id: 'governors', label: 'Governors', path: 'governors/' },
+  { id: 'senate', label: 'Senate', path: 'senate/' },
+  { id: 'story', label: 'Story', path: 'story/' },
+  { id: 'sources', label: 'Notes and sources', path: 'sources/' },
+];
 ---
 <header class="masthead">
   <div class="wrap masthead__inner">
-    {showTitle && (
-      <p class="label masthead__title">
-        {current === 'story' ? <a href={base}>US Congress, 1946 to 2026</a> : 'US Congress, 1946 to 2026'}
-      </p>
-    )}
+    <p class="label masthead__title"><a href={base} data-carry>US Congress, 1946 to 2026</a></p>
     <nav aria-label="Pages" class="masthead__nav">
-      {current === 'story' ? <a href={base}>Dashboard</a> : <a href={`${base}story`}>Story</a>}
-      <a href={`${base}#notes`}>Sources</a>
+      {pages.map((p) => (
+        <a href={`${base}${p.path}`} data-carry aria-current={p.id === current ? 'page' : undefined}>{p.label}</a>
+      ))}
     </nav>
   </div>
 </header>
+
+<script>
+  import '../scripts/nav-query';
+</script>
 
 <style>
   .masthead { border-bottom: 1px solid var(--ink); }
   .masthead__inner {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: var(--sp-4);
+    gap: 0 var(--sp-4);
     min-height: 44px;
   }
   @media (min-width: 768px) { .masthead__inner { min-height: 48px; } }
-  .masthead__title { font-weight: 700; font-size: 13px; }
+  .masthead__title { margin: 0; padding-block: var(--sp-2); font-weight: 700; font-size: 13px; flex: none; }
   .masthead__title a { text-decoration: none; }
   .masthead__nav {
-    margin-left: auto;
     display: flex;
-    gap: var(--sp-5);
+    flex-wrap: wrap;
+    column-gap: var(--sp-4);
     font-family: var(--font-label);
     font-size: var(--fs-2);
     font-weight: 500;
+  }
+  .masthead__nav a {
+    padding-block: var(--sp-2);
+    text-decoration: none;
+  }
+  .masthead__nav a:hover { text-decoration: underline; text-decoration-thickness: 1px; }
+  .masthead__nav a[aria-current='page'] {
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 0.35em;
+  }
+  @media (min-width: 768px) { .masthead__nav { column-gap: var(--sp-5); } }
+  /* On phones the links take their own line under the name. */
+  @media (max-width: 719.98px) {
+    .masthead__title { width: 100%; padding-bottom: 0; }
+    .masthead__nav { width: 100%; }
   }
 </style>

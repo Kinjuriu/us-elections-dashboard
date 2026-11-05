@@ -14,6 +14,10 @@ export interface Governor {
   /** The page's own wording, e.g. "Democratic-Farmer-Labor". */
   detail: string;
   tookOffice: string;
+  /** The governor before, when the data has one. */
+  previous: { name: string; party: GovParty; detail: string } | null;
+  /** The Wikipedia page the term comes from. */
+  sourceUrl: string;
 }
 
 export interface GovSnapshot {
@@ -31,6 +35,23 @@ const ROOT = process.cwd();
 const read = (p: string) => parseCsv(readFileSync(join(ROOT, p), 'utf8'));
 const GROUP: Record<string, GovParty> = { Democratic: 'D', Republican: 'R', Independent: 'I' };
 
+type Term = Record<string, string>;
+
+/** A term's party on a date, after any switch recorded in governor_party_changes.csv. */
+function partyOn(t: Term, date: string, changes: Term[]) {
+  let party = t.party as GovParty;
+  let detail = t.party_detail;
+  for (const c of changes) {
+    if (c.state_po !== t.state_po || c.governor !== t.governor) continue;
+    const eff = c.effective.length === 7 ? `${c.effective}-01` : c.effective;
+    if (eff <= date) {
+      party = GROUP[c.party_to] ?? party;
+      detail = c.party_to;
+    }
+  }
+  return { party, detail };
+}
+
 function snapshot(date: string) {
   const terms = read('data/processed/governors_terms.csv');
   const changes = read('data/manual/governor_party_changes.csv');
@@ -39,17 +60,15 @@ function snapshot(date: string) {
     if (t.took_office > date || (t.left_office && t.left_office <= date)) continue;
     const prev = states[t.state_po];
     if (prev && prev.tookOffice > t.took_office) continue;
-    let party = t.party as GovParty;
-    let detail = t.party_detail;
-    for (const c of changes) {
-      if (c.state_po !== t.state_po || c.governor !== t.governor) continue;
-      const eff = c.effective.length === 7 ? `${c.effective}-01` : c.effective;
-      if (eff <= date) {
-        party = GROUP[c.party_to] ?? party;
-        detail = c.party_to;
-      }
-    }
-    states[t.state_po] = { name: t.governor, party, detail, tookOffice: t.took_office };
+    const { party, detail } = partyOn(t, date, changes);
+    // The governor before: the latest earlier term in the same state.
+    const before = terms
+      .filter((u) => u.state_po === t.state_po && u.took_office < t.took_office)
+      .sort((a, b) => b.took_office.localeCompare(a.took_office))[0];
+    const previous = before
+      ? { name: before.governor, ...partyOn(before, before.left_office || t.took_office, changes) }
+      : null;
+    states[t.state_po] = { name: t.governor, party, detail, tookOffice: t.took_office, previous, sourceUrl: t.source_url };
   }
   return states;
 }

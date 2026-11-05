@@ -14,6 +14,7 @@ function writeUrl() {
   const url = new URL(location.href);
   url.search = serializeState(store.get());
   history.replaceState(null, '', url);
+  document.dispatchEvent(new CustomEvent('dash:url'));
 }
 store.subscribe(writeUrl);
 // A link with invalid values is tidied up on arrival.

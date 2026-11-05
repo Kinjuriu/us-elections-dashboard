@@ -41,6 +41,9 @@ function init(root: HTMLElement) {
   const tooltip = root.querySelector<HTMLElement>('.cmap__tooltip')!;
   const panel = root.querySelector<HTMLElement>('[data-panel]')!;
   const panelRoot = root.querySelector<HTMLElement>('[data-panel-root]')!;
+  const panelFocus = root.querySelector<HTMLElement>('[data-panel-focus]')!;
+  const kb = root.querySelector<HTMLButtonElement>('[data-kb]')!;
+  const kbLive = root.querySelector<HTMLElement>('[data-kb-live]')!;
   const clearBtn = root.querySelector<HTMLButtonElement>('[data-clear]')!;
   // The finding line and its provisional tag sit above the map, in the board.
   const finding = document.querySelector<HTMLElement>('[data-finding]');
@@ -198,7 +201,7 @@ function init(root: HTMLElement) {
 
     for (const el of root.querySelectorAll<SVGUseElement>('.cmap__state')) {
       const st = el.dataset.state!;
-      el.setAttribute('aria-label', ariaLabel(view, st, name(st), sy, hy));
+      el.dataset.label = ariaLabel(view, st, name(st), sy, hy);
     }
     if (state.pinned) showPanel(state.pinned);
     hideTooltip();
@@ -289,7 +292,7 @@ function init(root: HTMLElement) {
   function pin(st: string) {
     state.pinned = st;
     showPanel(st);
-    setRoving(st);
+    kbState = st;
     updateRings();
     revealPanel();
   }
@@ -310,14 +313,12 @@ function init(root: HTMLElement) {
     updateRings();
   }
 
-  // ---------- Keyboard: one tab stop, arrow keys move between states ----------
+  // ---------- Keyboard: one real button, arrow keys move between states ----------
+  // The states are drawings, so they take no focus. The button is the one tab
+  // stop; the state the arrows are on is `kbState`, shown with the ring and
+  // the tooltip, and read out through the live region.
 
-  function setRoving(st: string) {
-    for (const el of root.querySelectorAll<SVGUseElement>('.cmap__state')) {
-      el.setAttribute('tabindex', el.dataset.state === st ? '0' : '-1');
-    }
-  }
-  setRoving(data.stateOrder[0]);
+  let kbState = data.stateOrder[0];
 
   const DIRS: Record<string, Pt> = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowDown: [0, 1], ArrowUp: [0, -1] };
   /** Nearest state in the direction pressed, favouring ones straight ahead. */
@@ -338,10 +339,13 @@ function init(root: HTMLElement) {
     return best;
   }
   function focusState(st: string) {
-    const l = currentLayout();
-    const el = layoutEls.get(l.id)!.querySelector<SVGUseElement>(`.cmap__state[data-state="${st}"]`);
-    setRoving(st);
-    el?.focus();
+    kbState = st;
+    if (document.activeElement !== kb) kb.focus();
+    state.focused = st;
+    tooltipAtAnchor(st);
+    updateRings();
+    const label = root.querySelector<SVGUseElement>(`.cmap__state[data-state="${st}"]`)?.dataset.label ?? name(st);
+    kbLive.textContent = label;
   }
 
   // ---------- Events ----------
@@ -371,22 +375,20 @@ function init(root: HTMLElement) {
     const st = stateFrom(e.target);
     if (st) openState(st);
   });
-  map.addEventListener('focusin', (e) => {
-    const st = stateFrom(e.target);
+  kb.addEventListener('focus', () => {
     // Only keyboard focus shows the tooltip; a tap or click pins instead.
-    if (!st || !(e.target as Element).matches(':focus-visible')) return;
-    state.focused = st;
-    tooltipAtAnchor(st);
+    if (!kb.matches(':focus-visible')) return;
+    state.focused = kbState;
+    tooltipAtAnchor(kbState);
     updateRings();
   });
-  map.addEventListener('focusout', () => {
+  kb.addEventListener('blur', () => {
     state.focused = null;
     hideTooltip();
     updateRings();
   });
-  map.addEventListener('keydown', (e) => {
-    const st = stateFrom(e.target);
-    if (!st) return;
+  kb.addEventListener('keydown', (e) => {
+    const st = kbState;
     if (DIRS[e.key]) {
       e.preventDefault();
       const next = neighbour(st, DIRS[e.key]);
@@ -416,7 +418,7 @@ function init(root: HTMLElement) {
     else if (st) focusState(st);
   });
   // A request from further down the page (the flips table): bring the panel into view.
-  document.addEventListener('dash:focus-panel', () => panelRoot.focus());
+  document.addEventListener('dash:focus-panel', () => panelFocus.focus());
 
   for (const l of data.layouts) matchMedia(l.media).addEventListener('change', hideTooltip);
 

@@ -1,5 +1,5 @@
-// End-to-end check: changing the year in the control strip updates the map,
-// the summary band, the side panel and the flips table together, and the URL follows.
+// End-to-end check of the Congress page: changing the year in the control strip
+// updates the map, the cards and the side panel together, and the URL follows.
 // Run with `npm run test:e2e` (builds first). Needs Google Chrome; set
 // CHROME_PATH if it is not in the usual place.
 import { test, before, after } from 'node:test';
@@ -23,7 +23,7 @@ after(async () => {
 
 const read = () => page.eval<{
   url: string; mapTitle: string; finding: string; bandLabels: string[]; houseDem: string; panelTitle: string | null;
-  flipsYear: string; flipsStates: string[]; chamber: string; stripYear: string;
+  chamber: string; stripYear: string;
 }>(`({
   url: location.search,
   mapTitle: document.querySelector('.cmap [data-title]').textContent,
@@ -31,8 +31,6 @@ const read = () => page.eval<{
   bandLabels: [document.querySelector('[data-hemi]').getAttribute('aria-label')],
   houseDem: document.querySelector('[data-block="dem"] .block__n').firstChild.textContent,
   panelTitle: document.querySelector('[data-panel] .cmn__title')?.textContent ?? null,
-  flipsYear: document.querySelector('[data-fl-year]').textContent,
-  flipsStates: [...document.querySelectorAll('[data-fl-table] .fl__state')].map((e) => e.dataset.state),
   chamber: document.querySelector('[data-cbar] [data-segmented="chamber"] [aria-pressed="true"]').dataset.value,
   stripYear: document.querySelector('[data-cbar] .rw__st[aria-checked="true"]').dataset.year,
 })`);
@@ -45,7 +43,6 @@ test('the default view is the latest year with results', async () => {
   assert.equal(s.chamber, 'senate');
   assert.equal(s.stripYear, '2024');
   assert.equal(s.panelTitle, 'Senate 2024');
-  assert.equal(s.flipsYear, '2024');
   assert.deepEqual(page.errors, []);
 });
 
@@ -59,7 +56,7 @@ test('the map is in the first screen at 1280 and 1440 wide', async () => {
   await page.viewport(1440, 900);
 });
 
-test('changing the year updates the map, the band, the panel and the flips table together', async () => {
+test('changing the year updates the map, the cards and the panel together', async () => {
   await page.goto(srv.url);
   const before = await read();
   await page.click('[data-cbar] .rw__st[data-year="2018"]');
@@ -71,8 +68,6 @@ test('changing the year updates the map, the band, the panel and the flips table
   assert.notEqual(s.panelTitle, before.panelTitle);
   assert.match(s.bandLabels[0], /116th Congress, elected 2018/);
   assert.equal(s.houseDem, '235');
-  assert.equal(s.flipsYear, '2018');
-  assert.deepEqual(s.flipsStates, ['AZ', 'FL', 'IN', 'MO', 'NV', 'ND']);
   assert.deepEqual(page.errors, []);
 });
 
@@ -89,7 +84,7 @@ test('comparing two years writes the change and lists the states that changed', 
 
 test('a chart can set the year too, and the URL survives a reload', async () => {
   await page.goto(srv.url);
-  await page.click('[data-fl] .fl__cycle[data-year="2014"]');
+  await page.click('.cc__hit[data-year="2014"]');
   let s = await read();
   assert.equal(s.mapTitle, 'Senate 2014');
   assert.equal(s.stripYear, '2014');
@@ -100,17 +95,17 @@ test('a chart can set the year too, and the URL survives a reload', async () => 
   assert.deepEqual(page.errors, []);
 });
 
-test('a state from the flips table opens its record; Esc closes it', async () => {
+test('keyboard: the map is one tab stop, arrows move between states, Enter opens, Esc closes', async () => {
   await page.goto(srv.url + '?year=2020');
-  await page.click('[data-fl] .fl__state[data-state="GA"]');
-  assert.match(await read().then((s) => s.url), /state=GA/);
-  const panel = await page.eval<string>(`document.querySelector('[data-panel]').textContent`);
-  assert.match(panel, /Georgia/);
-  assert.match(panel, /Senate races since 2000/);
+  await page.eval(`document.querySelector('[data-kb]').focus()`);
+  await page.key('ArrowRight', 'ArrowRight');
+  const live = await page.eval<string>(`document.querySelector('[data-kb-live]').textContent`);
+  assert.ok(live.length > 5, 'the live region names the state the arrows are on');
+  await page.key('Enter', 'Enter');
+  assert.match(await read().then((s) => s.url), /state=[A-Z]{2}/);
+  assert.equal(await page.eval(`document.querySelectorAll('.cmap__state[tabindex], .cmap__state[role]').length`), 0);
   await page.key('Escape');
-  const after = await read();
-  assert.doesNotMatch(after.url, /state=/);
-  assert.equal(after.panelTitle, 'Senate 2020');
+  assert.doesNotMatch(await read().then((s) => s.url), /state=/);
   assert.deepEqual(page.errors, []);
 });
 

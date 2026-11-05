@@ -2,14 +2,19 @@
 // The governors map: which party held each state's governorship after the
 // elections of the year selected on the railway. Drawn at build time for the
 // default year, so it reads with JavaScript off; src/scripts/governors-map.ts
-// follows the shared year. Flat fills, white borders, no labels on the map:
-// the list under it gives every governor by name.
+// follows the shared year. Flat fills, white borders, no labels on the map.
+// A state selected on the map (or by button in the list of all 50, which is
+// the keyboard path) fills the governor card beside the map, or under it on
+// narrow screens. The paths themselves take no focus: 50 tab stops on a map
+// would be a trap, and the list reaches every state.
 import { readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { geoPath } from 'd3-geo';
 import { feature } from 'topojson-client';
 import { FIPS } from '../lib/geo';
 import { govHeadline, govCounts, longDate, partyWord, type GovSnapshot } from '../lib/governors';
+import { govCardHtml } from '../lib/govCard';
+import PartyMark from './PartyMark.astro';
 
 interface Props {
   snapshots: Record<number, GovSnapshot>;
@@ -52,33 +57,34 @@ const caption = (s: GovSnapshot) =>
         const g = snap.states[st];
         return (
           <path class="gov__state" d={d} data-st={st} fill={fillVar[g.party]}>
-            <title>{`${stateNames[st]}: ${g.name} (${partyWord(g.party)})`}</title>
+            <title>{`${stateNames[st]}: ${g.name} (${g.detail})`}</title>
           </path>
         );
       })}
     </svg>
-    <p class="gov__readout" data-gov-readout>Select a state on the map, or open the list, for its governor.</p>
+    <div class="gcard" data-gcard role="region" aria-label="Governor" aria-live="polite" set:html={govCardHtml(snap, null, stateNames)}></div>
   </div>
 
-  <details class="gov__list">
-    <summary>All 50 governors</summary>
+  <section class="gov__list" aria-labelledby="gov-list-h">
+    <h3 class="gov__list-h label" id="gov-list-h">All 50 governors</h3>
+    <p class="gov__list-note">Press Enter on a state to show its governor in the card.</p>
     <table class="gov__table">
       <thead><tr><th scope="col">State</th><th scope="col">Governor</th><th scope="col">Party</th><th scope="col">Took office</th></tr></thead>
       <tbody data-gov-tbody>
         {order.map((st) => {
           const g = snap.states[st];
           return (
-            <tr>
-              <th scope="row">{stateNames[st]}</th>
+            <tr data-st={st}>
+              <th scope="row"><button type="button" class="gov__pick" data-st={st} aria-pressed="false">{stateNames[st]}</button></th>
               <td>{g.name}</td>
-              <td><span class="gov__sw" style={`background:${fillVar[g.party]}`}></span>{g.detail}</td>
+              <td><PartyMark party={g.party} /> {g.detail}</td>
               <td>{longDate(g.tookOffice)}</td>
             </tr>
           );
         })}
       </tbody>
     </table>
-  </details>
+  </section>
 
   <script type="application/json" data-gov-data set:html={JSON.stringify({ snapshots, stateNames })}></script>
 </div>
@@ -113,23 +119,59 @@ const caption = (s: GovSnapshot) =>
     margin-right: 6px;
     vertical-align: -1px;
   }
-  .gov__layout { margin-top: var(--sp-4); }
+  .gov__layout { margin-top: var(--sp-4); display: grid; gap: var(--sp-4); }
+  @media (min-width: 1024px) {
+    .gov__layout { grid-template-columns: minmax(0, 1fr) 320px; align-items: start; }
+  }
   .gov__svg { display: block; width: 100%; max-width: 900px; height: auto; }
   .gov__state { stroke: var(--border); stroke-width: 0.75; cursor: pointer; transition: fill var(--dur-data) var(--ease-data); }
   .gov__state:hover, .gov__state.is-sel { stroke: var(--ink); stroke-width: 1.5; }
   @media (prefers-reduced-motion: reduce) { .gov__state { transition: none; } }
-  .gov__readout { margin-top: var(--sp-3); font-size: var(--fs-2); min-height: 1.5em; }
-  .gov__list { margin-top: var(--sp-4); border-top: var(--hairline); }
-  .gov__list > summary {
-    padding-block: var(--sp-3);
-    font-family: var(--font-label);
-    font-size: var(--fs-2);
+
+  /* The governor card: type only, no photos. */
+  .gcard { border-top: 1px solid var(--ink); padding-top: var(--sp-3); display: grid; gap: var(--sp-2); align-content: start; min-height: 200px; }
+  .gcard :global(.gcard__shape) { display: block; width: 64px; height: 64px; }
+  .gcard :global(.gcard__state) { margin-top: var(--sp-1); }
+  .gcard :global(.gcard__name) {
+    max-width: none;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
     font-weight: 600;
-    letter-spacing: var(--tracking-label);
-    text-transform: uppercase;
+    font-size: var(--fs-5);
+    line-height: 1.15;
+  }
+  .gcard :global(.gcard__big) {
+    max-width: none;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: var(--fs-5);
+    line-height: 1.15;
+  }
+  .gcard :global(.gcard__party) { display: flex; align-items: center; gap: var(--sp-2); font-size: var(--fs-2); max-width: none; }
+  .gcard :global(.gcard__party .pmark) { vertical-align: baseline; }
+  .gcard :global(.gcard__line) { font-size: var(--fs-2); color: var(--ink-2); max-width: none; }
+  .gcard :global(.gcard__src a) { color: var(--ink); }
+
+  .gov__list { margin-top: var(--sp-6); border-top: 1px solid var(--ink); padding-top: var(--sp-3); }
+  .gov__list-h { font-size: var(--fs-2); }
+  .gov__list-note { margin-top: var(--sp-1); font-size: var(--fs-1); color: var(--ink-2); }
+  .gov__table tbody tr.is-sel { background: var(--paper-2); }
+  .gov__table :global(.gov__pick) {
+    appearance: none;
+    padding: 0;
+    border: 0;
+    background: none;
+    font: inherit;
+    font-weight: 600;
+    color: var(--ink);
+    text-align: left;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.18em;
     cursor: pointer;
   }
-  .gov__list > summary:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .gov__table :global(.gov__pick:hover) { text-decoration-thickness: 2px; }
   .gov__table { width: 100%; border-collapse: collapse; font-size: var(--fs-2); font-variant-numeric: tabular-nums lining-nums; }
   .gov__table th, .gov__table td { padding: var(--sp-2) var(--sp-3) var(--sp-2) 0; border-bottom: var(--hairline); text-align: left; vertical-align: top; }
   .gov__table thead th {

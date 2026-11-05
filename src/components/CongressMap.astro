@@ -88,6 +88,8 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
 
   <div class="cmap__body">
     <div class="cmap__map">
+      <button type="button" class="cmap__kb visually-hidden" data-kb>Map of states. Press an arrow key to move between states and Enter to open the one you are on.</button>
+      <p class="visually-hidden" role="status" aria-live="polite" data-kb-live></p>
       <div class="cmap__titleblock">
         <p class="cmap__title" data-title>{title.title}</p>
         <p class="cmap__subtitle" data-subtitle>{title.subtitle}</p>
@@ -128,7 +130,7 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
               class="cmap__svg"
               viewBox={`0 0 ${spec.width} ${spec.height}`}
               role="group"
-              aria-label={`Map of the United States. Select a state for its result. Arrow keys move between states.`}
+              aria-label="Map of the United States. Select a state for its result. For the keyboard, use the map control before it.""
             >
               <defs>
                 {regions.map((r) => {
@@ -171,9 +173,7 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
                           data-state={st}
                           data-fill={fillOf(st)}
                           data-split={splitOf(st)?.join('|')}
-                          role="button"
-                          tabindex="-1"
-                          aria-label={ariaLabel('senate', st, name(st), senate, house)}
+                          data-label={ariaLabel('senate', st, name(st), senate, house)}
                         />
                       ))}
                       {statesIn(r).map((st) => (
@@ -221,8 +221,8 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
       <div class="cmap__tooltip" role="tooltip" hidden></div>
     </div>
 
-    <aside class="cmap__panel" aria-label="State record" tabindex="-1" data-panel-root>
-      <div class="cmap__panel-scroll">
+    <aside class="cmap__panel" aria-label="State record" data-panel-root>
+      <div class="cmap__panel-scroll" tabindex="-1" data-panel-focus>
         <button type="button" class="cmap__clear" data-clear hidden>Close</button>
         <div class="cmap__panel-body" data-panel aria-live="polite" set:html={nationalDefault}></div>
       </div>
@@ -358,6 +358,8 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
     transition: fill var(--dur-data) var(--ease-data);
   }
   .cmap__state:focus { outline: none; }
+  /* The keyboard control is hidden; its focus shows as an outline on the map, and the state it is on gets the ring. */
+  .cmap__map:has(.cmap__kb:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
   .cmap__state[data-fill='dem'] { fill: var(--dem); }
   .cmap__state[data-fill='gop'] { fill: var(--gop); }
   .cmap__state[data-fill='ind'] { fill: var(--ind); }

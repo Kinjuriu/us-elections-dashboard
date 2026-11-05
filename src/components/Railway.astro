@@ -17,6 +17,7 @@
 import { railway, stationLabel, type RailColumn } from '../lib/railway';
 import type { StoreConfig } from '../lib/store';
 import { PROVISIONAL_YEAR } from '../lib/mapData';
+import YearBar from './YearBar.astro';
 
 interface Props {
   config: StoreConfig;
@@ -108,8 +109,11 @@ const last = rw.stations[n - 1];
   )}
 </div>
 
+<YearBar columns={columns} year={year} />
+
 <script>
   import '../scripts/railway';
+  import '../scripts/year-bar';
 </script>
 
 <style>

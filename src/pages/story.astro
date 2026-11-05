@@ -90,7 +90,7 @@ const findings: Array<{ headline: string; note: string; href: string; link: stri
     preview: { kind: 'flips', chart: flipsChart, highlight: top.year },
     headline: flipsChart.headline,
     note: 'A seat counts as flipped when it passes from one caucus to the other, compared with whoever held it on election day.',
-    href: dash(`year=${top.year}&chamber=senate`),
+    href: `${base}senate/?year=${top.year}&chamber=senate`,
     link: `Senate flips by election, ${top.year} outlined`,
   },
   {

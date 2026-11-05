@@ -1,42 +1,49 @@
 ---
-// Senate races involving independents, or where the flip definitions give
-// different answers, 2000 to 2024. Read at build time from the table in
-// data/SOURCES.md ("Flip definitions"), so there is one copy of these facts.
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
+// Senate races involving independents, 2000 to 2024, in the style of AP's
+// results summary table: one row per race, a coloured square with the state
+// outline, bold names with a small grey party tag, and a light tint across
+// the rows that count as a flip. Senators link to their Biographical
+// Directory page. Races come from the table in data/SOURCES.md.
+import StateShape from './StateShape.astro';
+import { loadIndependentsRaces, type Person, type TableParty } from '../lib/independents';
 
-const md = readFileSync(join(process.cwd(), 'data/SOURCES.md'), 'utf8');
-const start = md.indexOf('Races involving independents, or where the definitions differ');
-if (start < 0) throw new Error('IndependentsTable: table not found in data/SOURCES.md');
-const lines = md.slice(start).split('\n').filter((l) => l.startsWith('|')).slice(2);
-const rows = lines
-  .map((l) => l.split('|').slice(1, -1).map((c) => c.trim()))
-  .filter((c) => c.length === 6)
-  .map(([race, holder, winner, vsHolder, changed, vsLast]) => ({ race, holder, winner, vsHolder, changed, vsLast }));
-if (!rows.length) throw new Error('IndependentsTable: no rows');
-const yes = (v: string) => (v === 'yes' ? 'Yes' : 'No');
-const party = (s: string) =>
-  s.replace(/\bDEM\b/g, 'Democrat').replace(/\bGOP\b/g, 'Republican').replace(/\bIND\b/g, 'Independent');
+interface Props { stateNames: Record<string, string> }
+const { stateNames } = Astro.props;
+const { races } = loadIndependentsRaces();
+const TAG: Record<TableParty, string> = { DEM: 'DEM', GOP: 'GOP', IND: 'IND' };
+const CAUCUS: Record<TableParty, string> = { DEM: 'Democrats', GOP: 'Republicans', IND: 'independents' };
+const bio = (id: string) => `https://bioguide.congress.gov/search/bio/${id}`;
 ---
 <div class="ind">
   <table class="ind__table">
     <thead>
       <tr>
+        <th scope="col" class="ind__sqh"><span class="visually-hidden">Winning party</span></th>
         <th scope="col">Race</th>
-        <th scope="col">Seat held by (party, caucus)</th>
-        <th scope="col">Won by (party, caucus)</th>
+        <th scope="col">Seat held by</th>
+        <th scope="col">Won by</th>
         <th scope="col">Counted as a flip</th>
-        <th scope="col">Party label changed</th>
       </tr>
     </thead>
     <tbody>
-      {rows.map((r) => (
-        <tr>
-          <th scope="row">{r.race}</th>
-          <td>{party(r.holder)}</td>
-          <td>{party(r.winner)}</td>
-          <td>{yes(r.vsHolder)}</td>
-          <td>{yes(r.changed)}</td>
+      {races.map((r) => (
+        <tr class:list={['ind__row', { 'ind__row--flip': r.flip }]} data-tint={r.flip ? r.tint : undefined}>
+          <td class="ind__sq"><span class="ind__square" data-fill={r.colour}><StateShape state={r.state} size={24} /></span></td>
+          <th scope="row" class="ind__race">
+            <span class="ind__state">{stateNames[r.state]} {r.year}</span>
+            {r.special && <span class="ind__grey"> special</span>}
+          </th>
+          {[r.holder, r.winner].map((p: Person) => (
+            <td class="ind__who" data-label={p === r.holder ? 'Seat held by' : 'Won by'}>
+              {p.bioguideId
+                ? <a class="ind__name" href={bio(p.bioguideId)}>{p.name}</a>
+                : <b class="ind__name">{p.name}</b>}
+              {p.party && <span class="ind__tag">{TAG[p.party]}</span>}
+              {p.caucus && <span class="ind__grey">caucused with {CAUCUS[p.caucus]}</span>}
+              {p.note && <span class="ind__grey">{p.note}</span>}
+            </td>
+          ))}
+          <td class="ind__flip" data-label="Counted as a flip">{r.flip ? 'Yes' : 'No'}</td>
         </tr>
       ))}
     </tbody>
@@ -44,13 +51,12 @@ const party = (s: string) =>
 </div>
 
 <style>
-  .ind { overflow-x: auto; }
   .ind__table { width: 100%; border-collapse: collapse; font-size: var(--fs-2); }
   .ind__table th, .ind__table td {
-    padding: var(--sp-2) var(--sp-3) var(--sp-2) 0;
+    padding: var(--sp-3) var(--sp-3) var(--sp-3) 0;
     border-bottom: var(--hairline);
     text-align: left;
-    vertical-align: top;
+    vertical-align: middle;
   }
   .ind__table thead th {
     border-bottom: 1px solid var(--ink);
@@ -61,5 +67,54 @@ const party = (s: string) =>
     text-transform: uppercase;
     vertical-align: bottom;
   }
-  .ind__table tbody th { font-weight: 600; white-space: nowrap; }
+  .ind__sq, .ind__sqh { width: 32px; padding-right: var(--sp-3); }
+  .ind__square {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    color: #fff;
+    background: var(--no-race);
+  }
+  .ind__square[data-fill='dem'] { background: var(--dem); }
+  .ind__square[data-fill='gop'] { background: var(--gop); }
+  .ind__square[data-fill='ind'] { background: var(--ind); }
+  /* A tint of the winner's caucus colour runs across the rows that count as a flip, as AP tints the advancing candidates. */
+  .ind__row--flip[data-tint='dem'] { background: color-mix(in srgb, var(--dem-tint) 25%, transparent); }
+  .ind__row--flip[data-tint='gop'] { background: color-mix(in srgb, var(--gop-tint) 25%, transparent); }
+  .ind__race { font-weight: 400; }
+  .ind__state { font-weight: 700; }
+  .ind__grey { color: var(--ink-2); }
+  .ind__name { font-weight: 700; color: var(--ink); }
+  .ind__who > * + * { margin-left: var(--sp-2); }
+  .ind__tag {
+    font-family: var(--font-label);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    color: var(--ink-2);
+  }
+  .ind__flip { font-weight: 600; }
+
+  /* Phones: one block per race, no sideways scroll. */
+  @media (max-width: 719.98px) {
+    .ind__table, .ind__table tbody { display: block; }
+    .ind__table thead { display: none; }
+    .ind__row {
+      display: grid;
+      grid-template-columns: 32px minmax(0, 1fr);
+      gap: var(--sp-1) var(--sp-3);
+      padding: var(--sp-3) var(--sp-2) var(--sp-3) 0;
+      border-bottom: var(--hairline);
+    }
+    .ind__table th, .ind__table td { display: block; padding: 0; border: 0; }
+    .ind__sq { grid-row: 1 / span 4; }
+    .ind__who::before, .ind__flip::before {
+      content: attr(data-label) ': ';
+      color: var(--ink-2);
+      font-weight: 400;
+    }
+    .ind__who > * + * { margin-left: var(--sp-2); }
+  }
 </style>

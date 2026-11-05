@@ -3,6 +3,7 @@
 // No DOM and no Node APIs here.
 import type { Party } from './data';
 import type { FlipRow } from './chartData';
+import { stateShapeUse } from './stateUse';
 
 export type FlipSort = 'state' | 'margin-asc' | 'margin-desc';
 
@@ -49,13 +50,16 @@ export function sortRows(rows: FlipRow[], sort: FlipSort): FlipRow[] {
   return out.sort((a, b) => (sort === 'margin-asc' ? m(a) - m(b) : m(b) - m(a)));
 }
 
-export function flipsTableHtml(rows: FlipRow[], sort: FlipSort): string {
+const SHAPE_COLOUR: Record<Party, string> = { DEM: 'var(--dem)', GOP: 'var(--gop)', IND: 'var(--ind)', OTHER: 'var(--ink-2)' };
+
+/** `base` is the site's base path: each state name links to that state's record on the Congress map. */
+export function flipsTableHtml(rows: FlipRow[], sort: FlipSort, base: string): string {
   if (!rows.length) return '';
   const body = sortRows(rows, sort).map((r) => {
     const note = r.labelOnly && r.previousParty && r.winnerParty
       ? `<span class="fl__label">Label change: ${NOUN[r.previousParty]} to ${NOUN[r.winnerParty]}, same caucus</span>` : '';
     return `<tr${r.labelOnly ? ' class="is-label"' : ''}>
-<th scope="row"><button type="button" class="fl__state" data-state="${r.state}">${esc(r.stateName)}</button>${r.special ? '<span class="fl__sub">Special election</span>' : ''}</th>
+<th scope="row"><span class="fl__stcell"><span style="color:${SHAPE_COLOUR[r.next ?? 'OTHER']}">${stateShapeUse(r.state, 24)}</span><a class="fl__state" href="${base}?year=${r.year}&amp;chamber=senate&amp;state=${r.state}">${esc(r.stateName)}</a></span>${r.special ? '<span class="fl__sub">Special election</span>' : ''}</th>
 <td>${caucus(r.previous)}</td>
 <td>${caucus(r.next)}</td>
 <td>${esc(r.winner)}${note}</td>
