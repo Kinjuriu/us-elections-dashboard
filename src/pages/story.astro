@@ -1,9 +1,14 @@
 ---
-// The story: the explanation and the findings in words. No charts here.
-// Each finding links to the dashboard at the year it is about.
+// The story: the explanation and the findings in words. Each finding has a
+// small preview of the dashboard view it is about, which links to that view.
 import Base from '../layouts/Base.astro';
 import Masthead from '../components/Masthead.astro';
 import Footer from '../components/Footer.astro';
+import StoryPreview from '../components/StoryPreview.astro';
+import ChartFrame from '../components/ChartFrame.astro';
+import WomenChart from '../components/WomenChart.astro';
+import { loadWomenChart } from '../lib/women';
+import { asOf } from '../lib/pageData';
 import { loadMapData, defaultYear } from '../lib/mapData';
 import { loadControlChart, loadMidtermChart, loadFlipsChart } from '../lib/chartData';
 import {
@@ -12,6 +17,10 @@ import {
 } from '../lib/data';
 
 const base = import.meta.env.BASE_URL;
+const women = loadWomenChart();
+const womenFirst = women.rows[0];
+const womenLast = women.rows[women.rows.length - 1];
+const womenAsOf = asOf('congress_legislators_current', 'congress_legislators_historical');
 const control = loadChamberControl();
 const swing = loadMidtermSwing();
 const asOfDates = ['house_historian_party_divisions', 'senate_party_division']
@@ -63,48 +72,53 @@ const midtermChart = loadMidtermChart();
 const flipsChart = loadFlipsChart(mapData);
 const top = [...flipsChart.cycles].filter((c) => !c.provisional).sort((a, b) => b.toDem + b.toGop - (a.toDem + a.toGop))[0];
 const dash = (q: string) => `${base}?${q}`;
-const findings = [
+const findings: Array<{ headline: string; note: string; href: string; link: string; preview: Record<string, unknown> }> = [
   {
+    preview: { kind: 'control', chart: controlChart },
     headline: controlChart.headline,
-    note: 'The history chart shows every Congress. The strip at the top of the dashboard colours each one by the majority party.',
+    note: 'The history chart shows every Congress. The railway at the top of the dashboard colours each election from 2000 by the majority party.',
     href: dash(`year=${startYear}&chamber=senate`),
-    link: `Open the dashboard at ${startYear}`,
+    link: 'Every Congress since 1947, House above Senate',
   },
   {
+    preview: { kind: 'midterm', chart: midtermChart, chamber: 'house', highlight: midLast },
     headline: midtermChart.headline.house,
     note: `The midterm chart gives the seat change for each election. The dashboard opens on ${midLast}, the latest certified midterm.`,
     href: dash(`year=${midLast}&chamber=house`),
-    link: `Open the House in ${midLast}`,
+    link: `House midterms, ${midLast} outlined`,
   },
   {
+    preview: { kind: 'midterm', chart: midtermChart, chamber: 'senate', highlight: midLast },
     headline: midtermChart.headline.senate,
     note: 'Senate counts before each midterm are from election day, and counts after are from the opening of the new Congress.',
     href: dash(`year=${midLast}&chamber=senate`),
-    link: `Open the Senate in ${midLast}`,
+    link: `Senate midterms, ${midLast} outlined`,
   },
   {
+    preview: { kind: 'flips', chart: flipsChart, highlight: top.year },
     headline: flipsChart.headline,
     note: 'A seat counts as flipped when it passes from one caucus to the other, compared with whoever held it on election day.',
-    href: dash(`year=${top.year}&chamber=senate`),
-    link: `Open the Senate in ${top.year}`,
+    href: `${base}senate/?year=${top.year}&chamber=senate`,
+    link: `Senate flips by election, ${top.year} outlined`,
   },
   {
+    preview: { kind: 'map', senate: mapData.senate[startYear] },
     headline: mapData.senate[startYear].headline,
     note: 'The map starts in 2000. Select a state on it for every Senate race and House delegation since.',
     href: dash(`year=${startYear}&chamber=senate`),
-    link: `Open the map at ${startYear}`,
+    link: `The Senate map in ${startYear}`,
   },
 ];
 ---
 <Base
   title="The story: US Congress, 1946 to 2026"
-  description={`What the data shows about who controlled the House and Senate since ${firstYear}, and how the president's party fares in midterm elections.`}
+  description={`What the data shows about who controlled the House and Senate since ${firstYear}, and how the party holding the White House fares in midterm elections.`}
 >
   <Masthead current="story" />
   <main id="main" class="wrap story">
     <article class="story__prose">
       <p class="label story__kicker">Congress since {firstYear}</p>
-      <h1>The president's party lost House seats in {houseLosses.length} of the {houseMidterms.length} midterms since {midFirst}</h1>
+      <h1>The party holding the White House lost House seats in {houseLosses.length} of the {houseMidterms.length} midterms since {midFirst}</h1>
       <div class="story__standfirst">
         <p>
           Congress is two chambers: the House of Representatives, whose 435 voting seats are all elected every two
@@ -128,12 +142,26 @@ const findings = [
 
       <h2 class="story__h2">What the data shows</h2>
       <ol class="story__findings">
-        {findings.map((f) => (
-          <li>
-            <h3>{f.headline}</h3>
-            <p>{f.note}</p>
-            <p><a href={f.href}>{f.link}</a></p>
-          </li>
+        {findings.map((f, i) => (
+          <>
+            <li>
+              <h3>{f.headline}</h3>
+              <p>{f.note}</p>
+              <StoryPreview {...(f.preview as any)} href={f.href} label={f.link} />
+            </li>
+            {i === 0 && (
+              <li class="story__women">
+                <ChartFrame
+                  title={women.headline}
+                  subtitle={`Share of members of the House and Senate who were women, by Congress, ${womenFirst.startYear} to ${womenLast.startYear}. One figure is 1% of members.`}
+                  source="unitedstates/congress-legislators (public domain). Members who served at any point in each Congress, House and Senate together; delegates excluded."
+                  dataAsOf={womenAsOf}
+                >
+                  <WomenChart chart={women} />
+                </ChartFrame>
+              </li>
+            )}
+          </>
         ))}
       </ol>
       <p class="story__back"><a href={base}>Go to the dashboard</a></p>
@@ -168,5 +196,6 @@ const findings = [
   .story__findings h3 { font-size: var(--fs-5); }
   .story__findings p { margin-top: var(--sp-2); font-size: var(--fs-2); color: var(--ink-2); }
   .story__findings p:last-child { color: var(--ink); }
+  .story__findings .story__women :global(p) { color: inherit; font-size: inherit; }
   .story__back { margin-top: var(--sp-7); }
 </style>

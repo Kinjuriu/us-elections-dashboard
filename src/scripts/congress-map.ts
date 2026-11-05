@@ -6,10 +6,14 @@
 import type { MapData, SenateYear, HouseYear, HouseStateYear } from '../lib/mapData';
 import type { HouseGrid } from '../lib/geo';
 import type { DashState } from '../lib/store';
-import { store, openState, closeState } from './dashboard';
+import { store, config, openState, closeState } from './dashboard';
+import type { HeaderYear } from '../lib/dashboardData';
+import type { Party } from '../lib/data';
+import { findingFor } from '../lib/finding';
+import { compareLine, orderPair } from '../lib/compare';
 import {
   senateTitle, houseTitle, senateTone, hatchParty, detailsHtml, ariaLabel, nationalHtml,
-  stateRecordHtml, senateChanged, houseChanged, type View, type NationalHeader,
+  stateRecordHtml, senateChanges, houseChanged, compareTitle, type View, type NationalHeader,
 } from '../lib/mapText';
 
 type Pt = [number, number];
@@ -40,6 +44,9 @@ function init(root: HTMLElement) {
   const tooltip = root.querySelector<HTMLElement>('.cmap__tooltip')!;
   const panel = root.querySelector<HTMLElement>('[data-panel]')!;
   const panelRoot = root.querySelector<HTMLElement>('[data-panel-root]')!;
+  const panelFocus = root.querySelector<HTMLElement>('[data-panel-focus]')!;
+  const kb = root.querySelector<HTMLButtonElement>('[data-kb]')!;
+  const kbLive = root.querySelector<HTMLElement>('[data-kb-live]')!;
   const clearBtn = root.querySelector<HTMLButtonElement>('[data-clear]')!;
   // The finding line and its provisional tag sit above the map, in the board.
   const finding = document.querySelector<HTMLElement>('[data-finding]');
@@ -59,9 +66,15 @@ function init(root: HTMLElement) {
     apportionment: '',
   };
 
-  const senateYear = (): SenateYear => data.senate[state.year];
+  // The cards' numbers for each year, which the comparison sentence is built from.
+  const cardYears = JSON.parse(document.querySelector('[data-cards-data]')!.textContent!) as Record<number, HeaderYear>;
+
+  // While comparing, the map shows the later of the two years; the states that
+  // changed since the earlier one are picked out on it.
+  const mapYear = () => (state.compare === null ? state.year : Math.max(state.year, state.compare));
+  const senateYear = (): SenateYear => data.senate[mapYear()];
   // Odd (special-election) years are Senate only; the House stays on the election before.
-  const houseYear = (): HouseYear => data.house[state.year] ?? data.house[state.year - 1];
+  const houseYear = (): HouseYear => data.house[mapYear()] ?? data.house[mapYear() - 1];
   const name = (st: string) => data.stateNames[st];
 
   /** The layout on screen now (each has its own media query). */
@@ -70,24 +83,45 @@ function init(root: HTMLElement) {
 
   // ---------- Drawing ----------
 
-  function drawSenate() {
+  const FILL_OF: Record<Party, string> = { DEM: 'dem', GOP: 'gop', IND: 'ind', OTHER: 'other' };
+
+  /** What the comparison picks out: the changed states, and the colour each takes in the later year. */
+  interface Compare { a: number; b: number; states: Set<string>; fills: Map<string, string>; count: number }
+  function compareInfo(): Compare | null {
+    if (state.compare === null) return null;
+    const [a, b] = orderPair(state.year, state.compare);
+    if (state.view === 'senate') {
+      const ch = senateChanges(data, a, b);
+      const fills = new Map<string, string>();
+      for (const c of ch) if (!fills.has(c.state)) fills.set(c.state, FILL_OF[c.to]);
+      return { a, b, states: new Set(fills.keys()), fills, count: ch.length };
+    }
+    const states = houseChanged(data, a, b);
+    return { a, b, states, fills: new Map(), count: states.size };
+  }
+
+  function drawSenate(cmp: Compare | null) {
     const sy = senateYear();
+    const fillOf = (st: string) => (cmp ? cmp.fills.get(st) ?? 'no-race' : sy.states[st]?.fill ?? 'no-race');
     for (const el of root.querySelectorAll<SVGUseElement>('.cmap__state')) {
       const st = el.dataset.state!;
-      el.dataset.fill = sy.states[st]?.fill ?? 'no-race';
-      const split = sy.states[st]?.split;
+      el.dataset.fill = fillOf(st);
+      const split = cmp ? null : sy.states[st]?.split;
       if (split) el.dataset.split = split.join('|');
       else delete el.dataset.split;
     }
-    root.querySelector<HTMLElement>('[data-split-key]')!.hidden = !Object.values(sy.states).some((s) => s.split);
+    root.querySelector<HTMLElement>('[data-split-key]')!.hidden = !!cmp || !Object.values(sy.states).some((s) => s.split);
     for (const el of root.querySelectorAll<SVGUseElement>('.cmap__hatch')) {
       const s = sy.states[el.dataset.state!];
-      el.dataset.hatch = s?.flipped ? hatchParty(s.fill) : '';
+      el.dataset.hatch = !cmp && s?.flipped ? hatchParty(s.fill) : '';
     }
     for (const el of root.querySelectorAll<HTMLElement>('.cmap__labels--senate .cmap__label')) {
-      const s = sy.states[el.dataset.state!];
-      if (!('callout' in el.dataset)) el.dataset.tone = senateTone(s?.fill ?? 'no-race', s?.flipped ?? false, s?.split ?? null);
-      el.querySelector<HTMLElement>('.cmap__races')!.hidden = (s?.races.length ?? 0) < 2;
+      const st = el.dataset.state!;
+      const s = sy.states[st];
+      if (!('callout' in el.dataset)) {
+        el.dataset.tone = cmp ? senateTone(fillOf(st) as never, false, null) : senateTone(s?.fill ?? 'no-race', s?.flipped ?? false, s?.split ?? null);
+      }
+      el.querySelector<HTMLElement>('.cmap__races')!.hidden = !!cmp || (s?.races.length ?? 0) < 2;
     }
   }
 
@@ -157,23 +191,22 @@ function init(root: HTMLElement) {
         label.style.left = `${g.label.x}%`;
         label.style.top = `${g.label.y}%`;
         label.textContent = g.state;
-        const mark = document.createElement('span');
-        mark.className = 'cmap__changed';
-        mark.hidden = true;
-        label.append(mark);
         labels.append(label);
       }
     }
   }
 
-  function drawHouse() {
+  function drawHouse(cmp: Compare | null) {
     const hy = houseYear();
     if (hy.apportionment !== state.apportionment) {
       buildHouseLayer(hy.apportionment);
       state.apportionment = hy.apportionment;
     }
     for (const group of root.querySelectorAll<SVGGElement>('.cmap__squares g[data-state]')) {
-      const kinds = squareKinds(hy.states[group.dataset.state!]);
+      const st = group.dataset.state!;
+      const kinds = squareKinds(hy.states[st]);
+      if (cmp) group.dataset.cmp = cmp.states.has(st) ? 'changed' : 'same';
+      else delete group.dataset.cmp;
       group.querySelectorAll('rect:not([fill])').forEach((r, i) => {
         (r as SVGRectElement).dataset.kind = kinds[i];
       });
@@ -182,49 +215,58 @@ function init(root: HTMLElement) {
 
   function draw() {
     const { view, year } = state;
+    const cmp = compareInfo();
     root.dataset.view = view;
-    root.dataset.year = String(year);
+    root.dataset.year = String(mapYear());
+    if (cmp) root.dataset.compare = ''; else delete root.dataset.compare;
     const sy = senateYear();
     const hy = houseYear();
-    const t = view === 'senate' ? senateTitle(sy) : houseTitle(hy);
+    const t = cmp ? compareTitle(view, cmp.a, cmp.b, cmp.count) : view === 'senate' ? senateTitle(sy) : houseTitle(hy);
     root.querySelector('[data-title]')!.textContent = t.title;
     root.querySelector('[data-subtitle]')!.textContent = t.subtitle;
-    if (finding) finding.textContent = view === 'senate' ? sy.headline : hy.headline;
+    if (finding) {
+      finding.textContent = cmp
+        ? compareLine(cardYears[cmp.a], cardYears[cmp.b])
+        : findingFor(year, view === 'senate' ? sy.headline : hy.headline, config.shownYears);
+    }
     if (provTag) provTag.hidden = !(view === 'senate' ? sy.provisional : hy.provisional);
 
-    if (view === 'senate') drawSenate();
-    else drawHouse();
+    if (view === 'senate') drawSenate(cmp);
+    else drawHouse(cmp);
 
     for (const el of root.querySelectorAll<SVGUseElement>('.cmap__state')) {
       const st = el.dataset.state!;
-      el.setAttribute('aria-label', ariaLabel(view, st, name(st), sy, hy));
+      el.dataset.label = ariaLabel(view, st, name(st), sy, hy);
+    }
+    drawOutlines(cmp);
+    for (const li of root.querySelectorAll<HTMLElement>('[data-compare-key]')) {
+      li.hidden = !cmp;
+      li.querySelector('[data-compare-key-text]')!.textContent = cmp ? t.subtitle : '';
     }
     if (state.pinned) showPanel(state.pinned);
+    else showNational();
     hideTooltip();
     updateRings();
-    drawCompare();
   }
 
-  // ---------- Compare: mark states that changed between the two years ----------
+  // ---------- Compare: an ink outline on each state that changed ----------
+  // Drawn as shapes of their own, after every state, so a neighbour's fill
+  // never covers part of an outline.
 
-  function drawCompare() {
-    const { compare, year, view } = state;
-    const changed = compare === null ? new Set<string>()
-      : view === 'senate' ? senateChanged(data, Math.min(compare, year), Math.max(compare, year))
-      : houseChanged(data, Math.min(compare, year), Math.max(compare, year));
-    for (const m of root.querySelectorAll<HTMLElement>('.cmap__changed:not(.cmap__changed--key)')) {
-      const st = (m.parentElement as HTMLElement).dataset.state!;
-      m.hidden = !changed.has(st);
+  function drawOutlines(cmp: Compare | null) {
+    for (const el of layoutEls.values()) el.querySelectorAll('.cmap__chg').forEach((n) => n.remove());
+    if (!cmp) return;
+    for (const el of layoutEls.values()) {
+      for (const st of cmp.states) {
+        const region = el.querySelector(`.cmap__region[data-region="${data.regions[st]}"]`);
+        if (!region) continue;
+        const use = document.createElementNS(SVG, 'use');
+        use.setAttribute('href', `#cm-st-${st}`);
+        use.setAttribute('class', 'cmap__chg');
+        use.setAttribute('aria-hidden', 'true');
+        region.insertBefore(use, region.querySelector('.cmap__ring--hover'));
+      }
     }
-    const text = compare === null ? ''
-      : view === 'senate'
-        ? `A Senate seat changed caucus between ${Math.min(compare, year)} and ${Math.max(compare, year)} (${changed.size} ${changed.size === 1 ? 'state' : 'states'})`
-        : `The House delegation's majority changed between ${Math.min(compare, year)} and ${Math.max(compare, year)} (${changed.size} ${changed.size === 1 ? 'state' : 'states'})`;
-    for (const li of root.querySelectorAll<HTMLElement>('[data-compare-key]')) {
-      li.hidden = compare === null;
-      li.querySelector('[data-compare-key-text]')!.textContent = text;
-    }
-    if (!state.pinned) showNational();
   }
 
   // ---------- Selection rings ----------
@@ -288,7 +330,7 @@ function init(root: HTMLElement) {
   function pin(st: string) {
     state.pinned = st;
     showPanel(st);
-    setRoving(st);
+    kbState = st;
     updateRings();
     revealPanel();
   }
@@ -309,14 +351,12 @@ function init(root: HTMLElement) {
     updateRings();
   }
 
-  // ---------- Keyboard: one tab stop, arrow keys move between states ----------
+  // ---------- Keyboard: one real button, arrow keys move between states ----------
+  // The states are drawings, so they take no focus. The button is the one tab
+  // stop; the state the arrows are on is `kbState`, shown with the ring and
+  // the tooltip, and read out through the live region.
 
-  function setRoving(st: string) {
-    for (const el of root.querySelectorAll<SVGUseElement>('.cmap__state')) {
-      el.setAttribute('tabindex', el.dataset.state === st ? '0' : '-1');
-    }
-  }
-  setRoving(data.stateOrder[0]);
+  let kbState = data.stateOrder[0];
 
   const DIRS: Record<string, Pt> = { ArrowRight: [1, 0], ArrowLeft: [-1, 0], ArrowDown: [0, 1], ArrowUp: [0, -1] };
   /** Nearest state in the direction pressed, favouring ones straight ahead. */
@@ -337,10 +377,13 @@ function init(root: HTMLElement) {
     return best;
   }
   function focusState(st: string) {
-    const l = currentLayout();
-    const el = layoutEls.get(l.id)!.querySelector<SVGUseElement>(`.cmap__state[data-state="${st}"]`);
-    setRoving(st);
-    el?.focus();
+    kbState = st;
+    if (document.activeElement !== kb) kb.focus();
+    state.focused = st;
+    tooltipAtAnchor(st);
+    updateRings();
+    const label = root.querySelector<SVGUseElement>(`.cmap__state[data-state="${st}"]`)?.dataset.label ?? name(st);
+    kbLive.textContent = label;
   }
 
   // ---------- Events ----------
@@ -370,22 +413,20 @@ function init(root: HTMLElement) {
     const st = stateFrom(e.target);
     if (st) openState(st);
   });
-  map.addEventListener('focusin', (e) => {
-    const st = stateFrom(e.target);
+  kb.addEventListener('focus', () => {
     // Only keyboard focus shows the tooltip; a tap or click pins instead.
-    if (!st || !(e.target as Element).matches(':focus-visible')) return;
-    state.focused = st;
-    tooltipAtAnchor(st);
+    if (!kb.matches(':focus-visible')) return;
+    state.focused = kbState;
+    tooltipAtAnchor(kbState);
     updateRings();
   });
-  map.addEventListener('focusout', () => {
+  kb.addEventListener('blur', () => {
     state.focused = null;
     hideTooltip();
     updateRings();
   });
-  map.addEventListener('keydown', (e) => {
-    const st = stateFrom(e.target);
-    if (!st) return;
+  kb.addEventListener('keydown', (e) => {
+    const st = kbState;
     if (DIRS[e.key]) {
       e.preventDefault();
       const next = neighbour(st, DIRS[e.key]);
@@ -399,7 +440,8 @@ function init(root: HTMLElement) {
     } else if (e.key === 'Escape') {
       e.preventDefault();
       hideTooltip();
-      closeState();
+      if (state.pinned) closeState();
+      else if (state.compare !== null) store.set({ compare: null });
     }
   });
   panel.addEventListener('click', (e) => {
@@ -415,19 +457,18 @@ function init(root: HTMLElement) {
     else if (st) focusState(st);
   });
   // A request from further down the page (the flips table): bring the panel into view.
-  document.addEventListener('dash:focus-panel', () => panelRoot.focus());
+  document.addEventListener('dash:focus-panel', () => panelFocus.focus());
 
   for (const l of data.layouts) matchMedia(l.media).addEventListener('change', hideTooltip);
 
   // ---------- Follow the store ----------
 
   function follow(s: DashState, prev: DashState | null) {
-    const viewChanged = !prev || s.year !== prev.year || s.chamber !== prev.chamber;
+    const viewChanged = !prev || s.year !== prev.year || s.chamber !== prev.chamber || s.compare !== prev.compare;
     state.view = s.chamber;
     state.year = s.year;
     state.compare = s.compare;
     if (viewChanged) draw();
-    else if (!prev || s.compare !== prev.compare) drawCompare();
     if (!prev || s.state !== prev.state) {
       if (s.state) pin(s.state);
       else if (state.pinned) unpin();

@@ -1,0 +1,22 @@
+---
+// The title block at the top of a page: the page's name, one line saying
+// what it shows, and an optional small note.
+interface Props {
+  title: string;
+  sub: string;
+  note?: string;
+}
+const { title, sub, note } = Astro.props;
+---
+<header class="ptitle">
+  <h1 class="ptitle__h">{title}</h1>
+  <p class="ptitle__sub">{sub}</p>
+  {note && <p class="ptitle__note">{note}</p>}
+</header>
+
+<style>
+  .ptitle { margin-bottom: var(--sp-5); }
+  .ptitle__h { max-width: none; }
+  .ptitle__sub { margin-top: var(--sp-2); font-size: var(--fs-4); font-weight: 500; }
+  .ptitle__note { margin-top: var(--sp-1); font-size: var(--fs-1); color: var(--ink-2); }
+</style>

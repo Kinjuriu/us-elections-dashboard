@@ -88,6 +88,8 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
 
   <div class="cmap__body">
     <div class="cmap__map">
+      <button type="button" class="cmap__kb visually-hidden" data-kb>Map of states. Press an arrow key to move between states and Enter to open the one you are on.</button>
+      <p class="visually-hidden" role="status" aria-live="polite" data-kb-live></p>
       <div class="cmap__titleblock">
         <p class="cmap__title" data-title>{title.title}</p>
         <p class="cmap__subtitle" data-subtitle>{title.subtitle}</p>
@@ -128,7 +130,7 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
               class="cmap__svg"
               viewBox={`0 0 ${spec.width} ${spec.height}`}
               role="group"
-              aria-label={`Map of the United States. Select a state for its result. Arrow keys move between states.`}
+              aria-label="Map of the United States. Select a state for its result. For the keyboard, use the map control before it.""
             >
               <defs>
                 {regions.map((r) => {
@@ -171,9 +173,7 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
                           data-state={st}
                           data-fill={fillOf(st)}
                           data-split={splitOf(st)?.join('|')}
-                          role="button"
-                          tabindex="-1"
-                          aria-label={ariaLabel('senate', st, name(st), senate, house)}
+                          data-label={ariaLabel('senate', st, name(st), senate, house)}
                         />
                       ))}
                       {statesIn(r).map((st) => (
@@ -209,8 +209,7 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
                 >
                   <span class="cmap__code">{s.state}</span>
                   <span class="cmap__races" hidden={(senate.states[s.state]?.races.length ?? 0) < 2}>2</span>
-                  <span class="cmap__changed" hidden></span>
-                </span>
+                                  </span>
               ))}
             </div>
             <div class="cmap__labels cmap__labels--house" aria-hidden="true"></div>
@@ -221,8 +220,8 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
       <div class="cmap__tooltip" role="tooltip" hidden></div>
     </div>
 
-    <aside class="cmap__panel" aria-label="State record" tabindex="-1" data-panel-root>
-      <div class="cmap__panel-scroll">
+    <aside class="cmap__panel" aria-label="State record" data-panel-root>
+      <div class="cmap__panel-scroll" tabindex="-1" data-panel-focus>
         <button type="button" class="cmap__clear" data-clear hidden>Close</button>
         <div class="cmap__panel-body" data-panel aria-live="polite" set:html={nationalDefault}></div>
       </div>
@@ -240,7 +239,7 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
     <li><span class="cmap__sw" data-fill="pending"></span>Result not yet entered</li>
     <li><span class="cmap__races cmap__races--key">2</span>Two races: regular and special election</li>
     <li data-split-key hidden={!Object.values(senate.states).some((s) => s.split)}><span class="cmap__sw cmap__sw--split"></span>Split: the two races went different ways (regular top left)</li>
-    <li data-compare-key hidden><span class="cmap__changed cmap__changed--key"></span><span data-compare-key-text></span></li>
+    <li data-compare-key hidden><span class="cmap__changed--key"></span><span data-compare-key-text></span></li>
   </ul>
     <ul class="cmap__legend cmap__legend--house" aria-label="Key">
     <li><span class="cmap__sq" data-kind="dem"></span>Democrat</li>
@@ -249,9 +248,9 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
     <li><span class="cmap__sq" data-kind="vacant"></span>Vacant</li>
     <li><span class="cmap__sq" data-kind="missing"></span>Not yet entered</li>
     <li>One square per seat, grouped by party</li>
-    <li data-compare-key hidden><span class="cmap__changed cmap__changed--key"></span><span data-compare-key-text></span></li>
+    <li data-compare-key hidden><span class="cmap__changed--key"></span><span data-compare-key-text></span></li>
   </ul>
-    <p class="cmap__floor">Years before 2000 show on the year strip but have no map.</p>
+    <p class="cmap__floor">Years before 2000 show as a faded track on the railway but have no map.</p>
   </div>
 
   <script type="application/json" data-cmap-data set:html={JSON.stringify(clientData)}></script>
@@ -358,6 +357,8 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
     transition: fill var(--dur-data) var(--ease-data);
   }
   .cmap__state:focus { outline: none; }
+  /* The keyboard control is hidden; its focus shows as an outline on the map, and the state it is on gets the ring. */
+  .cmap__map:has(.cmap__kb:focus-visible) { outline: 2px solid var(--ink); outline-offset: 2px; }
   .cmap__state[data-fill='dem'] { fill: var(--dem); }
   .cmap__state[data-fill='gop'] { fill: var(--gop); }
   .cmap__state[data-fill='ind'] { fill: var(--ind); }
@@ -458,21 +459,29 @@ const nationalDefault = nationalHtml('senate', year, data, header[year], null);
     text-align: center;
   }
   .cmap__races--key { color: var(--ink); }
-  /* Compare: a small diamond on states that changed between the two years. */
-  .cmap__changed,
-  .cmap__labels :global(.cmap__changed) {
+  /* Compare: the later year's colour on each state that changed, outlined in
+     ink at 2px; everything else is drawn in the no-race grey. */
+  .cmap :global(.cmap__chg) {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 2;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
+    pointer-events: none;
+  }
+  .cmap__squares :global(g[data-cmp='same'] rect[data-kind]) { fill: var(--no-race); stroke: none; }
+  .cmap__changed--key {
     display: inline-block;
-    width: 8px;
-    height: 8px;
-    margin-left: 2px;
+    width: 14px;
+    height: 14px;
+    margin: 0 var(--sp-2) 0 0;
     flex: none;
-    transform: rotate(45deg);
-    background: var(--paper);
+    vertical-align: -2px;
+    background: var(--no-race);
     border: 2px solid var(--ink);
   }
-  .cmap__changed[hidden],
-  .cmap__labels :global(.cmap__changed[hidden]) { display: none; }
-  .cmap__changed--key { margin: 0 3px; }
+  /* While comparing, the key says one thing. */
+  .cmap[data-compare] .cmap__legend li:not([data-compare-key]) { display: none; }
   .cmap__races[hidden] { display: none; }
   /* House labels: a white chip, so they read on land, water and squares
      alike. The anchor is the chip's edge that faces the grid. */

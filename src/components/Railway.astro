@@ -1,0 +1,389 @@
+---
+// The year control: a railway. Two rails run left to right, House on top and
+// Senate below, each stretch coloured by the majority party of that Congress,
+// with grey sleepers under both. A station at every election from 2000 splits
+// into the House majority colour (top) and the Senate majority colour
+// (bottom). Years before 2000 are a faded track with no stations.
+//
+// Built at build time for the default year and fully readable without
+// JavaScript. src/scripts/railway.ts adds click, drag, keyboard and the
+// phone stepper. On phones (under 900px) the railway is a small read-only
+// picture under a big-year stepper, which is the control there.
+//
+// The stations are a radio group, not a slider: there are fourteen named
+// choices, each a real button that voice control and screen readers can reach
+// by name, and arrow keys move between radios as people expect. Dragging is a
+// pointer shortcut layered on top.
+import { railway, stationLabel, type RailColumn } from '../lib/railway';
+import type { StoreConfig } from '../lib/store';
+import { PROVISIONAL_YEAR } from '../lib/mapData';
+import YearBar from './YearBar.astro';
+
+interface Props {
+  config: StoreConfig;
+  columns: RailColumn[];
+  /** The year drawn as selected at build time. */
+  year: number;
+  /** First year of the faded track, e.g. 1946. */
+  trackStart: number;
+}
+const { config, columns, year, trackStart } = Astro.props;
+const rw = railway(columns);
+const n = rw.stations.length;
+const checked = year % 2 === 0 ? year : year - 1;
+const last = rw.stations[n - 1];
+---
+<div class="year" data-year-control>
+  <div class="stepper" data-stepper>
+    <button type="button" class="stepper__btn" data-step="-1" aria-label="Previous election">&lsaquo;</button>
+    <output class="stepper__year" data-year-out aria-live="polite">
+      <span data-y>{year}</span><span class="stepper__prov label" data-prov hidden={year !== PROVISIONAL_YEAR}>provisional</span>
+    </output>
+    <button type="button" class="stepper__btn" data-step="1" aria-label="Next election">&rsaquo;</button>
+  </div>
+
+  <div class="rw" data-rw style={`--n:${n}`}>
+    <p class="rw__side label" aria-hidden="true"><span>House</span><span>Senate</span></p>
+    <div class="rw__track" data-track>
+      <svg class="rw__sleepers" aria-hidden="true" focusable="false">
+        <defs>
+          <pattern id="rw-sleeper" width="10" height="44" patternUnits="userSpaceOnUse">
+            <rect class="rw__sleeper" x="3" width="4" height="44" />
+          </pattern>
+        </defs>
+        <rect class="rw__sleepers-past" width="100%" height="100%" fill="url(#rw-sleeper)" />
+        <rect class="rw__sleepers-live" width="100%" height="100%" fill="url(#rw-sleeper)" />
+      </svg>
+      <div class="rw__gap" aria-hidden="true"></div>
+
+      <div class="rw__run rw__run--past rw__run--house" aria-hidden="true"></div>
+      <div class="rw__run rw__run--past rw__run--senate" aria-hidden="true"></div>
+      {rw.runs.map((r) => (
+        <div
+          class:list={['rw__run', `rw__run--${r.chamber}`, { 'rw__run--dashed': r.dashed }]}
+          data-fill={r.fill}
+          style={`--a:${r.from};--b:${r.to}`}
+          aria-hidden="true"
+        ></div>
+      ))}
+
+      <span class="rw__yr rw__yr--past" aria-hidden="true">{trackStart}</span>
+
+      <div class="rw__stations" role="radiogroup" aria-label="Election year. Click, drag or use the arrow keys.">
+        {rw.stations.map((s) => (
+          <button
+            type="button"
+            role="radio"
+            class:list={['rw__st', { 'rw__st--odd': s.index % 2 === 1, 'rw__st--prov': s.provisional }]}
+            data-year={String(s.year)}
+            style={`--i:${s.index}`}
+            aria-checked={s.year === checked ? 'true' : 'false'}
+            aria-label={stationLabel(s)}
+            tabindex={s.year === checked ? '0' : '-1'}
+          >
+            <span class="rw__half" data-fill={s.house}></span>
+            <span class="rw__half" data-fill={s.senate}></span>
+            <span class="rw__yr" aria-hidden="true">{s.year}{s.provisional && <span class="rw__prov">prov.</span>}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+
+    <ul class="rw__key" aria-label="Key">
+      <li class="rw__key-rows">Top rail House, bottom rail Senate</li>
+      <li><span class="rw__sw" data-fill="dem"></span>Democratic majority</li>
+      <li><span class="rw__sw" data-fill="gop"></span>Republican majority</li>
+      {rw.usesAmber && <li><span class="rw__sw" data-fill="ind"></span>Independents decided control</li>}
+      {last.provisional && <li><span class="rw__sw rw__sw--dashed"></span>Dashed: {last.year} is provisional</li>}
+      <li class="rw__key-past"><span class="rw__sw rw__sw--past"></span>Before 2000: not available to select</li>
+    </ul>
+  </div>
+
+  {config.senateOnlyYears.length > 0 && (
+    <div class="specials" data-specials role="group" aria-label="Senate special elections">
+      <span class="label specials__label">Senate special elections</span>
+      {config.senateOnlyYears.map((y) => (
+        <button type="button" class="specials__btn" data-year={String(y)} aria-pressed={y === year ? 'true' : 'false'}>{y}</button>
+      ))}
+    </div>
+  )}
+</div>
+
+<YearBar columns={columns} year={year} />
+
+<script>
+  import '../scripts/railway';
+  import '../scripts/year-bar';
+</script>
+
+<style>
+  .year { min-width: 0; }
+
+  /* ---- Phone stepper: the big year with previous and next ---- */
+  .stepper {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--sp-3);
+  }
+  .stepper__btn {
+    appearance: none;
+    flex: none;
+    width: 48px;
+    height: 48px;
+    padding: 0 0 4px;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius-control);
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-label);
+    font-size: var(--fs-6);
+    line-height: 1;
+    cursor: pointer;
+  }
+  .stepper__btn:hover:not(:disabled) { background: var(--paper-2); }
+  .stepper__btn:disabled { color: var(--ink-3); border-color: var(--rule); cursor: default; }
+  .stepper__year {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-weight: 700;
+    font-size: var(--fs-7);
+    font-variant-numeric: tabular-nums lining-nums;
+    line-height: 1;
+  }
+  .stepper__prov { margin-top: var(--sp-1); font-size: 12px; color: var(--ink-2); }
+  .stepper__prov[hidden] { display: none; }
+
+  /* ---- The railway ---- */
+  .rw {
+    /* Sizes in one place. The track is: sleeper stub, rail, white gap, rail, sleeper stub. */
+    --past: 9%;
+    --cell: calc((100% - var(--past)) / var(--n));
+    --stub: 4px;
+    --rail: 6px;
+    --gap: 8px;
+    --h: calc(2 * var(--stub) + 2 * var(--rail) + var(--gap));
+    --st-w: 12px;
+    --st-w-sel: 18px;
+    --st-h: var(--h);
+    --st-h-sel: calc(var(--h) + 8px);
+    --out: 2.5px;
+    --out-sel: 5.5px;
+    --label-top: 12px;
+    position: relative;
+    margin-top: var(--sp-3);
+    pointer-events: none;
+  }
+  .rw__side { display: none; }
+  .rw__track {
+    position: relative;
+    height: var(--h);
+    margin-top: 14px;
+    /* Room for the year labels, two lines on a phone. */
+    margin-bottom: 56px;
+  }
+
+  .rw__sleepers {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .rw__sleeper { fill: var(--ink-3); }
+  /* Sleepers show above the top rail and below the bottom rail; the gap between the rails stays white. */
+  .rw__sleepers-live { clip-path: inset(0 0 0 var(--past)); opacity: 0.6; }
+  .rw__sleepers-past { clip-path: inset(0 calc(100% - var(--past)) 0 0); opacity: 0.2; }
+
+  .rw__gap {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: calc(var(--stub) + var(--rail));
+    height: var(--gap);
+    background: #fff;
+  }
+
+  .rw__run {
+    position: absolute;
+    height: var(--rail);
+    left: calc(var(--past) + (var(--a) + 0.5) * var(--cell));
+    width: calc((var(--b) - var(--a)) * var(--cell));
+    box-sizing: border-box;
+  }
+  .rw__run--house { top: var(--stub); }
+  .rw__run--senate { top: calc(var(--stub) + var(--rail) + var(--gap)); }
+  .rw__run--past { left: 0; width: calc(var(--past) + 0.5 * var(--cell)); background: var(--rule); opacity: 0.6; }
+  .rw__run[data-fill='dem'] { background: var(--dem); }
+  .rw__run[data-fill='gop'] { background: var(--gop); }
+  .rw__run[data-fill='ind'] { background: var(--ind); }
+  .rw__run[data-fill='none'] { background: var(--no-race); }
+  .rw__run--dashed { background: var(--paper) !important; border: 1.5px dashed var(--ink-2); }
+
+  .rw__stations { position: absolute; inset: 0; }
+  .rw__st {
+    --w: var(--st-w);
+    --hh: var(--st-h);
+    position: absolute;
+    left: calc(var(--past) + (var(--i) + 0.5) * var(--cell));
+    top: calc((var(--h) - var(--hh)) / 2);
+    width: var(--w);
+    height: var(--hh);
+    margin-left: calc(var(--w) / -2);
+    display: flex;
+    flex-direction: column;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: var(--paper);
+    box-shadow: 0 0 0 var(--out) #fff;
+    cursor: pointer;
+    font: inherit;
+    color: inherit;
+    z-index: 1;
+  }
+  .rw__half { flex: 1 1 0; background: var(--no-race); }
+  .rw__half:first-of-type { border-radius: 8px 8px 0 0; }
+  .rw__half:nth-of-type(2) { border-radius: 0 0 8px 8px; }
+  .rw__half[data-fill='dem'] { background: var(--dem); }
+  .rw__half[data-fill='gop'] { background: var(--gop); }
+  .rw__half[data-fill='ind'] { background: var(--ind); }
+  /* A station for results not yet in: dashed outline, no fill. */
+  .rw__st--prov::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border: 2px dashed var(--ink-2);
+    border-radius: 8px;
+    pointer-events: none;
+  }
+  .rw__st--prov .rw__half[data-fill='none'] { background: var(--paper); }
+  .rw__st[aria-checked='true'] {
+    --w: var(--st-w-sel);
+    --hh: var(--st-h-sel);
+    z-index: 3;
+    box-shadow: 0 0 0 var(--out) #fff, 0 0 0 var(--out-sel) var(--ink);
+  }
+  .rw__st:hover:not([aria-checked='true']) { box-shadow: 0 0 0 var(--out) #fff, 0 0 0 calc(var(--out) + 1px) var(--ink-2); }
+  .rw__st:focus-visible { outline: 2px solid var(--ink); outline-offset: 4px; z-index: 4; }
+  .rw__st[aria-checked='true']:focus-visible { outline-offset: 8px; }
+
+  /* Year labels sit under every station, on one baseline. */
+  .rw__yr {
+    position: absolute;
+    left: 50%;
+    top: calc(100% + var(--label-top) + 4px);
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1.2;
+    color: var(--ink-2);
+    font-variant-numeric: tabular-nums lining-nums;
+    white-space: nowrap;
+    pointer-events: none;
+  }
+  .rw__st[aria-checked='true'] .rw__yr { top: calc(100% + var(--label-top) - 2px); font-weight: 700; color: var(--ink); }
+  .rw__prov { font-size: 12px; font-weight: 500; }
+  .rw__yr--past { left: 0; transform: none; top: calc(100% + var(--label-top) + 4px + 16px); align-items: flex-start; }
+  /* Four-digit labels do not fit side by side on a phone: every second one drops a line. */
+  .rw__st--odd .rw__yr { margin-top: 16px; }
+
+  .rw__key {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--sp-1) var(--sp-4);
+    font-size: 13px;
+    color: var(--ink-2);
+  }
+  .rw__key li { display: flex; align-items: center; gap: 6px; }
+  .rw__sw { display: inline-block; width: 12px; height: 12px; background: var(--no-race); }
+  .rw__sw[data-fill='dem'] { background: var(--dem); }
+  .rw__sw[data-fill='gop'] { background: var(--gop); }
+  .rw__sw[data-fill='ind'] { background: var(--ind); }
+  .rw__sw--dashed { background: var(--paper); border: 1.5px dashed var(--ink-2); }
+  .rw__sw--past { background: var(--rule); opacity: 0.6; }
+
+  .specials { display: none; }
+
+  /* The stepper is the control on phones; the railway is a picture. */
+  @media (max-width: 899.98px) {
+    .rw__key .rw__key-past { display: none; }
+  }
+
+  /* ---- Desktop: the railway is the control ---- */
+  @media (min-width: 900px) {
+    .stepper { display: none; }
+    .rw {
+      --past: 15%;
+      --stub: 6px;
+      --rail: 10px;
+      --gap: 12px;
+      --st-w: 32px;
+      --st-w-sel: 42px;
+      --st-h-sel: calc(var(--h) + 12px);
+      --label-top: 10px;
+      display: grid;
+      grid-template-columns: 64px minmax(0, 1fr);
+      margin-top: 0;
+      pointer-events: auto;
+    }
+    .rw__side {
+      display: block;
+      position: relative;
+      margin-top: 14px;
+      height: var(--h);
+    }
+    .rw__side span {
+      position: absolute;
+      left: 0;
+      font-size: 12px;
+      line-height: 1;
+      transform: translateY(-50%);
+      color: var(--ink);
+    }
+    .rw__side span:first-child { top: calc(var(--stub) + var(--rail) / 2); }
+    .rw__side span:last-child { top: calc(var(--stub) + var(--rail) * 1.5 + var(--gap)); }
+    .rw__track { touch-action: pan-y; margin-bottom: 44px; }
+    .rw__yr { font-size: 13px; }
+    .rw__st--odd .rw__yr { margin-top: 0; }
+    .rw__yr--past { top: calc(100% + var(--label-top) + 4px); }
+    .rw__key { grid-column: 2; }
+    .rw__key .rw__key-rows { display: none; }
+    .specials {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: var(--sp-2);
+      margin-top: var(--sp-2);
+      padding-left: 64px;
+    }
+    .specials[hidden] { display: none; }
+    .specials__label { margin-right: var(--sp-2); color: var(--ink-2); font-size: 12px; }
+    .specials__btn {
+      appearance: none;
+      min-width: 52px;
+      min-height: 32px;
+      padding: 4px var(--sp-2);
+      border: 1px solid var(--ink-3);
+      border-radius: var(--radius-control);
+      background: var(--paper);
+      color: var(--ink);
+      font-family: var(--font-label);
+      font-weight: 600;
+      font-size: var(--fs-1);
+      cursor: pointer;
+    }
+    .specials__btn:hover { border-color: var(--ink); background: var(--paper-2); }
+    .specials__btn[aria-pressed='true'] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+  }
+</style>

@@ -1,0 +1,31 @@
+---
+// The railway on its own, for pages that follow the year but have no map
+// board of their own (Governors, Senate). The Congress page puts the railway
+// inside ControlStrip with the chamber and comparison controls.
+import Railway from './Railway.astro';
+import type { StoreConfig } from '../lib/store';
+import type { StripColumn } from '../lib/dashboardData';
+
+interface Props {
+  config: StoreConfig;
+  columns: StripColumn[];
+}
+const { config, columns } = Astro.props;
+---
+<div class="ystrip">
+  <Railway config={config} columns={columns} year={config.defaultYear} trackStart={columns[0].year} />
+  <noscript>
+    <p class="ystrip__noscript">Showing {config.defaultYear}. Turn on JavaScript to change the year.</p>
+  </noscript>
+</div>
+
+<style>
+  .ystrip {
+    padding: var(--sp-4) var(--sp-3) var(--sp-3);
+    background: var(--paper-2);
+    border: 1px solid var(--ink);
+    min-width: 0;
+  }
+  @media (min-width: 900px) { .ystrip { padding: var(--sp-3) var(--sp-4); } }
+  .ystrip__noscript { font-size: var(--fs-1); color: var(--ink-2); }
+</style>

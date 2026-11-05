@@ -1,0 +1,6 @@
+---
+import { markParty, partyMarkHtml } from '../lib/partyMark';
+interface Props { party: string | null | undefined }
+const { party } = Astro.props;
+---
+{markParty(party) && <Fragment set:html={partyMarkHtml(party)} />}

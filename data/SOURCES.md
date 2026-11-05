@@ -20,6 +20,19 @@ Party codes used in every file: `DEM` (Democratic, including Minnesota's Democra
   The House Historian gives one division per Congress and no House majority changed hands during a Congress in this period, so for the House the column equals `majority_party`. Charts use `majority_party_most_of_congress`, with a footnote marker where `majority_note` is set.
 - **Majority threshold:** `floor(total_seats / 2) + 1`, so 218 for a 435-seat House and 51 for a 100-seat Senate. In a 50-50 Senate the Vice President's tie-breaking vote decides control; the threshold column does not model that.
 
+## Senate count on the day control was settled
+
+`senate_control_day.csv` (from `data/manual/senate_control_day.csv`) gives the Senate count after opening day for the two Congresses where control differs from opening day. Each row is copied from a dated row of the Senate Historical Office's own party division page (archived copy above) and the pipeline checks the numbers against it.
+
+- 117th: 20 January 2021, 48 D, 50 R, 2 independents caucusing with the Democrats; Democratic control through the vice president's tie-breaking vote.
+- 107th: 6 June 2001, 50 D, 49 R, 1 independent (Jeffords) caucusing with the Democrats; 51 for the Democratic caucus, no vice president needed.
+
+The Congress card reads these as "50 Democrats, with the vice president" (2020) and "51 Democrats" (2000), with the opening-day count in the line underneath.
+
+## Firsts of 2026
+
+`data/manual/firsts.csv` holds one row per first, each with a source URL and access time. A first is entered only when CAWP, the House Historian, the Senate Historical Office, the National Governors Association, a state's official page or a major news organisation states it. No rows were entered on 5 November 2026 because no 2026 general-election result could be read from an allowed source.
+
 ## Statehood seats, 1959 to 1963
 
 - **House:** 435 seats, except 436 at the opening of the 86th Congress (Alaska seated in January 1959; Hawaii's member joined on 21 August 1959) and 437 in the 87th. Back to 435 from the 88th.
@@ -91,6 +104,53 @@ Seats are counted by **caucus**: the president's party plus the independents who
   - Independents go in `ind` (Sanders VT 2000 to 2004, Goode VA 2000); other parties go in `other`.
   - NC-9 2018 is counted as vacant, because the election was never certified and was re-run in 2019. NY-22 2020 stays a Republican seat, because the count finished after the 117th Congress opened. Both rows carry a `note`.
   - With those rules, seat counts rebuilt from MEDSL match the House Historian's opening-day counts in every year from 2000 to 2024. The one difference is NY-22 2020, which the Historian lists as vacant at the opening.
+
+### `congress_legislators_current` and `congress_legislators_historical`
+- **Title:** unitedstates/congress-legislators, `legislators-current.yaml` and `legislators-historical.yaml`
+- **Publisher:** the unitedstates project, https://github.com/unitedstates/congress-legislators, pinned to commit `15530b7d` (24 October 2026)
+- **Licence:** CC0 1.0 (public domain)
+- **Accessed:** 4 November 2026
+- **Coverage used:** every voting term overlapping the 80th to 119th Congress. The 120th is not in the source until January 2027.
+- **Output:** `members_by_congress.csv`, `women_by_congress.csv`, `age_by_congress.csv`, built by `pipeline/build_members.py`.
+- **Caveats:**
+  - Counts are of members who served at any point in the Congress, so House totals exceed 435. Opening-day counts are not built: the source holds only a term start date, and gives some mid-Congress joiners the opening date (the 86th House has 447 terms starting on opening day).
+  - Delegates, resident commissioners and Alaska and Hawaii's pre-statehood delegates are excluded.
+  - Party is the party on a member's first day in that Congress. `IND` is Independent or Ind. Democrat; `OTHER` is any other label.
+  - `age_at_start` is whole years on 3 January of the Congress's first year. Three members have no birthday and their age is null (80th Rohrbough, 88th Burkhalter, 96th Hutchinson).
+
+### `medsl_county_president`
+- **Title:** County Presidential Election Returns 2000-2024
+- **Publisher:** MIT Election Data and Science Lab, Harvard Dataverse, doi:10.7910/DVN/VOQCHQ
+- **Version:** 20.0, released 25 February 2026 (file version stamp 20260225). Codebook dated 2025-07-12. Licence: CC0 1.0.
+- **Files:** `data/raw/medsl/countypres_2000-2024.csv`, the codebook and `sources-president.csv` (per-state source URLs, certified or not, for 2020). Downloaded by hand on 4 November 2026 because of the Dataverse guestbook; `medsl_county_president_meta` in the manifest records the dataset metadata.
+- **Years used:** 2016, 2020, 2024. Output: `county_presidential_shift.csv` (joinable to `us-atlas` `counties-10m.json`) and `county_presidential_unmatched.csv`, built by `pipeline/build_county_shift.py`.
+- **Caveats:**
+  - Mode rule, from the codebook: a county with TOTAL-mode rows uses them; one with only vote modes (absentee, early, election day, provisional and so on) has the modes summed. 2020 has 849 such counties and 2024 has 376.
+  - Shares are of all votes cast (`totalvotes`), so third-party and write-in votes sit in neither column. Vermont 2024 candidate rows are 0.9% short of `totalvotes`, and DC 2024 is 0.8% over; every other state and year is within 0.5%.
+  - The 2024 New Mexico Libertarian cells are `NA` in the file and are left missing; they do not enter the Democratic or Republican shares.
+  - Alaska reports by state house district, not borough, so it cannot join to the map. One statewide row (fips 02000) is in the unmatched file.
+  - Kansas City, MO is its own unit in every year (FIPS 2938000, and 36000 in 2024) and spans four counties, so it is in the unmatched file. Jackson, Clay, Platte and Cass exclude it in every year, so their shifts are consistent but their vote totals are not whole counties.
+  - Oglala Lakota County SD is 46113 in the 2024 rows and 46102 before; recoded to 46102 to match us-atlas.
+  - Not joined: rows with no FIPS (CT statewide write-ins 2016, ME UOCAVA 2016, RI federal precinct 2016 and 2020) and Bedford city VA (51515, 2016, zero votes, merged into Bedford County in 2013). The file keeps Connecticut's old counties in every year, matching us-atlas, so the 2022 planning-region change does not appear. Virginia's independent cities are separate units in both.
+  - us-atlas counties with no data: Kalawao, HI (15005). Alaska's boroughs are not in the file by design. Territories are out of scope.
+
+### `wikipedia_governors` (CC BY-SA 4.0, the only share-alike source)
+- **Title:** "List of governors of <State>" for each of the 50 states
+- **Publisher:** Wikipedia, English edition, https://en.wikipedia.org. Text and tables by Wikipedia contributors, licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). **Credit: Wikipedia contributors.** `governors_terms.csv` and `governors_by_year.csv` are adapted from these pages and are CC BY-SA 4.0 too. They must be shared under the same licence. The rest of the project's data stays CC0.
+- **Files:** `data/raw/wikipedia_governors/<PO>.html` holds only the `wikitable` elements of each page. The manifest gives each page's revision id (permalink with `oldid`) and the time it was accessed. Rows in `governors_terms.csv` carry that permalink in `source_url`.
+- **Outputs, built by `pipeline/build_governors.py`:**
+  - `governors_terms.csv`: every term overlapping 2000 to 2025, with `party_detail` as the page words it for the start of the term, `party` as its group (D, R or I), `left_office` blank for a governor still in office, and `party_note` where the party changed mid-term.
+  - `governors_by_year.csv`: the governor in office on 1 January of each year, 2000 to 2025: the term with the latest start on or before that day that has not yet ended. It has the same `party` and `party_detail` columns.
+- **Mid-term party changes:** `data/manual/governor_party_changes.csv`, from the footnotes on the pages: Crist (FL, to Independent, April 2010), Chafee (RI, to Democratic, 30 May 2013) and Justice (WV, to Republican, August 2017). The build stops if a page lists two parties for a term with no row there. `governors_by_year.csv` uses the new party for any 1 January after the change.
+- **Caveats:**
+  - `party_detail` keeps Wikipedia's wording. `party` groups it: Democratic and Democratic-Farmer-Labor (Minnesota) are D; Republican is R; Independent and Reform/Independence (Ventura) are I. The build stops on any other wording.
+  - Pages end a term on the last day in office or on the day the successor starts, so consecutive terms are 0 or 1 days apart. Dates are not adjusted.
+  - Where a governor was acting or succeeded from another office, the page lists them as a governor and so do we.
+  - Governors-elect who take office in 2027 are not included.
+  - Spot checks against official state websites are in `review/07-report.md`.
+
+### `manual` women cross-check
+- **File:** `data/manual/women_crosscheck.csv`: published totals of women by Congress, used only by a test and the step 07 report. 1991 to 2021 come from the Congressional Research Service report R43244 (CAWP's site blocks scripts); 2025 from CAWP's 2 January 2025 press release.
 
 ### `manual_2026_provisional`
 - **File:** `data/manual/2026_provisional.csv`

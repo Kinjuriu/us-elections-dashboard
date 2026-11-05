@@ -1,0 +1,62 @@
+---
+// Governors: the map of each state's governor by party for the year chosen on
+// the railway, the governor card, the list of all 50, and a link to the Firsts page once that page has rows.
+import Base from '../layouts/Base.astro';
+import ChartFrame from '../components/ChartFrame.astro';
+import Masthead from '../components/Masthead.astro';
+import Footer from '../components/Footer.astro';
+import PageTitle from '../components/PageTitle.astro';
+import YearStrip from '../components/YearStrip.astro';
+import StateSprite from '../components/StateSprite.astro';
+import GovernorsMap from '../components/GovernorsMap.astro';
+import { loadGovernors } from '../lib/governors';
+import { hasFirsts } from '../lib/firsts';
+import { loadYearControl, asOf, CONTROL_AS_OF } from '../lib/pageData';
+
+const { mapData, dashConfig, columns } = loadYearControl();
+const govYears = [...dashConfig.years, ...dashConfig.senateOnlyYears].sort((a, b) => a - b);
+const governors = loadGovernors(govYears);
+---
+<Base
+  title="Governors, 2000 to 2026: which party holds each state"
+  description="A map of the governor of every state by party, for each election year from 2000, with the governor's name, party and start date."
+>
+  <Masthead current="governors" />
+  <script type="application/json" id="dash-config" set:html={JSON.stringify(dashConfig)}></script>
+  <StateSprite />
+
+  <main id="main" class="wrap gpage">
+    <PageTitle title="Governors" sub="Which party holds each state's governorship" />
+
+    <YearStrip config={dashConfig} columns={columns} />
+
+    <section class="gpage__map" aria-label="Governors map">
+      <ChartFrame
+        title="Governors"
+        subtitle="The party of each state's governor after the elections of the year chosen on the railway, 2000 to 2024. Select a state for its governor."
+        source="Wikipedia contributors, the List of governors page for each state (CC BY-SA 4.0); party switches from the footnotes on those pages."
+        dataAsOf={asOf(...Object.keys(mapData.stateNames).map((st) => `wikipedia_governors_${st}`))}
+      >
+        <GovernorsMap snapshots={governors} year={dashConfig.defaultYear} stateNames={mapData.stateNames} />
+      </ChartFrame>
+    </section>
+
+    {hasFirsts() && (
+      <section class="gpage__firsts" aria-labelledby="firsts-h">
+        <h2 class="gpage__h2" id="firsts-h">Firsts</h2>
+        <p>Milestones in this year's elections for governor and other offices are on the <a href={`${import.meta.env.BASE_URL}firsts/`} data-carry>Firsts of 2026</a> page.</p>
+      </section>
+    )}
+  </main>
+
+  <Footer asOf={CONTROL_AS_OF()} />
+</Base>
+
+<style>
+  .gpage { padding-top: var(--sp-4); }
+  @media (min-width: 768px) { .gpage { padding-top: var(--sp-5); } }
+  .gpage__map { margin-top: var(--sp-6); }
+  .gpage__firsts { margin-top: var(--sp-8); border-top: 1px solid var(--ink); padding-top: var(--sp-3); }
+  .gpage__h2 { font-size: var(--fs-5); }
+  .gpage__firsts p { margin-top: var(--sp-2); color: var(--ink-2); }
+</style>

@@ -1,0 +1,71 @@
+---
+// Senate: the seats that changed party in the year chosen on the railway, and
+// the races that involved independents.
+import Base from '../layouts/Base.astro';
+import ChartFrame from '../components/ChartFrame.astro';
+import Masthead from '../components/Masthead.astro';
+import Footer from '../components/Footer.astro';
+import PageTitle from '../components/PageTitle.astro';
+import YearStrip from '../components/YearStrip.astro';
+import StateSprite from '../components/StateSprite.astro';
+import FlipsChart from '../components/FlipsChart.astro';
+import IndependentsTable from '../components/IndependentsTable.astro';
+import { loadYearControl, asOf, CONTROL_AS_OF } from '../lib/pageData';
+import { loadFlipsChart } from '../lib/chartData';
+import { loadSenateRaces } from '../lib/data';
+
+const { mapData, dashConfig, columns } = loadYearControl();
+const flipsChart = loadFlipsChart(mapData);
+const races = loadSenateRaces();
+const senateAsOf = asOf('medsl_senate');
+const flipFirst = Math.min(...races.filter((r) => !r.isProvisional).map((r) => r.year));
+---
+<Base
+  title="Senate seats that changed party, 2000 to 2026"
+  description="Which Senate seats flipped from one party's caucus to the other in each election since 2000, and the races that involved independents."
+>
+  <Masthead current="senate" />
+  <script type="application/json" id="dash-config" set:html={JSON.stringify(dashConfig)}></script>
+  <StateSprite />
+
+  <main id="main" class="wrap spage">
+    <PageTitle title="Senate" sub="Seats that changed party, and races with independents" />
+
+    <YearStrip config={dashConfig} columns={columns} />
+
+    <section class="spage__sec" aria-label="Seats that flipped">
+      <div class="spage__cell">
+        <ChartFrame
+          title="Seats that flipped"
+          subtitle={`Senate seats won by a different caucus from the one holding them, ${flipFirst} to 2026.`}
+          source="MIT Election Data and Science Lab, U.S. Senate statewide returns; official state results for races the dataset lacks."
+          dataAsOf={senateAsOf}
+        >
+          <FlipsChart chart={flipsChart} year={dashConfig.defaultYear} />
+        </ChartFrame>
+      </div>
+    </section>
+
+    <section class="spage__sec" aria-label="Senate races involving independents">
+      <ChartFrame
+        title="Senate races involving independents"
+        subtitle="Races from 2000 to 2024 where an independent held or won the seat, or where a seat changed party label without changing caucus. Only a change of caucus counts as a flip."
+        source="MIT Election Data and Science Lab, U.S. Senate statewide returns; US Senate Historical Office for party switches and appointments. Names link to the Biographical Directory of the United States Congress."
+        dataAsOf={senateAsOf}
+      >
+        <IndependentsTable stateNames={mapData.stateNames} />
+      </ChartFrame>
+    </section>
+  </main>
+
+  <Footer asOf={CONTROL_AS_OF()} />
+</Base>
+
+<style>
+  .spage { padding-top: var(--sp-4); }
+  @media (min-width: 768px) { .spage { padding-top: var(--sp-5); } }
+  .spage__sec { margin-top: var(--sp-8); }
+  .spage__sec:first-of-type { margin-top: var(--sp-6); }
+  /* The chart picks its narrow or wide drawing from the width of this cell. */
+  .spage__cell { container: chart / inline-size; min-width: 0; }
+</style>

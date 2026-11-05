@@ -1,4 +1,18 @@
 {
+  "congress_legislators_current": {
+    "accessed_at": "2026-11-04T18:32:05+00:00",
+    "bytes": 1081187,
+    "path": "data/raw/congress_legislators/legislators-current.yaml",
+    "sha256": "fcd8e7f3b8b8286d99056a2be95907c7f6bce4d2dce069a074aa2f6970ecc717",
+    "url": "https://raw.githubusercontent.com/unitedstates/congress-legislators/15530b7d621009eb5fc7eda67f75194d7d91f8c1/legislators-current.yaml"
+  },
+  "congress_legislators_historical": {
+    "accessed_at": "2026-11-04T18:32:08+00:00",
+    "bytes": 8997407,
+    "path": "data/raw/congress_legislators/legislators-historical.yaml",
+    "sha256": "ea7a1e35e7854418033b155420b522d3cefffc9763b67d7044cde45b8e49a355",
+    "url": "https://raw.githubusercontent.com/unitedstates/congress-legislators/15530b7d621009eb5fc7eda67f75194d7d91f8c1/legislators-historical.yaml"
+  },
   "house_historian_party_divisions": {
     "accessed_at": "2026-11-04T12:42:16+00:00",
     "bytes": 95320,
@@ -19,6 +33,20 @@
     "path": "data/raw/house_historian/presidents_coinciding.html",
     "sha256": "94c40dbbbb308e67ebd7736a9bb47d85a9f45aa7b74c166d459c227687016272",
     "url": "https://history.house.gov/Institution/Presidents-Coinciding/Presidents-Coinciding/"
+  },
+  "medsl_county_president": {
+    "accessed_at": "2026-11-04T18:50:26+00:00",
+    "bytes": 10222208,
+    "path": "data/raw/medsl/countypres_2000-2024.csv",
+    "sha256": "9299583148f5f8264baf50b5d929c260699c46d915909b13ea3c3850918946f8",
+    "url": "manual download, see data/SOURCES.md"
+  },
+  "medsl_county_president_meta": {
+    "accessed_at": "2026-11-04T18:32:46+00:00",
+    "bytes": 4883,
+    "path": "data/raw/medsl/county_president_meta.json",
+    "sha256": "3f0e1c4671246100196491427ac23ecff8e94846354c4d577142807aa91d1cf6",
+    "url": "https://dataverse.harvard.edu/api/datasets/:persistentId/versions/:latest-published?persistentId=doi:10.7910/DVN/VOQCHQ"
   },
   "medsl_house": {
     "accessed_at": "2026-11-04T04:42:20+00:00",
@@ -117,5 +145,455 @@
     "path": "data/raw/senate/party_division.html",
     "sha256": "2be84a8b5cc5c71ba08ee3bf499712e6b5131a9ef8a215ac83c9c3b5625cf9f0",
     "url": "https://web.archive.org/web/20261102191213id_/https://www.senate.gov/about/parties-leadership/party-division.htm"
+  },
+  "wikipedia_governors_AK": {
+    "accessed_at": "2026-11-04T19:19:37+00:00",
+    "bytes": 116519,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/AK.html",
+    "revision_id": 1382778048,
+    "sha256": "8769e92e4afcd6cb2e9cb357e1e2a9c98b27bff6b0b5a3e60586ff7a5dc0ce81",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Alaska&oldid=1382778048"
+  },
+  "wikipedia_governors_AL": {
+    "accessed_at": "2026-11-04T19:19:35+00:00",
+    "bytes": 305315,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/AL.html",
+    "revision_id": 1383757280,
+    "sha256": "96ae5d1bb860a0e94074caf6ad06d2290d5b6a61ded9f256b0d7c56dfbe1435c",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Alabama&oldid=1383757280"
+  },
+  "wikipedia_governors_AR": {
+    "accessed_at": "2026-11-04T19:19:42+00:00",
+    "bytes": 163524,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/AR.html",
+    "revision_id": 1383757896,
+    "sha256": "1dc95c9ce15148a5c1c6be62d35a68daad5716a3f365a4a581a59c99c992f23b",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Arkansas&oldid=1383757896"
+  },
+  "wikipedia_governors_AZ": {
+    "accessed_at": "2026-11-04T19:19:40+00:00",
+    "bytes": 98551,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/AZ.html",
+    "revision_id": 1383757863,
+    "sha256": "861b42a28d1e9c02840d17b3805fa7805de091675cb412fca80a26095db2cb92",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Arizona&oldid=1383757863"
+  },
+  "wikipedia_governors_CA": {
+    "accessed_at": "2026-11-04T19:19:43+00:00",
+    "bytes": 121390,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/CA.html",
+    "revision_id": 1383684863,
+    "sha256": "404a5e0c6c40eb58a98333e18a810ef4e0b2bb85f525af2689e3b46f2f32aaf6",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_California&oldid=1383684863"
+  },
+  "wikipedia_governors_CO": {
+    "accessed_at": "2026-11-04T19:19:46+00:00",
+    "bytes": 137226,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/CO.html",
+    "revision_id": 1383680468,
+    "sha256": "a73a53f0c67ef9a3f7b92f16afd14ba81c929924a38f62506e323c5edf4ab2a5",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Colorado&oldid=1383680468"
+  },
+  "wikipedia_governors_CT": {
+    "accessed_at": "2026-11-04T19:19:48+00:00",
+    "bytes": 212627,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/CT.html",
+    "revision_id": 1383674228,
+    "sha256": "84ecb4911a356156c727a874f8ea3a05850097210d02e4cec26bb7d8a40b3931",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Connecticut&oldid=1383674228"
+  },
+  "wikipedia_governors_DE": {
+    "accessed_at": "2026-11-04T19:19:50+00:00",
+    "bytes": 201893,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/DE.html",
+    "revision_id": 1381759056,
+    "sha256": "6541394b548a0db9341f32d1409c3ab48b314d29bf9196ba3b3a5037b5ca0b2d",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Delaware&oldid=1381759056"
+  },
+  "wikipedia_governors_FL": {
+    "accessed_at": "2026-11-04T19:19:52+00:00",
+    "bytes": 138754,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/FL.html",
+    "revision_id": 1383673336,
+    "sha256": "2a8ad6d18072a97e5231fbca2553876e683ef9bd10006f996fcb17296f05af12",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Florida&oldid=1383673336"
+  },
+  "wikipedia_governors_GA": {
+    "accessed_at": "2026-11-04T19:19:55+00:00",
+    "bytes": 223900,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/GA.html",
+    "revision_id": 1383672326,
+    "sha256": "6960c3874f570ba42a4464c0ab3ab6a00fea252bc1119077a152b1e1988a533c",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Georgia&oldid=1383672326"
+  },
+  "wikipedia_governors_HI": {
+    "accessed_at": "2026-11-04T19:20:02+00:00",
+    "bytes": 61747,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/HI.html",
+    "revision_id": 1383757758,
+    "sha256": "b8d8b59ce816c92bc48c8406c806e0ae6fff223e8a06cc18229d67e4a983d637",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Hawaii&oldid=1383757758"
+  },
+  "wikipedia_governors_IA": {
+    "accessed_at": "2026-11-04T19:20:11+00:00",
+    "bytes": 121131,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/IA.html",
+    "revision_id": 1383687884,
+    "sha256": "7e8c663b9b4299cfa16c2c3343bad9a142bc9a27ef092b6b15f85e5807b5c9ca",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Iowa&oldid=1383687884"
+  },
+  "wikipedia_governors_ID": {
+    "accessed_at": "2026-11-04T19:20:04+00:00",
+    "bytes": 127880,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/ID.html",
+    "revision_id": 1383758158,
+    "sha256": "8d249870dad1b037382bfd9225ee02d366a6b44c9e2b848865452fe3f095ead3",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Idaho&oldid=1383758158"
+  },
+  "wikipedia_governors_IL": {
+    "accessed_at": "2026-11-04T19:20:06+00:00",
+    "bytes": 126541,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/IL.html",
+    "revision_id": 1383674592,
+    "sha256": "ead39e0081d1301d5f0928e1363d43796361f8731daa9108f4f838ae2059d3ef",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Illinois&oldid=1383674592"
+  },
+  "wikipedia_governors_IN": {
+    "accessed_at": "2026-11-04T19:20:08+00:00",
+    "bytes": 141626,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/IN.html",
+    "revision_id": 1381850188,
+    "sha256": "91903f6756eee0b2d63149737c6f962d36a30f299e7b4569136b5aa44e680040",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Indiana&oldid=1381850188"
+  },
+  "wikipedia_governors_KS": {
+    "accessed_at": "2026-11-04T19:20:13+00:00",
+    "bytes": 144958,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/KS.html",
+    "revision_id": 1382046118,
+    "sha256": "2be96df815078ab280bb2808253cfba501a3a77c6e59ca605a5e5c8f21f7bb8b",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Kansas&oldid=1382046118"
+  },
+  "wikipedia_governors_KY": {
+    "accessed_at": "2026-11-04T19:20:15+00:00",
+    "bytes": 160687,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/KY.html",
+    "revision_id": 1382272139,
+    "sha256": "983b95cbe30397dc54af0d5b85e32fa2232bab065aa51461ab98f11184ed6aef",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Kentucky&oldid=1382272139"
+  },
+  "wikipedia_governors_LA": {
+    "accessed_at": "2026-11-04T19:20:17+00:00",
+    "bytes": 161108,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/LA.html",
+    "revision_id": 1382342587,
+    "sha256": "91e65e27dafc75bdfbb360efe65af5dae8b4425ba19b17ef61b54fa80f9467dd",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Louisiana&oldid=1382342587"
+  },
+  "wikipedia_governors_MA": {
+    "accessed_at": "2026-11-04T19:21:16+00:00",
+    "bytes": 217106,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/MA.html",
+    "revision_id": 1383758603,
+    "sha256": "26965359e0b0bbbb003b2e68feb961b2145fb95ccf870b86093ac22465266243",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Massachusetts&oldid=1383758603"
+  },
+  "wikipedia_governors_MD": {
+    "accessed_at": "2026-11-04T19:20:21+00:00",
+    "bytes": 176724,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/MD.html",
+    "revision_id": 1383758572,
+    "sha256": "4cf97731cc1ee4aee219964f08bb57adb080483af8d2953f192ccbea6aa58eb0",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Maryland&oldid=1383758572"
+  },
+  "wikipedia_governors_ME": {
+    "accessed_at": "2026-11-04T19:20:19+00:00",
+    "bytes": 173547,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/ME.html",
+    "revision_id": 1383758533,
+    "sha256": "4a8bee5d7ccf1d41d102f223be280705fc4f2a67387a9558e21fd30bd7a68e01",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Maine&oldid=1383758533"
+  },
+  "wikipedia_governors_MI": {
+    "accessed_at": "2026-11-04T19:21:18+00:00",
+    "bytes": 139940,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/MI.html",
+    "revision_id": 1383758891,
+    "sha256": "83d0a4d512c53b914263c311fdbe45705924f3a9975d3eb0fdf778aa0f55cfd5",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Michigan&oldid=1383758891"
+  },
+  "wikipedia_governors_MN": {
+    "accessed_at": "2026-11-04T19:21:20+00:00",
+    "bytes": 251938,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/MN.html",
+    "revision_id": 1383690723,
+    "sha256": "5460680dba6d1a284952353d8804b425fa93b88da7a9ee9de8875fae83506145",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Minnesota&oldid=1383690723"
+  },
+  "wikipedia_governors_MO": {
+    "accessed_at": "2026-11-04T19:21:24+00:00",
+    "bytes": 153017,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/MO.html",
+    "revision_id": 1383694223,
+    "sha256": "7dcb4d8e4642886423a3711c14d513ac11101f6b7d23cd138781b58aeb7dfd88",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Missouri&oldid=1383694223"
+  },
+  "wikipedia_governors_MS": {
+    "accessed_at": "2026-11-04T19:21:22+00:00",
+    "bytes": 164720,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/MS.html",
+    "revision_id": 1383643622,
+    "sha256": "c847aede64837c4c3dc4bad4dbc6cd997636e6f36721de747baf60ffabb628f9",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Mississippi&oldid=1383643622"
+  },
+  "wikipedia_governors_MT": {
+    "accessed_at": "2026-11-04T19:21:26+00:00",
+    "bytes": 102234,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/MT.html",
+    "revision_id": 1383767109,
+    "sha256": "fe1463e5c3684ef91c8a15b2fc1c08dc19f617a2b0dfdbd1fee002dbf858ccb7",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Montana&oldid=1383767109"
+  },
+  "wikipedia_governors_NC": {
+    "accessed_at": "2026-11-04T19:22:13+00:00",
+    "bytes": 192398,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/NC.html",
+    "revision_id": 1382839935,
+    "sha256": "b3d71acda1a99d9f477a2a3fdc2922f6e595fdd3a1d5519ed0981b487740be3e",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_North_Carolina&oldid=1382839935"
+  },
+  "wikipedia_governors_ND": {
+    "accessed_at": "2026-11-04T19:22:15+00:00",
+    "bytes": 106402,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/ND.html",
+    "revision_id": 1379210006,
+    "sha256": "6cd7603d9a6018e16b1b70218bb3e275500668a9d7dc2219e1a4037b52a425c3",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_North_Dakota&oldid=1379210006"
+  },
+  "wikipedia_governors_NE": {
+    "accessed_at": "2026-11-04T19:21:28+00:00",
+    "bytes": 126186,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/NE.html",
+    "revision_id": 1383759144,
+    "sha256": "8909c1d8a1fdd93035ccd642bee83db1fb88d8382851f45a8adaf5568e7f6649",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Nebraska&oldid=1383759144"
+  },
+  "wikipedia_governors_NH": {
+    "accessed_at": "2026-11-04T19:21:33+00:00",
+    "bytes": 216630,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/NH.html",
+    "revision_id": 1383759811,
+    "sha256": "f70b081438eaeb17864898de2c3ab4d3b88c782e78ca5598bff2e98c9b160bf2",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_New_Hampshire&oldid=1383759811"
+  },
+  "wikipedia_governors_NJ": {
+    "accessed_at": "2026-11-04T19:21:35+00:00",
+    "bytes": 192804,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/NJ.html",
+    "revision_id": 1383211680,
+    "sha256": "bd67debd18be08734989a8d270018064480f66b3bbe75dd3efd8778f8124cc73",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_New_Jersey&oldid=1383211680"
+  },
+  "wikipedia_governors_NM": {
+    "accessed_at": "2026-11-04T19:22:08+00:00",
+    "bytes": 118709,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/NM.html",
+    "revision_id": 1383688216,
+    "sha256": "b06416a1f5b45e17890699b08269d722800e845cb7fd2d65483479cc4766de90",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_New_Mexico&oldid=1383688216"
+  },
+  "wikipedia_governors_NV": {
+    "accessed_at": "2026-11-04T19:21:30+00:00",
+    "bytes": 103993,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/NV.html",
+    "revision_id": 1383759529,
+    "sha256": "8dea73e619039671e67812baf02de0d8b876fb7b4f4833d8aadfa7a494c90ccd",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Nevada&oldid=1383759529"
+  },
+  "wikipedia_governors_NY": {
+    "accessed_at": "2026-11-04T19:22:11+00:00",
+    "bytes": 175364,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/NY.html",
+    "revision_id": 1383680509,
+    "sha256": "e66c90130b7bce328af8c6f52fd628fe2c3f02089874c31976fe5b04fb027549",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_New_York&oldid=1383680509"
+  },
+  "wikipedia_governors_OH": {
+    "accessed_at": "2026-11-04T19:22:17+00:00",
+    "bytes": 187756,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/OH.html",
+    "revision_id": 1383684517,
+    "sha256": "15b01f218528896789db382cb6bdb0da60d307f4d909d855dd3ed2f4190ad38c",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Ohio&oldid=1383684517"
+  },
+  "wikipedia_governors_OK": {
+    "accessed_at": "2026-11-04T19:22:19+00:00",
+    "bytes": 82884,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/OK.html",
+    "revision_id": 1383689748,
+    "sha256": "71db185e157bf28212a29f95bdcb20dd8e843a86e01f7bd874c11b3351096e47",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Oklahoma&oldid=1383689748"
+  },
+  "wikipedia_governors_OR": {
+    "accessed_at": "2026-11-04T19:22:21+00:00",
+    "bytes": 116437,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/OR.html",
+    "revision_id": 1383760212,
+    "sha256": "e7ee91061b102f12ddc8c65d1ffa5869e6e14d1ab5cab30d6c28e6b6aa882462",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Oregon&oldid=1383760212"
+  },
+  "wikipedia_governors_PA": {
+    "accessed_at": "2026-11-04T19:22:23+00:00",
+    "bytes": 143882,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/PA.html",
+    "revision_id": 1383760209,
+    "sha256": "c86cdec898ee9f8d3156027ea8c598e5746eae8c15ca41ee9636aabc4ee4e2bc",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Pennsylvania&oldid=1383760209"
+  },
+  "wikipedia_governors_RI": {
+    "accessed_at": "2026-11-04T19:22:26+00:00",
+    "bytes": 212100,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/RI.html",
+    "revision_id": 1383681228,
+    "sha256": "3df2e48939be78e4414aed6bd8e7f698367bbbf28ea6338712f8c56b609eb075",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Rhode_Island&oldid=1383681228"
+  },
+  "wikipedia_governors_SC": {
+    "accessed_at": "2026-11-04T19:22:28+00:00",
+    "bytes": 237607,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/SC.html",
+    "revision_id": 1383764523,
+    "sha256": "65e6cfd873330e2706049709110acf1e3c5552d21929d8f50bded850301d53c0",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_South_Carolina&oldid=1383764523"
+  },
+  "wikipedia_governors_SD": {
+    "accessed_at": "2026-11-04T19:23:01+00:00",
+    "bytes": 103258,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/SD.html",
+    "revision_id": 1383689967,
+    "sha256": "389049fe76ae6c68ec81d773de01f8f0624ea4368b7bdda8f16c02803dc26608",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_South_Dakota&oldid=1383689967"
+  },
+  "wikipedia_governors_TN": {
+    "accessed_at": "2026-11-04T19:23:03+00:00",
+    "bytes": 145755,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/TN.html",
+    "revision_id": 1383765388,
+    "sha256": "7b7c2cc92a4f43a952a0abe90e9039d26c12a51a7fe6a49e05da5c108f1ecf25",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Tennessee&oldid=1383765388"
+  },
+  "wikipedia_governors_TX": {
+    "accessed_at": "2026-11-04T19:23:05+00:00",
+    "bytes": 122699,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/TX.html",
+    "revision_id": 1383765486,
+    "sha256": "7d705dcd4777c232e5bbebf3b748cc84737ca856f47b5a7ab0b9118ab85e33d4",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Texas&oldid=1383765486"
+  },
+  "wikipedia_governors_UT": {
+    "accessed_at": "2026-11-04T19:23:08+00:00",
+    "bytes": 72451,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/UT.html",
+    "revision_id": 1375322026,
+    "sha256": "0a63729d19acb7baff021962cf6a28a217e3ad61834b5129d23f077ca096b393",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Utah&oldid=1375322026"
+  },
+  "wikipedia_governors_VA": {
+    "accessed_at": "2026-11-04T19:23:12+00:00",
+    "bytes": 214284,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/VA.html",
+    "revision_id": 1375266218,
+    "sha256": "d27d5ad5c97935a8654edd6ddd5fb67c11d242eaef9422b8e9689d1946de8de0",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Virginia&oldid=1375266218"
+  },
+  "wikipedia_governors_VT": {
+    "accessed_at": "2026-11-04T19:23:10+00:00",
+    "bytes": 230644,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/VT.html",
+    "revision_id": 1383690292,
+    "sha256": "f1ed18910bca27bb6db1ca9e96eb3349258b2c83de076287cdc4cac5e8cd25b3",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Vermont&oldid=1383690292"
+  },
+  "wikipedia_governors_WA": {
+    "accessed_at": "2026-11-04T19:23:14+00:00",
+    "bytes": 102671,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/WA.html",
+    "revision_id": 1375310892,
+    "sha256": "a18b9d1915ce8eee5a55df54a443b2a5134ce81ea1b19e3c3a7eb7d97788046a",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Washington&oldid=1375310892"
+  },
+  "wikipedia_governors_WI": {
+    "accessed_at": "2026-11-04T19:23:18+00:00",
+    "bytes": 135204,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/WI.html",
+    "revision_id": 1383765640,
+    "sha256": "bdca58f12debd62b2c9ba0a2fb0dbf8f32e95c424dbe1ccabe0fe930d242e2c1",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Wisconsin&oldid=1383765640"
+  },
+  "wikipedia_governors_WV": {
+    "accessed_at": "2026-11-04T19:23:16+00:00",
+    "bytes": 86611,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/WV.html",
+    "revision_id": 1375089589,
+    "sha256": "5f1160d33c1384c883303440fec6c6f795e4c165dee20d96e0cba40db4735d00",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_West_Virginia&oldid=1375089589"
+  },
+  "wikipedia_governors_WY": {
+    "accessed_at": "2026-11-04T19:23:20+00:00",
+    "bytes": 112213,
+    "note": "wikitable elements only, from the rendered page",
+    "path": "data/raw/wikipedia_governors/WY.html",
+    "revision_id": 1383681693,
+    "sha256": "e82d17f746887c8390c7fdf44995275aa37e66eb79a945733057507f3609d738",
+    "url": "https://en.wikipedia.org/w/index.php?title=List_of_governors_of_Wyoming&oldid=1383681693"
   }
 }

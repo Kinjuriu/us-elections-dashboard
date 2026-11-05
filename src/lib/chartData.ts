@@ -211,11 +211,11 @@ export function loadMidtermChart(): MidtermChart {
   const headline = (xs: MidtermBar[], word: string): string => {
     const d = done(xs);
     const lost = d.filter((b) => b.change! < 0).length;
-    return `The president's party lost ${word} seats in ${lost} of the ${d.length} midterms from ${d[0].year} to ${d[d.length - 1].year}`;
+    return `The party holding the White House lost ${word} seats in ${lost} of the ${d.length} midterms from ${d[0].year} to ${d[d.length - 1].year}`;
   };
   const hd = done(house);
   const medianHouse = median(hd.map((b) => b.change!));
-  const medianSentence = `Across the ${hd.length} midterms from ${hd[0].year} to ${hd[hd.length - 1].year}, the median change for the president's party in the House was ${signed(medianHouse)} seats.`;
+  const medianSentence = `Across the ${hd.length} midterms from ${hd[0].year} to ${hd[hd.length - 1].year}, the median change in the House for the party holding the White House was ${signed(medianHouse)} seats.`;
   return {
     house, senate,
     years: house.map((b) => b.year),

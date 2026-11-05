@@ -1,6 +1,6 @@
 // Chart 3: the flips table follows the shared year; a click on a cycle
-// sets the year; a click on a state opens its record beside the map.
-import { store, openState } from './dashboard';
+// sets the year; a state name links to its record on the Congress map.
+import { store } from './dashboard';
 import { flipsTableHtml, flipsSentence, type FlipSort } from '../lib/flipsText';
 import type { FlipRow } from '../lib/chartData';
 import type { DashState } from '../lib/store';
@@ -20,7 +20,7 @@ function init(root: HTMLElement) {
     const rows = data.rows.filter((r) => r.year === s.year);
     yearEl.textContent = String(s.year);
     sentence.textContent = flipsSentence(rows, s.year, data.decided[s.year] ?? 0);
-    table.innerHTML = flipsTableHtml(rows, sort);
+    table.innerHTML = flipsTableHtml(rows, sort, root.dataset.base!);
     root.dataset.year = String(s.year);
     for (const b of root.querySelectorAll<HTMLButtonElement>('.fl__cycle')) {
       b.setAttribute('aria-pressed', String(Number(b.dataset.year) === s.year));
@@ -31,8 +31,6 @@ function init(root: HTMLElement) {
     const t = e.target as Element;
     const cycle = t.closest<HTMLElement>('.fl__cycle');
     if (cycle) { store.set({ year: Number(cycle.dataset.year) }); return; }
-    const st = t.closest<HTMLElement>('.fl__state');
-    if (st) { openState(st.dataset.state!, st, true); return; }
     if (t.closest('[data-sort]')) {
       sort = sort === 'margin-asc' ? 'margin-desc' : 'margin-asc';
       draw(store.get());

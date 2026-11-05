@@ -1,0 +1,90 @@
+---
+// A pictogram of women's share of Congress: one row per Congress, 100 figures
+// per row, one figure for each 1% of members. Women are a figure with a skirt
+// in ink, men a figure with trousers in rule grey, so the shape carries the
+// meaning as well as the colour. The figures are drawn for this site (an
+// exception in DESIGN_RULES.md section 2). This is not party data, so no party
+// colours. The percentage is written at the end of each row. A row is two
+// lines of 50 figures so the figures stay large enough to read.
+import type { WomenChart } from '../lib/women';
+
+interface Props { chart: WomenChart }
+const { chart } = Astro.props;
+const figures = (n: number, cols: number, rows: number) =>
+  Array.from({ length: cols * rows }, (_, i) => ({
+    x: (i % cols) * 10, y: Math.floor(i / cols) * 24, woman: i < n,
+  }));
+const plural = (n: number, w: string) => `${n} ${w}`;
+---
+<svg class="women__defs" width="0" height="0" aria-hidden="true" focusable="false">
+  <defs>
+    <symbol id="fig-woman" viewBox="0 0 10 22">
+      <circle cx="5" cy="3" r="2.7" />
+      <path d="M3 6.6h4l2.6 11.2H0.4z" />
+      <rect x="3.4" y="17.8" width="1.3" height="4.2" />
+      <rect x="5.3" y="17.8" width="1.3" height="4.2" />
+    </symbol>
+    <symbol id="fig-man" viewBox="0 0 10 22">
+      <circle cx="5" cy="3" r="2.7" />
+      <rect x="2" y="6.6" width="6" height="7.6" />
+      <rect x="2.4" y="13.6" width="2.4" height="8.4" />
+      <rect x="5.2" y="13.6" width="2.4" height="8.4" />
+    </symbol>
+  </defs>
+</svg>
+
+<div class="women">
+  <p class="women__legend" aria-hidden="true">
+    <span class="women__key"><svg viewBox="0 0 10 22" class="women__lf women__lf--unit"><use href="#fig-man" /></svg> = 1%</span>
+    <span class="women__key"><svg viewBox="0 0 10 22" class="women__lf women__lf--man"><use href="#fig-man" /></svg> Men</span>
+    <span class="women__key"><svg viewBox="0 0 10 22" class="women__lf women__lf--woman"><use href="#fig-woman" /></svg> Women</span>
+  </p>
+  <ol class="women__rows">
+    {chart.rows.map((r) => {
+      const tip = `${r.startYear}: ${plural(r.women, 'women')} and ${plural(r.men, 'men')}. Women by party: ${r.womenDem} Democrats, ${r.womenGop} Republicans${r.womenOther ? `, ${r.womenOther} other` : ''}.`;
+      return (
+        <li class="women__row" title={tip} aria-label={`${tip} Share of members: ${r.pct}%.`}>
+          <span class="women__year">{r.startYear}</span>
+          <svg class="women__fig" viewBox="0 0 500 46" aria-hidden="true">
+            {figures(r.squares, 50, 2).map((f) => (
+              <use href={f.woman ? '#fig-woman' : '#fig-man'} x={f.x} y={f.y} width="10" height="22" class={f.woman ? 'on' : ''} />
+            ))}
+          </svg>
+          <span class="women__pct">{r.pct}%</span>
+        </li>
+      );
+    })}
+  </ol>
+</div>
+
+<style>
+  .women__defs { position: absolute; }
+  .women__legend {
+    display: flex; flex-wrap: wrap; gap: var(--sp-4);
+    margin: 0 0 var(--sp-3);
+    font-family: var(--font-label); font-size: var(--fs-1); font-weight: 600;
+  }
+  .women__key { display: inline-flex; align-items: center; gap: var(--sp-1); }
+  .women__lf { width: 10px; height: 22px; display: block; }
+  .women__lf--unit { fill: var(--ink-3); }
+  .women__lf--man { fill: var(--rule); }
+  .women__lf--woman { fill: var(--ink); }
+  .women__rows { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--sp-3); }
+  .women__row {
+    display: grid;
+    grid-template-columns: 3.2rem minmax(0, 1fr) 3.6rem;
+    max-width: 640px;
+    align-items: center;
+    gap: var(--sp-2);
+    font-family: var(--font-label);
+    font-variant-numeric: tabular-nums lining-nums;
+  }
+  .women__year { font-weight: 600; font-size: var(--fs-1); }
+  .women__pct { font-weight: 700; font-size: var(--fs-2); text-align: right; }
+  .women__fig { width: 100%; height: auto; display: block; fill: var(--rule); }
+  .women__fig use.on { fill: var(--ink); }
+  @media (max-width: 520px) {
+    .women__row { grid-template-columns: 1fr auto; row-gap: var(--sp-1); }
+    .women__fig { grid-column: 1 / -1; grid-row: 2; }
+  }
+</style>

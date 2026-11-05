@@ -1,0 +1,169 @@
+---
+// Notes and sources: how to read the railway, cards and charts, what counts as
+// a flip, what is provisional, and every source with its licence and date.
+import Base from '../layouts/Base.astro';
+import Footnote from '../components/Footnote.astro';
+import Masthead from '../components/Masthead.astro';
+import Footer from '../components/Footer.astro';
+import PageTitle from '../components/PageTitle.astro';
+import { loadYearControl, CONTROL_AS_OF } from '../lib/pageData';
+import { compiledContent as sourcesHtml } from '../../data/SOURCES.md';
+import { loadChamberControl, loadMidtermSwing, loadSenateRaces, latestElection } from '../lib/data';
+import { ordinal } from '../lib/mapText';
+
+const control = loadChamberControl();
+const swing = loadMidtermSwing();
+const { mapData, controlChart } = loadYearControl();
+const ccLast = controlChart.congresses[controlChart.congresses.length - 1];
+const mapLatestYear = Math.max(...mapData.years);
+const mapLatestHasResults = mapData.senate[mapLatestYear].decided > 0;
+const swingHasProvisional = swing.some((s) => s.isProvisional);
+const pendingYear = (() => {
+  const { newest, withCounts } = latestElection(control, 'house');
+  return withCounts && newest.electionYear !== withCounts.electionYear ? newest.electionYear : null;
+})();
+const listNames = (xs: string[]) =>
+  xs.length <= 1 ? xs.join('') : `${xs.slice(0, -1).join(', ')} and ${xs[xs.length - 1]}`;
+const races = loadSenateRaces();
+const oddSpecials = races
+  .filter((r) => r.year % 2 === 1)
+  .map((r) => `${mapData.stateNames[r.state]} in ${r.year}`);
+
+// SOURCES.md, with its own h1 dropped and headings shifted down.
+const sources = (await sourcesHtml())
+  .replace(/<h1[^>]*>[\s\S]*?<\/h1>/, '')
+  .replace(/<(\/?)h3/g, '<$1h4')
+  .replace(/<(\/?)h2/g, '<$1h3')
+  // The independents table is shown on the Senate page instead.
+  .replace(/<p>Races involving independents[\s\S]*?<\/table>/, '');
+---
+<Base
+  title="Notes and sources: US Congress, 1946 to 2026"
+  description="How to read the railway, cards, maps and charts, and every data source with its licence and the date it was accessed."
+>
+  <Masthead current="sources" />
+
+  <main id="main" class="wrap npage">
+    <PageTitle title="Notes and sources" sub="How to read the dashboard, and where every number comes from" />
+
+    <section class="npage__notes" aria-labelledby="notes-h">
+      <h2 class="npage__h2" id="notes-h">Notes</h2>
+      <div class="npage__list">
+        <Footnote>
+          The railway shows one station for each election from 2000. The top half of a station and the top rail are
+          the House, the bottom half and the bottom rail are the Senate, each coloured by the party with the majority
+          for most of the Congress elected that year, with independents counted with the party they caucus with.
+          Years before 2000 are a faded track that cannot be selected, because the map starts in 2000. The charts
+          cover the whole period. A dashed outline marks a result that is not final. When the railway scrolls out of
+          view, a compact year bar takes its place at the top of the window.
+        </Footnote>
+        <Footnote>
+          The cards under the map show seats at the opening of the Congress elected in the year selected. The
+          Senate has one square per seat, with a mark at 51 seats, a majority; a 50-50 Senate is controlled by the vice
+          president's party. The House blocks are drawn to scale, with a dotted line at 218 seats, the
+          majority. "Since" figures compare with the election before, or with the comparison year when one is set.
+          Pick a party on a card to outline it. The House squares on the map show seats won in the November election, from the state
+          returns, one per seat, grouped by party within each state rather than by district.
+        </Footnote>
+        <Footnote>
+          A Senate seat counts as flipped when it passes from one party's caucus to the other's, compared with whoever
+          held it on election day. Independents count with the party they caucus with. A seat whose party label changed
+          but which stayed with the same caucus (for example an independent who caucused with the Democrats replaced by
+          a Democrat) is listed with a note and not counted as a flip.
+        </Footnote>
+        <Footnote>
+          The governors map shows the governors in office on 1 February of the year after each election, once every
+          January inauguration has happened. The party is the one on the governor's Wikipedia entry, with switches of
+          party from the footnotes on those pages.
+        </Footnote>
+        <Footnote>
+          The small state outlines next to state names are each scaled to fill their own square, so states are not to
+          scale with each other. They are decoration; the name beside each one carries the meaning. The party marks (a
+          small square with D, R or I) stand in for party logos, which are trademarks.
+        </Footnote>
+        {oddSpecials.length > 0 && (
+          <Footnote>
+            Special elections held in odd years ({listNames(oddSpecials)}) have their own Senate maps, chosen from the
+            year control. They are not in the House view, which has no odd-year elections.
+          </Footnote>
+        )}
+        <Footnote>
+          Winners' names are title-cased from the source for display, with hand-checked exceptions such as McConnell and
+          DeWine. The data keeps the source's spelling.
+        </Footnote>
+        {controlChart.notes.map((n) => (
+          <Footnote marker={String(n.no)}>
+            Majority shown is the party in control for most of the Congress. {n.text}
+          </Footnote>
+        ))}
+        <Footnote>
+          In the history chart the bars are drawn to scale rather than as one square per seat, which would be too small
+          to see at this size. The line under the chart gives the exact counts for the Congress you point at or select.
+        </Footnote>
+        <Footnote>
+          The House source records only the opening of each Congress, so House "before" counts in the midterm chart are
+          from the start of the outgoing Congress, not election day. Some House changes therefore differ by a seat or two
+          from the figures usually quoted, which count from election day. Senate "before" counts are from election day;
+          "after" counts are from the opening of the new Congress.
+        </Footnote>
+        {(pendingYear || swingHasProvisional) && (
+          <Footnote>
+            {pendingYear ?? 2026} is provisional until results are certified. Results are entered as states certify, and
+            every {pendingYear ?? 2026} figure is marked until then.{' '}
+            {!mapLatestHasResults && `States with a ${mapLatestYear} Senate race are dotted on the map, and the House squares are outlined, until results are entered from official sources.`}
+            {pendingYear && ` The ${ordinal(ccLast.congress)} Congress, elected in ${pendingYear}, is shown in grey in the history chart, and the cards show the last Congress with counts.`}
+          </Footnote>
+        )}
+      </div>
+    </section>
+
+    <section class="npage__sources" aria-labelledby="sources-h">
+      <h2 class="npage__h2" id="sources-h">Sources</h2>
+      <div class="sources" set:html={sources} />
+    </section>
+  </main>
+
+  <Footer asOf={CONTROL_AS_OF()} />
+</Base>
+
+<style>
+  .npage { padding-top: var(--sp-4); }
+  @media (min-width: 768px) { .npage { padding-top: var(--sp-5); } }
+  .npage__notes, .npage__sources { margin-top: var(--sp-6); border-top: 1px solid var(--ink); padding-top: var(--sp-3); }
+  .npage__h2 { font-size: var(--fs-5); }
+  .npage__list { margin-top: var(--sp-3); display: grid; gap: var(--sp-3); }
+
+  .sources { max-width: var(--prose-max); font-size: var(--fs-2); }
+  .sources :global(h3) { margin-top: var(--sp-7); font-size: var(--fs-4); }
+  .sources :global(h4) { margin-top: var(--sp-5); font-family: var(--font-label); font-size: var(--fs-2); font-weight: 600; }
+  .sources :global(p),
+  .sources :global(ul),
+  .sources :global(ol),
+  .sources :global(table) { margin-top: var(--sp-3); }
+  .sources :global(ul),
+  .sources :global(ol) { padding-left: var(--sp-5); }
+  .sources :global(li + li) { margin-top: var(--sp-1); }
+  .sources :global(a) { overflow-wrap: anywhere; }
+  .sources :global(code) { font-size: 0.9em; overflow-wrap: anywhere; }
+  .sources :global(.table-wrap),
+  .sources :global(table) {
+    display: block;
+    overflow-x: auto;
+    border-collapse: collapse;
+    font-size: var(--fs-1);
+  }
+  .sources :global(th) {
+    text-align: left;
+    font-family: var(--font-label);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border-bottom: 1px solid var(--ink);
+    padding: var(--sp-1) var(--sp-3) var(--sp-1) 0;
+    vertical-align: bottom;
+  }
+  .sources :global(td) {
+    border-bottom: var(--hairline);
+    padding: var(--sp-2) var(--sp-3) var(--sp-2) 0;
+    vertical-align: top;
+  }
+</style>

@@ -1,7 +1,7 @@
 // Build-time data for the dashboard layer: the store's configuration and,
 // for every year the year control offers, the Congress the header seat bars
 // show. Read from data/processed/chamber_control.csv and independents.csv.
-import { loadChamberControl, loadIndependents, hasCounts, PARTY_NAME, type ChamberControl, type Party } from './data';
+import { loadChamberControl, loadIndependents, loadSenateControlDay, hasCounts, PARTY_NAME, type ChamberControl, type Party, type SenateControlDay } from './data';
 import { balanceFrom, defaultYear, type Balance, type MapData } from './mapData';
 import { ordinal } from './mapText';
 import type { StoreConfig } from './store';
@@ -15,7 +15,11 @@ export interface HeaderChamber {
   /** "116th Congress, elected 2018" */
   caption: string;
   majorityNote: string;
+  /** The party that held the majority for most of the Congress, which can differ from the opening-day count. */
+  controller: Party | null;
   unverifiedInd: boolean;
+  /** The Senate count on the day control was settled, when that is not opening day. */
+  controlDay: SenateControlDay | null;
 }
 
 export interface HeaderYear {
@@ -31,6 +35,8 @@ export interface HeaderYear {
   subtitle: string;
   house: HeaderChamber;
   senate: HeaderChamber;
+  /** The election before the one shown, for "change since" on the cards. Null when it has no counts. */
+  before: { year: number; house: Balance; senate: Balance } | null;
 }
 
 const majorityOf = (r: ChamberControl) => r.majorityMostOfCongress ?? r.majorityParty;
@@ -45,6 +51,7 @@ export function headerTitle(houseMaj: Party | null, senateMaj: Party | null, yea
 export function loadHeaderYears(map: MapData): Record<number, HeaderYear> {
   const control = loadChamberControl();
   const inds = loadIndependents();
+  const controlDays = loadSenateControlDay();
   const latestWithCounts = Math.max(...control.filter(hasCounts).map((r) => r.electionYear));
   const row = (chamber: 'house' | 'senate', y: number) =>
     control.find((r) => r.chamber === chamber && r.electionYear === y);
@@ -64,6 +71,12 @@ export function loadHeaderYears(map: MapData): Record<number, HeaderYear> {
       note = `${year} results are not yet entered, so these bars show the Congress elected in ${shownYear}. They will switch to the ${year} results, labelled provisional, once those are entered.`;
     }
 
+    const prevH = row('house', shownYear - 2);
+    const prevS = row('senate', shownYear - 2);
+    const before = prevH && prevS && hasCounts(prevH) && hasCounts(prevS)
+      ? { year: shownYear - 2, house: balanceFrom(prevH, inds, 'house'), senate: balanceFrom(prevS, inds, 'senate') }
+      : null;
+
     const chamber = (r: ChamberControl, c: 'house' | 'senate'): HeaderChamber => ({
       balance: balanceFrom(r, inds, c),
       total: r.totalSeats,
@@ -71,7 +84,9 @@ export function loadHeaderYears(map: MapData): Record<number, HeaderYear> {
       provisional: r.isProvisional,
       caption: `${ordinal(r.congress)} Congress, elected ${r.electionYear}`,
       majorityNote: r.majorityNote,
+      controller: majorityOf(r),
       unverifiedInd: inds.some((i) => i.chamber === c && i.congress === r.congress && !i.verified),
+      controlDay: c === 'senate' ? controlDays.find((d) => d.congress === r.congress) ?? null : null,
     });
 
     out[year] = {
@@ -84,18 +99,27 @@ export function loadHeaderYears(map: MapData): Record<number, HeaderYear> {
       subtitle: `Seats held at the opening of the ${ordinal(h.congress)} Congress, which sits from ${h.yearsServed.replace('-', ' to ')}. One square per seat.`,
       house: chamber(h, 'house'),
       senate: chamber(s, 'senate'),
+      before,
     };
   }
   return out;
 }
 
-export function storeConfig(map: MapData): StoreConfig {
+/** Even years with no results entered, mapped to the election whose Congress the cards show instead. */
+export function noDataYears(years: Record<number, HeaderYear>): Record<number, number> {
+  const out: Record<number, number> = {};
+  for (const h of Object.values(years)) if (h.year % 2 === 0 && h.year !== h.shownYear) out[h.year] = h.shownYear;
+  return out;
+}
+
+export function storeConfig(map: MapData, years?: Record<number, HeaderYear>): StoreConfig {
   return {
     years: map.years,
     senateOnlyYears: map.senateOnlyYears,
     states: Object.keys(map.stateNames).sort(),
     defaultYear: defaultYear(map),
     defaultChamber: 'senate',
+    ...(years ? { shownYears: noDataYears(years) } : {}),
   };
 }
 

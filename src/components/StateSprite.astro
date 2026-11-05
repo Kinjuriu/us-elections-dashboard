@@ -1,0 +1,12 @@
+---
+// Every state outline once, as symbols, for pages where script draws state
+// shapes after load (the governor card, the flips table). Build-time
+// StateShape.astro is used wherever the markup is known at build time.
+import { stateShapes } from '../lib/stateShapes';
+const shapes = Object.entries(stateShapes());
+---
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  {shapes.map(([st, s]) => (
+    <symbol id={`st-${st}`} viewBox={s.viewBox}><path d={s.d} /></symbol>
+  ))}
+</svg>

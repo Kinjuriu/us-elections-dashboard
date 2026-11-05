@@ -33,6 +33,8 @@ Never use any of the following:
 - Placeholder copy ("Lorem ipsum", "Insights at a glance", "Unlock the power of...")
 - Em dashes in copy; "not X, but Y" sentence constructions
 
+Exception: the women-in-Congress pictogram uses two person figures drawn for this site; no icon sets.
+
 ## 3. Typography
 
 The Financial Times uses **Financier Display** (headlines) and **Metric** (sans), both from Klim Type Foundry. They are commercial fonts; we must not self-host or hotlink them without a paid web licence. We use open fonts with the same character, and keep font names in CSS variables so a licensed font can be dropped in later.
@@ -94,7 +96,7 @@ Rules:
 
 - Title (Source Serif 4) + subtitle (Barlow) + chart + source line + date. Always all five.
 - Direct labels beat legends; if a legend is needed, it sits above the chart, inline, small.
-- Gridlines: horizontal only, 1px `--rule`. Axis lines only where they mean zero or a threshold (e.g. 218 seats, 50 senators).
+- Gridlines: horizontal only, 1px `--rule`. Axis lines only where they mean zero or a threshold (e.g. 218 seats, 51 senators).
 - Majority thresholds are marked with a small triangle and a number, like AP's 218 marker.
 - Seats are drawn as squares (one square per seat or per N seats, stated in the subtitle).
 - Tooltips: plain rectangle, 1px border, no shadow beyond `0 1px 2px rgba(0,0,0,.08)`, appear instantly.

@@ -1,0 +1,123 @@
+---
+// The compact year bar. When the full railway scrolls out of view, this bar
+// takes its place at the top of the window, so the year can still be changed
+// while looking at the map, the cards or a chart further down. Previous and
+// next buttons, the year, and (from 900px) a miniature railway: stations only,
+// in the same split colours, the selected one outlined, click or drag to pick.
+// Only one of the bar and the full railway is ever on screen:
+// src/scripts/year-bar.ts shows the bar with an IntersectionObserver on the
+// full railway. Hidden, it is out of the tab order.
+import { railway, stationLabel, type RailColumn } from '../lib/railway';
+
+interface Props {
+  columns: RailColumn[];
+  year: number;
+}
+const { columns, year } = Astro.props;
+const rw = railway(columns);
+const checked = year % 2 === 0 ? year : year - 1;
+---
+<div class="ybar" data-ybar hidden>
+  <div class="wrap ybar__inner">
+    <button type="button" class="ybar__btn" data-ystep="-1" aria-label="Previous year">&lsaquo;</button>
+    <output class="ybar__year" data-ybar-year aria-label="Selected year">{year}</output>
+    <button type="button" class="ybar__btn" data-ystep="1" aria-label="Next year">&rsaquo;</button>
+    <div class="ybar__rail" data-ybar-rail aria-hidden="true">
+      {rw.stations.map((s) => (
+        <span
+          class:list={['ybar__st', { 'ybar__st--prov': s.provisional }]}
+          data-year={String(s.year)}
+          data-selected={s.year === checked ? 'true' : undefined}
+          title={stationLabel(s)}
+        >
+          <span class="ybar__half" data-fill={s.house}></span>
+          <span class="ybar__half" data-fill={s.senate}></span>
+        </span>
+      ))}
+    </div>
+  </div>
+</div>
+
+<style>
+  .ybar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    height: 48px;
+    background: var(--paper);
+    border-bottom: 1px solid var(--ink);
+  }
+  .ybar[hidden] { display: none; }
+  .ybar__inner {
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: var(--sp-2);
+  }
+  .ybar__btn {
+    appearance: none;
+    flex: none;
+    width: 36px;
+    height: 36px;
+    padding: 0 0 3px;
+    border: 1px solid var(--ink);
+    border-radius: var(--radius-control);
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-label);
+    font-size: var(--fs-5);
+    line-height: 1;
+    cursor: pointer;
+  }
+  .ybar__btn:hover:not(:disabled) { background: var(--paper-2); }
+  .ybar__btn:disabled { color: var(--ink-3); border-color: var(--rule); cursor: default; }
+  .ybar__year {
+    flex: none;
+    min-width: 3.4ch;
+    white-space: nowrap;
+    text-align: center;
+    font-family: var(--font-label);
+    font-weight: 600;
+    font-size: var(--fs-4);
+    font-variant-numeric: tabular-nums lining-nums;
+    line-height: 1;
+  }
+  .ybar__rail { display: none; }
+
+  @media (min-width: 900px) {
+    .ybar__inner { gap: var(--sp-3); }
+    .ybar__rail {
+      flex: 1 1 auto;
+      min-width: 0;
+      height: 36px;
+      margin-left: var(--sp-3);
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      touch-action: pan-y;
+      user-select: none;
+    }
+    .ybar__st {
+      position: relative;
+      flex: 1 1 0;
+      max-width: 28px;
+      height: 22px;
+      display: flex;
+      flex-direction: column;
+      border-radius: 4px;
+      pointer-events: none;
+    }
+    .ybar__half { flex: 1 1 0; background: var(--no-race); }
+    .ybar__half:first-child { border-radius: 4px 4px 0 0; }
+    .ybar__half:last-child { border-radius: 0 0 4px 4px; }
+    .ybar__half[data-fill='dem'] { background: var(--dem); }
+    .ybar__half[data-fill='gop'] { background: var(--gop); }
+    .ybar__half[data-fill='ind'] { background: var(--ind); }
+    .ybar__st--prov .ybar__half[data-fill='none'] { background: var(--paper); }
+    .ybar__st--prov { outline: 1.5px dashed var(--ink-2); outline-offset: -1.5px; }
+    .ybar__st[data-selected] { outline: 2px solid var(--ink); outline-offset: 1px; }
+  }
+</style>

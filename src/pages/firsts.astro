@@ -1,0 +1,129 @@
+---
+// Firsts of 2026: one card per first a reliable source states, a filter by
+// office, and a table of all of them. No photos of people.
+import Base from '../layouts/Base.astro';
+import Masthead from '../components/Masthead.astro';
+import Footer from '../components/Footer.astro';
+import PageTitle from '../components/PageTitle.astro';
+import PartyMark from '../components/PartyMark.astro';
+import StateShape from '../components/StateShape.astro';
+import StateSprite from '../components/StateSprite.astro';
+import { loadFirsts, howTheyDid, headline, GROUPS } from '../lib/firsts';
+import { loadYearControl, CONTROL_AS_OF } from '../lib/pageData';
+import { markParty } from '../lib/partyMark';
+
+const { mapData } = loadYearControl();
+const firsts = loadFirsts();
+const colour = (p: string) => (markParty(p) === 'D' ? 'var(--dem)' : markParty(p) === 'R' ? 'var(--gop)' : markParty(p) === 'I' ? 'var(--ind)' : 'var(--ink-3)');
+const longDate = (iso: string) => new Date(`${iso}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const stateName = (po: string) => mapData.stateNames[po] ?? po;
+---
+<Base
+  title="Firsts of 2026: the milestones in this year's elections"
+  description="Historic firsts in the 2026 elections for governor, Senate, House and other statewide offices, each with the source that states it."
+>
+  <Masthead current="firsts" />
+  <StateSprite />
+  <main id="main" class="wrap fpage">
+    <PageTitle
+      title={headline(firsts.length)}
+      sub="Milestones in the 2026 elections for governor, the Senate, the House and other statewide offices"
+      note="A first is counted only when a reliable source states it: the Center for American Women and Politics, the House Office of the Historian, the Senate Historical Office, the National Governors Association, a state's official page, or a major news organisation. Results are provisional until states certify them."
+    />
+
+    <div class="fpage__filters" role="group" aria-label="Filter by office">
+      {GROUPS.map((g) => (
+        <button type="button" class="fpage__btn" data-group={g.id} aria-pressed={g.id === 'all' ? 'true' : 'false'}>{g.label}</button>
+      ))}
+    </div>
+
+    <p class="fpage__empty" data-empty hidden={firsts.length > 0}>
+      {firsts.length === 0
+        ? 'No firsts are listed yet. Results from the 3 November 2026 elections are not yet entered, and a first is added only once a reliable source has confirmed both the result and the first.'
+        : 'No firsts for this office.'}
+    </p>
+
+    <ul class="fpage__cards">
+      {firsts.map((f) => (
+        <li class="fcard" data-group={f.group}>
+          <span class="fcard__shape" style={`color:${colour(f.party)}`}><StateShape state={f.state} size={64} /></span>
+          <div class="fcard__body">
+            <p class="label fcard__office">{f.office}, {stateName(f.state)}</p>
+            <h2 class="fcard__name">{f.person} <PartyMark party={f.party} /></h2>
+            <p class="fcard__first">{f.first}</p>
+            <p class="fcard__how"><span class="label">How they did</span> {howTheyDid(f)}{f.provisional && <span class="fcard__tag">Provisional</span>}</p>
+            {f.articleUrl && <p>Read the story: <a href={f.articleUrl} rel="noopener">{f.articleTitle}</a>, {f.articlePublisher}, {longDate(f.articleDate)}</p>}
+            <p class="fcard__src">Source: <a href={f.sourceUrl} rel="noopener">{f.sourcePublisher}</a></p>
+          </div>
+        </li>
+      ))}
+    </ul>
+
+    <section aria-labelledby="ftable-h" class="fpage__table">
+      <h2 id="ftable-h">All firsts in a table</h2>
+      <table>
+        <thead><tr><th>Office</th><th>State</th><th>Winner</th><th>Party</th><th>First</th><th>Source</th></tr></thead>
+        <tbody>
+          {firsts.length === 0 && <tr><td colspan="6">None entered yet.</td></tr>}
+          {firsts.map((f) => (
+            <tr data-group={f.group}>
+              <td>{f.office}</td><td>{stateName(f.state)}</td><td>{f.person}</td><td>{f.party}</td><td>{f.first}</td>
+              <td><a href={f.sourceUrl} rel="noopener">{f.sourcePublisher}</a></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </section>
+  </main>
+  <Footer asOf={CONTROL_AS_OF()} />
+</Base>
+
+<script>
+  const btns = [...document.querySelectorAll<HTMLButtonElement>('.fpage__btn')];
+  const items = [...document.querySelectorAll<HTMLElement>('.fcard, .fpage__table tbody tr[data-group]')];
+  const empty = document.querySelector<HTMLElement>('[data-empty]')!;
+  const total = document.querySelectorAll('.fcard').length;
+  for (const b of btns) {
+    b.addEventListener('click', () => {
+      const g = b.dataset.group!;
+      for (const o of btns) o.setAttribute('aria-pressed', String(o === b));
+      let shown = 0;
+      for (const el of items) {
+        const on = g === 'all' || el.dataset.group === g;
+        el.hidden = !on;
+        if (on && el.classList.contains('fcard')) shown++;
+      }
+      if (total) empty.hidden = shown > 0;
+    });
+  }
+</script>
+
+<style>
+  .fpage { padding-top: var(--sp-4); }
+  @media (min-width: 768px) { .fpage { padding-top: var(--sp-5); } }
+  .fpage__filters { display: flex; flex-wrap: wrap; gap: var(--sp-2); margin-top: var(--sp-5); }
+  .fpage__btn {
+    appearance: none; min-height: 36px; padding: 4px var(--sp-3);
+    border: 1px solid var(--ink-3); border-radius: var(--radius-control);
+    background: var(--paper); color: var(--ink); cursor: pointer;
+    font-family: var(--font-label); font-weight: 600; font-size: var(--fs-1);
+  }
+  .fpage__btn:hover { border-color: var(--ink); background: var(--paper-2); }
+  .fpage__btn[aria-pressed='true'] { border-color: var(--ink); box-shadow: inset 0 0 0 1px var(--ink); }
+  .fpage__btn:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .fpage__empty { margin-top: var(--sp-5); max-width: var(--prose-max); color: var(--ink-2); }
+  .fpage__cards { list-style: none; margin: var(--sp-5) 0 0; padding: 0; display: grid; gap: var(--sp-5); }
+  @media (min-width: 900px) { .fpage__cards { grid-template-columns: 1fr 1fr; } }
+  .fcard { display: flex; gap: var(--sp-4); padding: var(--sp-4); border: 1px solid var(--rule); border-top: 1px solid var(--ink); }
+  .fcard[hidden] { display: none; }
+  .fcard__shape { flex: none; }
+  .fcard__body { display: grid; gap: var(--sp-2); min-width: 0; }
+  .fcard__name { font-size: var(--fs-5); display: flex; align-items: center; gap: var(--sp-2); }
+  .fcard__first { font-size: var(--fs-3); }
+  .fcard__how, .fcard__src { font-size: var(--fs-2); }
+  .fcard__tag { margin-left: var(--sp-2); padding: 0 var(--sp-1); border: 1px solid var(--ink-3); font-family: var(--font-label); font-size: var(--fs-1); }
+  .fpage__table { margin-top: var(--sp-8); border-top: 1px solid var(--ink); padding-top: var(--sp-3); overflow-x: auto; }
+  .fpage__table table { margin-top: var(--sp-3); border-collapse: collapse; width: 100%; font-size: var(--fs-2); }
+  .fpage__table th, .fpage__table td { text-align: left; padding: var(--sp-2); border-bottom: 1px solid var(--rule); vertical-align: top; }
+  .fpage__table tr[hidden] { display: none; }
+</style>

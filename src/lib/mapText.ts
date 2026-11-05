@@ -282,18 +282,38 @@ function senateHolders(data: RecordData, year: number): Record<string, Record<nu
   return out;
 }
 
-/** States where a Senate seat is held by a different caucus in the two years. */
-export function senateChanged(data: RecordData, a: number, b: number): Set<string> {
+/** One Senate seat held by a different caucus in the later year than in the earlier one. */
+export interface SeatChange {
+  state: string;
+  seatClass: number;
+  /** The caucus holding the seat in the later year. */
+  to: Party;
+}
+
+/** Every Senate seat held by a different caucus in the two years. */
+export function senateChanges(data: RecordData, a: number, b: number): SeatChange[] {
   const ha = senateHolders(data, a);
   const hb = senateHolders(data, b);
-  const changed = new Set<string>();
-  for (const st of Object.keys(hb)) {
+  const out: SeatChange[] = [];
+  for (const st of Object.keys(hb).sort()) {
     for (const [cls, p] of Object.entries(hb[st])) {
       const q = ha[st]?.[Number(cls)];
-      if (p && q && p !== q) changed.add(st);
+      if (p && q && p !== q) out.push({ state: st, seatClass: Number(cls), to: p });
     }
   }
-  return changed;
+  return out;
+}
+
+/** States where a Senate seat is held by a different caucus in the two years. */
+export function senateChanged(data: RecordData, a: number, b: number): Set<string> {
+  return new Set(senateChanges(data, a, b).map((c) => c.state));
+}
+
+/** Map title block while comparing: "Senate 2020 to 2024" over "4 seats changed caucus". */
+export function compareTitle(view: View, a: number, b: number, n: number): { title: string; subtitle: string } {
+  return view === 'senate'
+    ? { title: `Senate ${a} to ${b}`, subtitle: `${n} ${n === 1 ? 'seat' : 'seats'} changed caucus` }
+    : { title: `House ${a} to ${b}`, subtitle: `${n} ${n === 1 ? 'delegation' : 'delegations'} changed majority` };
 }
 
 /** Which party has more of a state's House seats (independents with their caucus). */
@@ -350,9 +370,21 @@ function stateLinks(sts: string[], view: View, year: number, names: Record<strin
 export function nationalHtml(
   view: View, year: number, data: NationalData, header: NationalHeader | undefined, compare: number | null,
 ): string {
+  const names = data.stateNames;
+  if (compare !== null) {
+    const [a, b] = compare < year ? [compare, year] : [year, compare];
+    const set = view === 'senate' ? senateChanged(data, a, b) : houseChanged(data, a, b);
+    const n = view === 'senate' ? senateChanges(data, a, b).length : set.size;
+    const t = compareTitle(view, a, b, n);
+    return `<h3 class="cmn__title">${t.title}</h3>
+<p class="cmn__sub">${t.subtitle}</p>` +
+      (set.size
+        ? `<p class="cmn__states">${stateLinks([...set], view, b, names)}</p>`
+        : `<p class="cmn__note">${view === 'senate' ? 'No Senate seat' : 'No House delegation'} changed hands between these years.</p>`) +
+      `<p class="cmn__hint">Select a state for its record since 2000.</p>`;
+  }
   const sy = data.senate[year];
   const hy = data.house[year] ?? data.house[year - 1];
-  const names = data.stateNames;
   const bal = view === 'senate' ? sy.balance : hy.totals;
   const provisional = view === 'senate' ? sy.provisional : hy.provisional;
   const row = (dt: string, dd: string) => `<div><dt>${dt}</dt><dd>${dd}</dd></div>`;
@@ -393,19 +425,9 @@ export function nationalHtml(
     header?.unverifiedInd ? 'The source gives the number of independents but not their caucus for this Congress; the caucus shown is still to be confirmed.' : '',
   ].filter(Boolean).map((t) => `<p class="cmn__note">${esc(t)}</p>`).join('');
 
-  let cmp = '';
-  if (compare !== null) {
-    const [a, b] = compare < year ? [compare, year] : [year, compare];
-    const set = view === 'senate' ? senateChanged(data, a, b) : houseChanged(data, a, b);
-    cmp = `<h4 class="cmn__head">Changed between ${a} and ${b}</h4>` +
-      (set.size
-        ? `<p class="cmn__states">${stateLinks([...set], view, year, names)}</p>`
-        : `<p class="cmn__note">${view === 'senate' ? 'No Senate seat' : 'No House delegation'} changed hands between these years.</p>`);
-  }
-
   return `<h3 class="cmn__title">${title}</h3>
 <p class="cmn__sub">${congress}</p>
 <dl class="cmn__nums">${rows.join('')}</dl>
-${flipped}${indNote}${cmp}${notes}
+${flipped}${indNote}${notes}
 <p class="cmn__hint">Select a state on the map, or Tab to the map and use the arrow keys, for its record since 2000.</p>`;
 }

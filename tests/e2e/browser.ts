@@ -151,10 +151,11 @@ export interface Browser {
   close(): Promise<void>;
 }
 
-export async function launch(): Promise<Browser> {
+/** `headed: true` opens a real, visible window (for reproducing things headless Chrome does not). */
+export async function launch(opts: { headed?: boolean; args?: string[] } = {}): Promise<Browser> {
   const profile = await mkdtemp(join(tmpdir(), 'cdp-'));
   const proc: ChildProcess = spawn(CHROME, [
-    '--headless=new', '--remote-debugging-port=0', `--user-data-dir=${profile}`,
+    ...(opts.headed ? [] : ['--headless=new']), ...(opts.args ?? []), '--remote-debugging-port=0', `--user-data-dir=${profile}`,
     '--no-first-run', '--no-default-browser-check', '--hide-scrollbars', '--force-color-profile=srgb', 'about:blank',
   ], { stdio: ['ignore', 'ignore', 'pipe'] });
 

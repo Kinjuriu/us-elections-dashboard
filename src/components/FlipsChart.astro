@@ -6,6 +6,7 @@
 // src/scripts/flips-chart.ts redraws the table for other years.
 import type { FlipsChart } from '../lib/chartData';
 import { flipsTableHtml, flipsSentence } from '../lib/flipsText';
+const base = import.meta.env.BASE_URL;
 
 interface Props {
   chart: FlipsChart;
@@ -23,7 +24,7 @@ const x = (i: number) => +(i * colPct + colPct / 2).toFixed(3);
 const rows = chart.rows.filter((r) => r.year === year);
 const decided = cyc.find((c) => c.year === year)?.decided ?? 0;
 ---
-<div class="fl" data-fl data-year={year}>
+<div class="fl" data-fl data-year={year} data-base={base}>
   <ul class="fl__legend" aria-label="Key">
     <li><span class="fl__sw" data-party="DEM"></span>Above the line: seats flipped to the Democrats</li>
     <li><span class="fl__sw" data-party="GOP"></span>Below: seats flipped to the Republicans</li>
@@ -49,7 +50,7 @@ const decided = cyc.find((c) => c.year === year)?.decided ?? 0;
           <>
             {c.toDem > 0 && <span style={`left:${x(i)}%;top:${HALF - h(c.toDem) - 17}px`}>{c.toDem}</span>}
             {c.toGop > 0 && <span style={`left:${x(i)}%;top:${HALF + h(c.toGop) + 1}px`}>{c.toGop}</span>}
-            {c.decided === 0 && <span class="fl__none" style={`left:${x(i)}%;top:${HALF - 22}px`}>No results yet</span>}
+            {c.decided === 0 && <span class="fl__none" style={`left:${x(i)}%;top:${HALF - 40}px`}>No results yet</span>}
           </>
         ))}
       </div>
@@ -72,7 +73,7 @@ const decided = cyc.find((c) => c.year === year)?.decided ?? 0;
 
   <h4 class="fl__head">Seats that changed party in <span data-fl-year>{year}</span></h4>
   <p class="fl__sentence" data-fl-sentence>{flipsSentence(rows, year, decided)}</p>
-  <div class="fl__tablewrap" data-fl-table set:html={flipsTableHtml(rows, 'state')} />
+  <div class="fl__tablewrap" data-fl-table set:html={flipsTableHtml(rows, 'state', base)} />
   <script type="application/json" data-fl-data set:html={JSON.stringify({ rows: chart.rows, decided: Object.fromEntries(cyc.map((c) => [c.year, c.decided])) })}></script>
 </div>
 
@@ -97,7 +98,7 @@ const decided = cyc.find((c) => c.year === year)?.decided ?? 0;
   .fl :global(.fl__sw[data-party='GOP']) { background: var(--gop); }
   .fl :global(.fl__sw[data-party='IND']) { background: var(--ind); }
 
-  .fl__cycles { position: relative; max-width: 760px; }
+  .fl__cycles { position: relative; }
   .fl__plot { position: relative; padding-block: 18px; }
   .fl__plot svg { display: block; width: 100%; overflow: visible; }
   .fl__zero { stroke: var(--ink); stroke-width: 1; vector-effect: non-scaling-stroke; }
@@ -112,7 +113,7 @@ const decided = cyc.find((c) => c.year === year)?.decided ?? 0;
     font-variant-numeric: tabular-nums lining-nums;
   }
   .fl__vals .fl__none {
-    width: 4em;
+    width: 6em;
     text-align: center;
     font-size: 12px;
     font-weight: 500;
@@ -201,6 +202,7 @@ const decided = cyc.find((c) => c.year === year)?.decided ?? 0;
     text-underline-offset: 0.18em;
   }
   .fl :global(.fl__state) { font-weight: 600; }
+  .fl :global(.fl__stcell) { display: inline-flex; align-items: center; gap: var(--sp-2); }
   .fl :global(.fl__state:hover),
   .fl :global(.fl__sort:hover) { text-decoration-thickness: 2px; }
   .fl :global(.fl__sort) { text-transform: inherit; letter-spacing: inherit; font-weight: 600; }

@@ -1,5 +1,7 @@
 ---
+import { hasFirsts } from '../lib/firsts';
 const base = import.meta.env.BASE_URL;
+const showFirsts = hasFirsts();
 interface Props {
   asOf: string;
 }
@@ -10,7 +12,11 @@ const { asOf } = Astro.props;
     Every number on this site is read from the files in <code>data/processed/</code>, built by the scripts in
     {' '}<code>pipeline/</code>. Data as of <time>{asOf}</time>.
   </p>
-  <p><a href={`${base}story`}>Read the story</a> · <a href={base}>Dashboard</a> · <a href={`${base}#notes`}>Notes and sources</a></p>
+  <p>
+    <a href={base} data-carry>US Congress</a> · <a href={`${base}governors/`} data-carry>Governors</a> ·
+    <a href={`${base}senate/`} data-carry>Senate</a> · {showFirsts && <Fragment><a href={`${base}firsts/`} data-carry>Firsts of 2026</a> · </Fragment>}<a href={`${base}story/`} data-carry>Story</a> ·
+    <a href={`${base}sources/`} data-carry>Notes and sources</a>
+  </p>
 </footer>
 
 <style>
