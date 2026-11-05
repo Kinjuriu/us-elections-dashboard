@@ -88,8 +88,25 @@ export function changeText(now: number | null, before: number | null, since: num
 /** Where the majority line sits along the House blocks, in percent from the left. */
 export const markPct = (threshold: number, total: number) => +((threshold / total) * 100).toFixed(2);
 
-/** The Senate's mark is the half-way line: 50 of 100, where a tie goes to the vice president. */
-export const SENATE_MARK = 50;
+export interface SeatMark {
+  /** Both ends of the line, in the semicircle's units, and where its outer end sits across the box, in percent. */
+  x1: number; y1: number; x2: number; y2: number;
+  pct: number;
+}
+
+/**
+ * The majority line across the semicircle: a radial line between the last
+ * seat a majority needs, counted from the left, and the next one.
+ */
+export function seatMark(seats: Seat[], threshold: number): SeatMark {
+  const ang = (s: Seat) => Math.atan2(-s.y, s.x);
+  const a = (ang(seats[threshold - 1]) + ang(seats[threshold])) / 2;
+  const box = HEMI.outer + HEMI.pad;
+  const at = (r: number): [number, number] => [+(r * Math.cos(a)).toFixed(2), +(-r * Math.sin(a)).toFixed(2)];
+  const [x1, y1] = at(HEMI.inner - HEMI.seat);
+  const [x2, y2] = at(box);
+  return { x1, y1, x2, y2, pct: +(((x2 + box) / (2 * box)) * 100).toFixed(2) };
+}
 
 // ---- Words, shared with the old summary band ----
 
@@ -195,7 +212,7 @@ export function centre(v: ChamberView, picked: Party | null): Centre {
   const b = v.balance;
   if (b.dem === null || b.gop === null) return { big: 'n/a', who: 'Results not yet entered', change: '' };
   const p = picked ?? leader(b);
-  if (!p) return { big: `${countText(b.dem)} to ${countText(b.gop)}`, who: 'Tied: the vice president decides', change: '' };
+  if (!p) return { big: `${countText(b.dem)} to ${countText(b.gop)}`, who: "Tied: the vice president's party controls", change: '' };
   return { big: countText(b[p]), who: PARTY_WORD[p], change: v.change[p] };
 }
 

@@ -1,11 +1,11 @@
 ---
 // The two balance cards under the railway: the Senate as a semicircle of
 // seats and the House as labelled blocks, for the year selected. The
-// semicircle has one square per seat with a mark at 50; the blocks are drawn
+// semicircle has one square per seat with a mark at 51, a majority; the blocks are drawn
 // to scale with a dotted line at 218. A party can be picked on either card
 // (outlined, the other fades). Drawn at build time for the default year;
 // src/scripts/cards.ts redraws them from the JSON block below.
-import { hemicycle, HEMI, cardViews, centre, blocksHtml, independentsLine, markPct, SENATE_MARK, PARTY_WORD } from '../lib/cards';
+import { hemicycle, HEMI, cardViews, centre, blocksHtml, independentsLine, markPct, seatMark, PARTY_WORD } from '../lib/cards';
 import type { HeaderYear } from '../lib/dashboardData';
 
 interface Props {
@@ -16,6 +16,7 @@ const { years, year } = Astro.props;
 const [house, senate] = cardViews(years[year], null);
 const seats = hemicycle(senate.total);
 const mid = centre(senate, null);
+const mark = seatMark(seats, senate.threshold);
 const half = HEMI.seat / 2;
 const box = HEMI.outer + HEMI.pad;
 ---
@@ -27,7 +28,7 @@ const box = HEMI.outer + HEMI.pad;
     </header>
     <div class="blocks" data-blocks>
       <p class="mark" style={`left:${markPct(house.threshold, house.total)}%`} aria-hidden="true">
-        <span class="mark__n" data-mark-n>{house.threshold}</span><span class="mark__tri"></span>
+        <span class="mark__n" data-mark-n>{house.threshold} for a majority</span><span class="mark__tri"></span>
       </p>
       <div class="blocks__row" role="group" aria-label="House seats by party. Pick a party to outline it." data-blocks-row set:html={blocksHtml(house, null)}></div>
       <span class="blocks__line" style={`left:${markPct(house.threshold, house.total)}%`} aria-hidden="true"></span>
@@ -42,7 +43,7 @@ const box = HEMI.outer + HEMI.pad;
       <p class="card__sub" data-caption>{senate.caption}</p>
     </header>
     <div class="hemi">
-      <p class="mark" aria-hidden="true"><span class="mark__n">{SENATE_MARK}</span><span class="mark__tri"></span></p>
+      <p class="mark" style={`left:${mark.pct}%`} aria-hidden="true"><span class="mark__n">{senate.threshold} for a majority</span><span class="mark__tri"></span></p>
       <svg viewBox={`${-box} ${-box} ${2 * box} ${box + HEMI.pad}`} role="img" aria-label={senate.label} data-hemi>
         {seats.map((s, i) => (
           <rect
@@ -51,7 +52,7 @@ const box = HEMI.outer + HEMI.pad;
             data-kind={senate.kinds[i]}
           />
         ))}
-        <line class="hemi__line" x1="0" x2="0" y1={-box} y2={-(HEMI.inner - HEMI.seat)} />
+        <line class="hemi__line" x1={mark.x1} x2={mark.x2} y1={mark.y1} y2={mark.y2} />
       </svg>
       <p class="hemi__centre" aria-hidden="true">
         <span class="hemi__big" data-big>{mid.big}</span>
@@ -67,7 +68,7 @@ const box = HEMI.outer + HEMI.pad;
       ))}
     </div>
     <p class="card__line" data-line>{independentsLine(senate.balance)}</p>
-    <p class="card__line card__line--major" data-major>{senate.threshold} seats for a majority. At {SENATE_MARK}, the vice president breaks ties.</p>
+    <p class="card__line card__line--major" data-major>{senate.threshold} seats for a majority. A 50-50 Senate is controlled by the vice president's party.</p>
   </article>
   <script type="application/json" data-cards-data set:html={JSON.stringify(years)}></script>
 </div>
@@ -96,6 +97,7 @@ const box = HEMI.outer + HEMI.pad;
 
   /* Threshold mark: a number over a small triangle, as on AP's balance bars. */
   .mark {
+    white-space: nowrap;
     position: absolute;
     top: 0;
     margin: 0;
@@ -120,7 +122,6 @@ const box = HEMI.outer + HEMI.pad;
 
   /* ---- Senate: the semicircle ---- */
   .hemi { position: relative; padding-top: 26px; max-width: 560px; width: 100%; margin-inline: auto; }
-  .hemi .mark { left: 50%; }
   .hemi svg { width: 100%; height: auto; overflow: visible; }
   .hemi__line { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; }
   .hemi__centre {

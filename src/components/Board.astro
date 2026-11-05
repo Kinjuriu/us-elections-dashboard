@@ -1,7 +1,7 @@
 ---
-// The map board: the one framed block that holds the controls, the balance
-// cards, the finding line, the map and the side panel. It is the first thing
-// on the page. Everything inside follows the shared store.
+// The map board: the one framed block that holds the controls, the finding
+// line, the map and the side panel, then the balance cards. The map comes
+// before the cards so it is in the first screen. Everything inside follows the shared store.
 import ControlStrip from './ControlStrip.astro';
 import BalanceCards from './BalanceCards.astro';
 import CongressMap from './CongressMap.astro';
@@ -19,12 +19,12 @@ const { config, columns, headerYears, finding, provisional } = Astro.props;
 ---
 <section class="board" aria-label="Map board">
   <ControlStrip config={config} columns={columns} />
-  <BalanceCards years={headerYears} year={config.defaultYear} />
   <div class="board__finding">
     <p class="board__sentence" data-finding aria-live="polite">{finding}</p>
     <p class="board__prov label" data-prov-tag hidden={!provisional}>Provisional</p>
   </div>
   <CongressMap />
+  <BalanceCards years={headerYears} year={config.defaultYear} />
 </section>
 
 <style>

@@ -49,10 +49,14 @@ test('the default view is the latest year with results', async () => {
   assert.deepEqual(page.errors, []);
 });
 
-test('the map starts within the first screen and a half (the title, railway and cards come first, by design)', async () => {
-  await page.goto(srv.url);
-  const top = await page.eval<number>(`document.querySelector('.cmap__map').getBoundingClientRect().top`);
-  assert.ok(top < 1350, `map top is at ${top}px`);
+test('the map is in the first screen at 1280 and 1440 wide', async () => {
+  for (const w of [1280, 1440]) {
+    await page.viewport(w, 900);
+    await page.goto(srv.url);
+    const top = await page.eval<number>(`document.querySelector('.cmap__map').getBoundingClientRect().top`);
+    assert.ok(top < 900, `map top is at ${top}px at ${w} wide`);
+  }
+  await page.viewport(1440, 900);
 });
 
 test('changing the year updates the map, the band, the panel and the flips table together', async () => {

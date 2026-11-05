@@ -94,7 +94,7 @@ Rules:
 
 - Title (Source Serif 4) + subtitle (Barlow) + chart + source line + date. Always all five.
 - Direct labels beat legends; if a legend is needed, it sits above the chart, inline, small.
-- Gridlines: horizontal only, 1px `--rule`. Axis lines only where they mean zero or a threshold (e.g. 218 seats, 50 senators).
+- Gridlines: horizontal only, 1px `--rule`. Axis lines only where they mean zero or a threshold (e.g. 218 seats, 51 senators).
 - Majority thresholds are marked with a small triangle and a number, like AP's 218 marker.
 - Seats are drawn as squares (one square per seat or per N seats, stated in the subtitle).
 - Tooltips: plain rectangle, 1px border, no shadow beyond `0 1px 2px rgba(0,0,0,.08)`, appear instantly.
