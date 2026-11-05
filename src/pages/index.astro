@@ -13,6 +13,7 @@ import { loadYearControl, CONTROL_AS_OF } from '../lib/pageData';
 import { loadMidtermChart } from '../lib/chartData';
 import { congressFor } from '../lib/store';
 import { ordinal } from '../lib/mapText';
+import { hasFirsts } from '../lib/firsts';
 import { loadMidtermSwing } from '../lib/data';
 
 // ---------- Data, all read at build time from data/processed/ ----------
@@ -79,7 +80,9 @@ const defaultSenate = mapData.senate[startYear];
         </ChartFrame>
       </div>
     </section>
-    <p class="dash__more">New in 2026: the <a href={`${import.meta.env.BASE_URL}firsts/`} data-carry>Firsts of 2026</a> page lists the milestones in this year's elections.</p>
+    {hasFirsts() && (
+      <p class="dash__more">New in 2026: the <a href={`${import.meta.env.BASE_URL}firsts/`} data-carry>Firsts of 2026</a> page lists the milestones in this year's elections.</p>
+    )}
   </main>
 
   <Footer asOf={controlAsOf} />

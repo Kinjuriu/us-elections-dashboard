@@ -43,6 +43,11 @@ export function loadFirsts(): First[] {
   }));
 }
 
+/** The Firsts page stays built, but nothing links to it until the manual file has rows. */
+export function hasFirsts(): boolean {
+  return loadFirsts().length > 0;
+}
+
 /** "1,234,567 votes, 54.2%, won by 8.7 points", leaving out any figure that is missing. */
 export function howTheyDid(f: First): string {
   const parts: string[] = [];

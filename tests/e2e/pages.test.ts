@@ -29,6 +29,9 @@ const PAGES = [
   { path: 'sources/', label: 'Notes and sources' },
 ];
 
+// The Firsts page is built but unlinked until data/manual/firsts.csv has rows.
+const NAV = PAGES.filter((x) => x.path !== 'firsts/');
+
 test('every page loads without errors, has its own title, and marks itself in the masthead', async () => {
   const titles = new Set<string>();
   for (const p of PAGES) {
@@ -39,13 +42,20 @@ test('every page loads without errors, has its own title, and marks itself in th
       current: [...document.querySelectorAll('.masthead__nav [aria-current="page"]')].map((a) => a.textContent),
       links: [...document.querySelectorAll('.masthead__nav a')].map((a) => a.textContent),
     })`);
-    assert.deepEqual(r.current, [p.label], p.path);
-    assert.deepEqual(r.links, PAGES.map((x) => x.label));
+    assert.deepEqual(r.current, NAV.includes(p) ? [p.label] : [], p.path);
+    assert.deepEqual(r.links, NAV.map((x) => x.label));
     assert.ok(r.desc.length > 20);
     titles.add(r.title);
     assert.deepEqual(page.errors, [], p.path);
   }
   assert.equal(titles.size, PAGES.length, 'each page has a different title');
+});
+
+test('while firsts.csv is empty, no page links to /firsts/', async () => {
+  for (const p of NAV) {
+    await page.goto(srv.url + p.path);
+    assert.equal(await page.eval(`document.querySelectorAll('a[href*="firsts"]').length`), 0, p.path || '/');
+  }
 });
 
 test('the year and chamber travel with the nav links, and each page reads them', async () => {
