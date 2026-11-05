@@ -126,11 +126,11 @@ Seats are counted by **caucus**: the president's party plus the independents who
 - **Publisher:** Wikipedia, English edition, https://en.wikipedia.org. Text and tables by Wikipedia contributors, licensed CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). **Credit: Wikipedia contributors.** `governors_terms.csv` and `governors_by_year.csv` are adapted from these pages and are CC BY-SA 4.0 too. They must be shared under the same licence. The rest of the project's data stays CC0.
 - **Files:** `data/raw/wikipedia_governors/<PO>.html` holds only the `wikitable` elements of each page. The manifest gives each page's revision id (permalink with `oldid`) and the time it was accessed. Rows in `governors_terms.csv` carry that permalink in `source_url`.
 - **Outputs, built by `pipeline/build_governors.py`:**
-  - `governors_terms.csv`: every term overlapping 2000 to 2025, with `party` as the page lists it for the start of the term, `left_office` blank for a governor still in office, and `party_note` where the party changed mid-term.
-  - `governors_by_year.csv`: the governor in office on 1 January of each year, 2000 to 2025: the term with the latest start on or before that day that has not yet ended.
+  - `governors_terms.csv`: every term overlapping 2000 to 2025, with `party_detail` as the page words it for the start of the term, `party` as its group (D, R or I), `left_office` blank for a governor still in office, and `party_note` where the party changed mid-term.
+  - `governors_by_year.csv`: the governor in office on 1 January of each year, 2000 to 2025: the term with the latest start on or before that day that has not yet ended. It has the same `party` and `party_detail` columns.
 - **Mid-term party changes:** `data/manual/governor_party_changes.csv`, from the footnotes on the pages: Crist (FL, to Independent, April 2010), Chafee (RI, to Democratic, 30 May 2013) and Justice (WV, to Republican, August 2017). The build stops if a page lists two parties for a term with no row there. `governors_by_year.csv` uses the new party for any 1 January after the change.
 - **Caveats:**
-  - Parties are as Wikipedia gives them: `Democratic-Farmer-Labor` (Minnesota) and `Reform/Independence` (Ventura) are kept as written and are not merged into `Democratic` or `Independent`.
+  - `party_detail` keeps Wikipedia's wording. `party` groups it: Democratic and Democratic-Farmer-Labor (Minnesota) are D; Republican is R; Independent and Reform/Independence (Ventura) are I. The build stops on any other wording.
   - Pages end a term on the last day in office or on the day the successor starts, so consecutive terms are 0 or 1 days apart. Dates are not adjusted.
   - Where a governor was acting or succeeded from another office, the page lists them as a governor and so do we.
   - Governors-elect who take office in 2027 are not included.

@@ -1,6 +1,6 @@
 # Step 07 report: data for the next round of visuals
 
-**A (county shift), B (members, women, age) and E (governors) are built. C is dropped to the backlog.** `run_all.py` runs end to end: exit 0, 42 tests pass, and the existing processed files are unchanged. Nothing was estimated or typed from memory.
+**A (county shift), B (members, women, age) and E (governors) are built. C is dropped to the backlog.** `run_all.py` runs end to end: exit 0, 43 tests pass, and the existing processed files are unchanged. Nothing was estimated or typed from memory.
 
 ## B. Who serves in Congress: built
 
@@ -61,13 +61,13 @@ CAWP's site returns HTTP 403 to scripts, so for 1991 to 2021 I used the Congress
 
 - **Source:** Wikipedia's "List of governors of <State>" pages, as you decided. `download.py` fetches each page through the Wikipedia API, keeps only its tables in `data/raw/wikipedia_governors/` (7.4MB) and records the revision id and time in the manifest. Wikipedia sometimes refuses bursts of requests, so the download retries with a pause.
 - **Outputs, built by `pipeline/build_governors.py` (added to `run_all.py`):**
-  - `governors_terms.csv`: 247 terms overlapping 2000 to 2025. Columns as you asked, plus `party_note` for the three mid-term party changes. `source_url` is the page's permalink.
+  - `governors_terms.csv`: 247 terms overlapping 2000 to 2025. Columns as you asked, with `party` now the group (D, R or I), plus `party_detail` (Wikipedia's wording) and `party_note` for the three mid-term party changes. `source_url` is the page's permalink.
   - `governors_by_year.csv`: 1,300 rows (50 states, 2000 to 2025), the governor in office on 1 January.
 - **Licence:** both files are marked CC BY-SA 4.0 and Wikipedia is credited in `data/SOURCES.md`. The rest of the data stays CC0.
 - **Party changes in a term:** the pages show the party at the start of a term and give a switch only in a footnote. Three governors switched: Crist (FL, Republican to Independent, April 2010), Chafee (RI, Independent to Democratic, 30 May 2013) and Justice (WV, Democratic to Republican, August 2017). I put these in `data/manual/governor_party_changes.csv`, with the footnote wording and source. This changes 1 January parties for Crist 2011, Chafee 2014 and 2015, and Justice 2018 to 2025. The build stops if a page lists two parties on a term with no row in that file. A scan of all 50 pages for other switch footnotes found only these three (Mississippi's Amy Tuck was a lieutenant governor).
-- **Not changed:** `Democratic-Farmer-Labor` (Minnesota, 14 year-rows) and `Reform/Independence` (Ventura, 4 rows) are kept as written. Decide how the map groups them.
+- **Party grouping:** `party` is D, R or I in both files, and `party_detail` keeps Wikipedia's exact wording. Democratic-Farmer-Labor (Minnesota, 14 year-rows) is D, and Reform/Independence (Ventura, 4 year-rows) is I, as you decided. The build stops if a page uses any wording outside the five it knows. On 1 January 2025 the count is 27 R and 23 D.
 - **Dates:** pages end a term either on the last day or on the successor's start day, so consecutive terms are 0 or 1 days apart. I did not adjust them.
-- **Tests (6, all pass):** 50 governors in each of the 26 years, one per state; no gap or overlap between consecutive terms in a state (0 or 1 days apart); only the last term in a state is open-ended; each by-year row matches a term in force on 1 January; the three party switches give the right 1 January party.
+- **Tests (7, all pass):** the grouped `party` holds only D, R or I, and agrees with `party_detail` in both files; 50 governors in each of the 26 years, one per state; no gap or overlap between consecutive terms in a state (0 or 1 days apart); only the last term in a state is open-ended; each by-year row matches a term in force on 1 January; the three party switches give the right 1 January party.
 - **Spot checks against official state sites (5 states):**
 
 | State | Term in our file | Official site | Result |
@@ -87,5 +87,4 @@ CAWP's site returns HTTP 403 to scripts, so for 1991 to 2021 I used the Congress
 
 ## Open questions
 
-1. How should the map group `Democratic-Farmer-Labor` and `Reform/Independence`?
-2. Is the CRS stand-in fine for the cross-check, or will you check CAWP's tables by hand?
+1. Is the CRS stand-in fine for the cross-check, or will you check CAWP's tables by hand?
