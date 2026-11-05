@@ -1,14 +1,10 @@
-# Step 11 report: go live (incomplete, waiting on merge permission)
+# Step 11 report: go live
 
-## Status
+## Tests (on `step-09-pages`, after merging `main` into it)
 
-Not live yet. The merge into `main` was denied by the permission classifier, so nothing was merged, deployed or enabled. Nothing was pushed.
-
-## Tests (on `step-09-pages`)
-
-- `pipeline/run_all.py`: passes, 49 pytest tests. Processed files reproduce exactly. Only the download timestamps in `data/raw/manifest.json` changed, and I reverted them. It needs `requests`, which was not installed in the system Python, so I ran it in a throwaway venv from `pipeline/requirements.txt`.
+- `pipeline/run_all.py`: passes, 49 pytest tests. Processed files reproduce exactly. Only download timestamps in `data/raw/manifest.json` changed, and I reverted them. It needs `requests`, which the system Python did not have, so I ran it in a throwaway venv from `pipeline/requirements.txt`.
 - `npm test`: 22 of 22 pass.
-- `npm run test:e2e`: 25 of 25 pass.
+- `npm run test:e2e`: 26 of 26 pass. The new test checks that no page links to `/firsts/` while `data/manual/firsts.csv` is empty.
 
 ## Audit against DESIGN_RULES.md section 2
 
@@ -29,16 +25,22 @@ Nothing to fix.
 | Firsts | 96 | 96 | 100 | 100 |
 | Sources | 98 | 95 | 100 | 100 |
 
-## Done
+## Changes in this step
 
-- `.github/workflows/deploy.yml` added and committed locally (Node 22, `npm ci`, `npm test`, `astro build`, upload and deploy Pages artifact; no Python in CI).
+- `.github/workflows/deploy.yml`: on push to `main`, Node 22, `npm ci`, `npm test`, `astro build`, then upload and deploy the Pages artifact. No Python in CI.
+- Firsts link hidden: the masthead, footer, home and governors links to `/firsts/` appear only when `data/manual/firsts.csv` has rows. The page is still built.
+- README: pages, local run, how to update 2026 results, sources and licences (CC0 data, CC BY-SA 4.0 governors files).
+- `.gitignore`: ignores Finder and iCloud duplicate copies (`* 2`, `* 2.*`).
+
+## How the merge went
+
+- PR #1 (docs, licence) was merged by Stephane on 5 November.
+- A rebase of `step-09-pages` onto `main` needed a force-push, which was blocked. Instead `main` was merged into `step-09-pages` and pushed normally.
+- One PR from `step-09-pages` into `main` replaces #5, #6 and #7.
 
 ## Left
 
-1. Merge PR #1 (docs, sources, licence). It is open, mergeable, and not included in `step-09-pages`. It adds `LICENSE`, `README.md`, `data/SOURCES.md` and `review/01-report.md`, so I did not write a new README.
-2. Rebase `step-09-pages` onto `main`, open "Steps 07 to 09: data, board, pages", merge with a merge commit, close #5, #6 and #7.
-3. Enable Pages with the workflow source, push, wait for the workflow, check every page.
-4. Check the README covers: pages, local run, updating 2026 results, sources and licences (CC0 data, CC BY-SA 4.0 governors files).
-5. Housekeeping: the shared repo has a stray local branch ref named `main 2` (broken name). Git warns about it and `git fetch` errors with "did not send all necessary objects". Worth deleting by hand.
-
-Live link: https://kinjuriu.github.io/us-elections-dashboard/ (not live yet)
+- Live link and the page-by-page check of the deployed site are reported in the chat once the workflow has run.
+- The Firsts page has no rows yet (see `review/10-report.md`).
+- Final human QA pass on phone and laptop.
+- Housekeeping: Finder or iCloud keeps creating " 2" duplicate files in this folder. The stray ref `main 2` was deleted by Stephane. Consider moving the project out of a synced folder.

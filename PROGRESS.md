@@ -51,6 +51,6 @@ Last updated: 4 November 2026, 20:30 Nairobi time. Ticks render as checkboxes on
 - [ ] Replace with certified results when states certify (late November to December)
 
 ## Launch
-- [ ] Site live at https://kinjuriu.github.io/us-elections-dashboard/
+- [ ] Site live at https://kinjuriu.github.io/us-elections-dashboard/ (deploy workflow added, waiting for the merge into main)
 - [ ] Final human QA pass on phone and laptop (guide section 13)
 - [ ] Share
