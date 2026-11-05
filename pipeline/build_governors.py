@@ -4,6 +4,7 @@
 Inputs:  data/raw/wikipedia_governors/<PO>.html (from download.py),
          data/manual/governor_party_changes.csv (mid-term party switches, from the pages' footnotes)
 Outputs: data/processed/governors_terms.csv    one row per term overlapping 2000 to 2025
+         (party is D, R or I; party_detail is Wikipedia's wording)
          data/processed/governors_by_year.csv  the governor in office on 1 January of each year
 
 Dates are as the pages give them. Some pages end a term on the last day in office
@@ -21,6 +22,14 @@ import pandas as pd
 from common import MANUAL, PROCESSED, RAW, STATES, write_csv
 
 FIRST_YEAR, LAST_YEAR = 2000, 2025
+# Wikipedia's party wording grouped for the map. Any other wording stops the build.
+PARTY_GROUP = {
+    "Democratic": "D",
+    "Democratic-Farmer-Labor": "D",
+    "Republican": "R",
+    "Independent": "I",
+    "Reform/Independence": "I",  # Jesse Ventura, Minnesota
+}
 DATE_RE = re.compile(r"([A-Z][a-z]+ \d{1,2}, \d{4})")
 
 
@@ -159,6 +168,12 @@ def parse_state(po: str) -> list[dict]:
     return out
 
 
+def group(po: str, detail: str) -> str:
+    if detail not in PARTY_GROUP:
+        raise SystemExit(f"{po}: party {detail!r} has no group in PARTY_GROUP")
+    return PARTY_GROUP[detail]
+
+
 def main() -> None:
     manifest = json.loads((RAW / "manifest.json").read_text())
     changes = pd.read_csv(MANUAL / "governor_party_changes.csv", dtype=str)
@@ -178,7 +193,7 @@ def main() -> None:
                     raise SystemExit(f"{po}: {t['governor']} parties {t['parties']} do not match governor_party_changes.csv")
                 note = f"Changed to {c.party_to} in {c.effective}"
                 used.add((po, t["governor"]))
-            rows.append({**{k: t[k] for k in ("state_po", "governor")}, "party": party,
+            rows.append({**{k: t[k] for k in ("state_po", "governor")}, "party": group(po, party), "party_detail": party,
                          "took_office": t["took_office"], "left_office": t["left_office"],
                          "source_url": url, "party_note": note})
     unused = set(zip(changes.state_po, changes.governor)) - used
@@ -199,11 +214,12 @@ def main() -> None:
             if live.empty:
                 raise SystemExit(f"{po} {year}: no governor in office on {jan1}")
             g = live.sort_values("took_office").iloc[-1]
-            party = g.party
+            detail = g.party_detail
             ch = changes[(changes.state_po == po) & (changes.governor == g.governor)]
             if not ch.empty and int(ch.iloc[0].effective[:4]) < year:  # switch came before this 1 January
-                party = ch.iloc[0].party_to
-            by_year.append({"year": year, "state_po": po, "governor": g.governor, "party": party, "took_office": g.took_office})
+                detail = ch.iloc[0].party_to
+            by_year.append({"year": year, "state_po": po, "governor": g.governor, "party": group(po, detail),
+                            "party_detail": detail, "took_office": g.took_office})
     write_csv(pd.DataFrame(by_year), "governors_by_year.csv")
 
 

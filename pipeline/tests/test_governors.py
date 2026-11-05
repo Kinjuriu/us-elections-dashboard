@@ -35,6 +35,16 @@ def test_fifty_governors_every_year(by_year):
         assert set(grp.state_po) == set(STATES)
 
 
+def test_grouped_party_is_only_d_r_or_i(terms, by_year):
+    assert set(terms.party) <= {"D", "R", "I"}
+    assert set(by_year.party) <= {"D", "R", "I"}
+    detail_to_group = {"Democratic": "D", "Democratic-Farmer-Labor": "D", "Republican": "R",
+                       "Independent": "I", "Reform/Independence": "I"}
+    for df in (terms, by_year):
+        assert set(df.party_detail) <= set(detail_to_group)
+        assert (df.party_detail.map(detail_to_group) == df.party).all()
+
+
 def test_no_blank_fields(terms, by_year):
     for df in (terms.drop(columns=["left_office", "party_note"]), by_year):
         assert (df.astype(str).apply(lambda c: c.str.strip()) != "").all().all()
@@ -75,6 +85,9 @@ def test_by_year_matches_terms(terms, by_year):
 
 def test_party_switches_follow_the_manual_file(by_year):
     pick = lambda y, po: by_year[(by_year.year == y) & (by_year.state_po == po)].iloc[0].party  # noqa: E731
-    assert pick(2010, "FL") == "Republican" and pick(2011, "FL") == "Independent"
-    assert pick(2013, "RI") == "Independent" and pick(2014, "RI") == "Democratic"
-    assert pick(2018, "WV") == "Republican"
+    assert pick(2010, "FL") == "R" and pick(2011, "FL") == "I"
+    assert pick(2013, "RI") == "I" and pick(2014, "RI") == "D"
+    assert pick(2018, "WV") == "R"
+    detail = by_year[(by_year.year == 2014) & (by_year.state_po == "RI")].iloc[0].party_detail
+    assert detail == "Democratic"
+    assert by_year[(by_year.year == 2003) & (by_year.state_po == "MN")].iloc[0].party_detail == "Reform/Independence"
