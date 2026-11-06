@@ -1,4 +1,7 @@
 ---
+// The foot of every page: every page of the site as a list a reader can
+// see is clickable, with one line on what each holds, then the data date
+// and a link back to the top. The current page is marked, not linked.
 import { hasFirsts } from '../lib/firsts';
 const base = import.meta.env.BASE_URL;
 const showFirsts = hasFirsts();
@@ -6,17 +9,38 @@ interface Props {
   asOf: string;
 }
 const { asOf } = Astro.props;
+
+const pages = [
+  { href: base, name: 'US Congress', what: 'The railway, the map and the balance of power' },
+  { href: `${base}governors/`, name: 'Governors', what: 'Which party held each governorship' },
+  { href: `${base}senate/`, name: 'Senate', what: 'Seats that flipped and races with independents' },
+  ...(showFirsts ? [{ href: `${base}firsts/`, name: 'Firsts of 2026', what: 'Historic firsts in this year’s elections' }] : []),
+  { href: `${base}story/`, name: 'Story', what: 'What the data shows, in words' },
+  { href: `${base}sources/`, name: 'Notes and sources', what: 'Where every number comes from' },
+];
+const here = (href: string) => {
+  const strip = (p: string) => p.replace(/\/+$/, '');
+  return strip(Astro.url.pathname) === strip(href);
+};
 ---
 <footer class="wrap site-footer">
-  <p>
-    Every number on this site is read from the files in <code>data/processed/</code>, built by the scripts in
-    {' '}<code>pipeline/</code>. Data as of <time>{asOf}</time>.
-  </p>
-  <p>
-    <a href={base} data-carry>US Congress</a> · <a href={`${base}governors/`} data-carry>Governors</a> ·
-    <a href={`${base}senate/`} data-carry>Senate</a> · {showFirsts && <Fragment><a href={`${base}firsts/`} data-carry>Firsts of 2026</a> · </Fragment>}<a href={`${base}story/`} data-carry>Story</a> ·
-    <a href={`${base}sources/`} data-carry>Notes and sources</a>
-  </p>
+  <nav aria-label="All pages" class="site-footer__nav">
+    <p class="label site-footer__label">Explore the dashboard</p>
+    <ul class="site-footer__list">
+      {pages.map((p) => (
+        <li class={here(p.href) ? 'is-here' : ''}>
+          {here(p.href)
+            ? <span class="site-footer__name" aria-current="page">{p.name}</span>
+            : <a class="site-footer__name" href={p.href} data-carry>{p.name}</a>}
+          <span class="site-footer__what">{here(p.href) ? 'You are on this page' : p.what}</span>
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <div class="site-footer__end">
+    <p>Data as of <time>{asOf}</time>.</p>
+    <a class="site-footer__top" href="#top">Back to top</a>
+  </div>
 </footer>
 
 <style>
@@ -24,10 +48,63 @@ const { asOf } = Astro.props;
     margin-top: var(--sp-8);
     padding-block: var(--sp-5) var(--sp-7);
     border-top: 1px solid var(--ink);
-    font-size: var(--fs-1);
-    color: var(--ink-2);
-    display: grid;
-    gap: var(--sp-2);
   }
-  .site-footer a { color: var(--ink); }
+  .site-footer__label {
+    margin-bottom: var(--sp-3);
+    font-family: var(--font-label);
+    font-size: var(--fs-1);
+    font-weight: 600;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+    color: var(--ink-2);
+  }
+  .site-footer__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0 var(--sp-5);
+  }
+  @media (min-width: 640px) { .site-footer__list { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (min-width: 1024px) { .site-footer__list { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+  .site-footer__list li {
+    display: grid;
+    gap: 2px;
+    padding-block: var(--sp-3);
+    border-top: var(--hairline);
+  }
+  .site-footer__name {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-size: var(--fs-4);
+    font-weight: 600;
+    color: var(--ink);
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 0.2em;
+  }
+  a.site-footer__name:hover { text-decoration-thickness: 2px; }
+  a.site-footer__name:focus-visible,
+  .site-footer__top:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+  .is-here .site-footer__name { text-decoration: none; }
+  .site-footer__what { font-size: var(--fs-2); color: var(--ink-2); }
+  .site-footer__end {
+    margin-top: var(--sp-5);
+    padding-top: var(--sp-3);
+    border-top: var(--hairline);
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: var(--sp-2) var(--sp-5);
+    font-size: var(--fs-2);
+    color: var(--ink-2);
+  }
+  .site-footer__end p { margin: 0; }
+  .site-footer__top {
+    font-family: var(--font-label);
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--ink);
+  }
 </style>
